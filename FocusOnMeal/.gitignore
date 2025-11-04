@@ -1,3 +1,14 @@
+# ===============================
+# 🧩 OS 임시 파일 (Mac / Windows)
+# ===============================
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
 ### STS ###
 .apt_generated
 .classpath
