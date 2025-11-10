@@ -64,4 +64,4 @@ build/
 .vscode/
 
 # DB정보 제외
-/src/main/resources/application.properties
+application.properties
