@@ -17,6 +17,7 @@ $RECYCLE.BIN/
 .recommenders/
 .classpath
 .project
+.class
 
 
 # Windows 전용: 자동 백업, 임시 파일 제거
