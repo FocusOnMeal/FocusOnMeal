@@ -12,5 +12,5 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Main {
-
+    private String main;
 }

@@ -11,6 +11,7 @@
 	<groupId>com.fom</groupId>
 	<artifactId>FocusOnMeal</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>FocusOnMeal</name>
 	<description>FOM Spring Boot</description>
 	<url/>
@@ -51,7 +52,6 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
         </dependency>
         <!-- 시작 boot에서 jstl을 사용하게 해줌(3개)-->
         <!-- https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api -->
@@ -119,6 +119,9 @@
 			<plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.fom.boot.FocusOnMealApplication</mainClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
