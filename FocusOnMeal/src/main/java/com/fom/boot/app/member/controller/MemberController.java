@@ -63,5 +63,13 @@ public class MemberController {
 			return "common/error";
 		}
 	}
+	
+	@GetMapping("logout")
+	public String processLogout(HttpSession session) {
+		if(session != null) {
+			session.invalidate();
+		}
+		return "redirect:/";
+	}
 
 }
