@@ -23,4 +23,7 @@ public class Notice {
     private String 			noticeIsNew;         	// NEW 뱃지 		(Y/N)
     private String 			noticeImportant;     	// 필독 뱃지 		(Y/N)
     private String 			isDeleted;           	// 논리삭제 		(Y/N)
+    
+    // 추가
+    private String 			nickname; 				// 공지사항 작성자용 닉네임
 }
