@@ -3,6 +3,8 @@ package com.fom.boot.app.member.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,7 +75,7 @@ public class MemberController {
 	public String joinMember(@ModelAttribute Member member, Model model) {
 		try {
 			member.setMemberPw(bcrypt.encode(member.getMemberPw()));
-			int resutl = mService.insertMember(member);
+			int result = mService.insertMember(member);
 			return "redirect:/member/login";
 		} catch (Exception e) {
 			model.addAttribute("errorMsg", e.getMessage());
