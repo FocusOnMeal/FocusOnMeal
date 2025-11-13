@@ -6,17 +6,17 @@ import logo from "../../../../webapp/resources/images/headerLogo.png";
 const Header = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [memberName, setMemberName] = useState("");
+    const [memberNickname, setMemberNickname] = useState("");
 
     // 로그인 상태 확인
     useEffect(() => {
     const checkLogin = () => {
         const token = localStorage.getItem("token");
-        const name = localStorage.getItem("memberName");
+        const nickname = localStorage.getItem("memberNickname");
 
         if (token) {
         setIsLoggedIn(true);
-        setMemberName(name || "");
+        setMemberNickname(nickname || "");
         } else {
         setIsLoggedIn(false);
         }
@@ -39,6 +39,7 @@ const Header = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("memberId");
         localStorage.removeItem("memberName");
+        localStorage.removeItem("memberNickname");
         localStorage.removeItem("adminYn");
 
         setIsLoggedIn(false);
@@ -76,24 +77,24 @@ const Header = () => {
                 <div className="user-area">
                     {isLoggedIn ? (
                     <>
-                    <span className="welcome">{memberName}님</span>
-                    <Link to="/mypage" className="mypage">
-                        마이페이지
-                    </Link>
-                    <span className="slash">/</span>
-                    <button onClick={handleLogout} className="logout">
-                        로그아웃
-                    </button>
+                        <span className="welcome">{memberNickname}님</span>
+                        <Link to="/mypage" className="mypage">
+                            마이페이지
+                        </Link>
+                        <span className="slash">/</span>
+                        <button onClick={handleLogout} className="logout">
+                            로그아웃
+                        </button>
                     </>
                 ) : (
                     <>
-                    <Link to="/member/login" className="login">
-                        로그인
-                    </Link>
-                    <span className="slash">/</span>
-                    <Link to="/member/join" className="join">
-                        회원가입
-                    </Link>
+                        <Link to="/member/login" className="login">
+                            로그인
+                        </Link>
+                        <span className="slash">/</span>
+                        <Link to="/member/join" className="join">
+                            회원가입
+                        </Link>
                     </>
                 )}
                 </div>
