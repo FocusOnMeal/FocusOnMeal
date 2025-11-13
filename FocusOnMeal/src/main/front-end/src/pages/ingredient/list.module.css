@@ -1,0 +1,194 @@
+/* list.module.css */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.container h2 {
+  border-bottom: 2px solid #eee;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+/* 1. 검색 필터 영역 */
+.filterSection {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+/* 필터들을 그리드 레이아웃으로 정렬 */
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filterGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.filterGroup select,
+.filterGroup input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.filterActions {
+  grid-column: 1 / -1; /* 그리드 전체 영역 차지 */
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.filterActions button {
+  padding: 10px 20px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.resetButton {
+  background-color: #f0f2f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+.resetButton:hover {
+  background-color: #e4e6e8;
+}
+
+.submitButton {
+  background-color: #007aff;
+  color: white;
+}
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+
+/* 2. 검색 결과 영역 */
+.resultsHeader {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.resultsHeader span {
+  font-weight: 700;
+  color: #007aff;
+}
+
+.resultsList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.resultItem {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  background-color: white;
+  transition: box-shadow 0.2s;
+}
+
+.resultItem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.itemTitleLink {
+  text-decoration: none;
+  color: black;
+}
+
+.itemTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+.itemTitleLink:hover .itemTitle {
+  color: #007aff;
+}
+
+.itemActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
+}
+
+.itemActions button {
+  background-color: #f0f2f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+.itemActions button:hover {
+  background-color: #e4e6e8;
+}
+
+.itemDetails p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #555;
+}
+
+.itemDetails strong {
+  font-weight: 600;
+  color: #111;
+}
+
+.safetyStatus {
+  font-weight: 600;
+}
+.safe {
+  color: #28a745; /* Green */
+}
+.warning {
+  color: #ffc107; /* Orange */
+}
+.danger {
+  color: #dc3545; /* Red */
+}
+
+.noResults {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+  font-size: 16px;
+  border: 1px dashed #ddd;
+  border-radius: 12px;
+}

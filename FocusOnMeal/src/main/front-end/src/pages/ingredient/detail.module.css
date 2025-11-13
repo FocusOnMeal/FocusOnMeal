@@ -1,0 +1,187 @@
+/* detail.module.css */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: 'Pretendard', sans-serif; /* (추천) Pretendard 같은 깔끔한 폰트 사용 */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.backButton {
+  background-color: #f0f2f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover {
+  background-color: #e4e6e8;
+}
+
+.main {
+  display: flex;
+  gap: 32px;
+}
+
+.leftColumn {
+  flex: 1;
+  min-width: 250px;
+}
+
+.rightColumn {
+  flex: 2;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* 정사각형 비율 */
+  background-color: #f7f7f7;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.nutritionTable {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 200px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.subTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.buttonGroup button {
+  padding: 10px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.wishButton {
+  background-color: #f0f2f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.wishButton:hover {
+  background-color: #e4e6e8;
+  border-color: #ccc;
+}
+
+.actionButton {
+  background-color: #f0f2f5; /* (예시) 메인 컬러 */
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.actionButton:hover {
+  background-color: #e4e6e8;
+  border-color: #ccc;
+}
+
+.infoBox {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  background-color: #fafafa;
+}
+
+.priceInfo p,
+.specInfo p {
+  font-size: 15px;
+  color: #333;
+  margin: 8px 0;
+  display: flex;
+}
+
+.priceInfo p span,
+.specInfo p span {
+  display: inline-block;
+  width: 90px;
+  color: #777;
+  font-weight: 500;
+}
+
+.priceInfo p b {
+  color: #d90000; /* (예시) 강조색 */
+}
+
+.specInfo hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
+}
+
+/* 찜하기 옆 안전도 표시용 */
+.safetyDisplay {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px; /* 버튼과 동일한 V/H 패딩 */
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background-color: #f9f9f9;
+  font-weight: 600;
+  color: #333; /* 기본 색상 */
+}
+
+/* 안전도 등급별 색상 */
+.safe {
+  color: #28a745; /* Green */
+}
+.warning {
+  color: #ffc107; /* Orange */
+}
+.danger {
+  color: #dc3545; /* Red */
+}
+
+/* 반응형: 화면이 768px보다 작아지면 세로로 쌓임 */
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+  }
+}
