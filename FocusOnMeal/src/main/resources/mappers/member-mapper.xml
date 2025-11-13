@@ -40,8 +40,43 @@
           AND STATUS_YN = 'Y' 
     </select>
     
-    <insert id="insertMember">
-    		
+    <!-- 회원가입 -->
+    <insert id="insertMember" parameterType="Member">
+        INSERT INTO MEMBER VALUES(
+            #{memberId},
+            #{memberPw},
+            #{memberName},
+            #{memberNickname},
+            #{email},
+            #{phone},
+            #{gender},
+            default,
+            default,
+            default
+        )
     </insert>
+
+    <!-- 관리자 권한 부여 -->
+    <update id="updateAdminStatus" parameterType="string">
+        UPDATE MEMBER
+        SET ADMIN_YN = 'Y'
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!-- 관리자 권한 부여 및 닉네임 변경 -->
+    <update id="updateAdminNickname" parameterType="map">
+        UPDATE MEMBER
+        SET ADMIN_YN = 'Y',
+            MEMBER_NICKNAME = #{newAdminNickname}
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!-- 닉네임 변경 -->
+    <update id="updateNickname" parameterType="map">
+        UPDATE MEMBER
+        SET MEMBER_NICKNAME = #{memberNickname}
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
     
   </mapper>

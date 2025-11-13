@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,6 +66,18 @@ public class MemberController {
 	}
 	
 	
+	@PostMapping("logout")
+	public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+		if(authHeader == null || !authHeader.startsWith("Bearer")) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("토큰없음");
+		}
+		
+		String token = authHeader.substring(7);
+		// 실제 운영 환경에서는 이 토큰을 Redis 같은 곳에 "블랙리스트"로 등록
+	    // 예: redisService.saveBlackList(token, jwtUtil.getExpiration(token));
+		return ResponseEntity.ok("로그아웃 완료");
+	}
+	
 	
 	@PostMapping("form")
 	public String sigupFormPage() {
@@ -72,15 +85,20 @@ public class MemberController {
 	}
 	
 	@PostMapping("join")
-	public String joinMember(@ModelAttribute Member member, Model model) {
-		try {
-			member.setMemberPw(bcrypt.encode(member.getMemberPw()));
-			int result = mService.insertMember(member);
-			return "redirect:/member/login";
-		} catch (Exception e) {
-			model.addAttribute("errorMsg", e.getMessage());
-			return "common/error";
-		}
+	public ResponseEntity<?> joinMember(@RequestBody Member member) {
+	    try {
+	        member.setMemberPw(bcrypt.encode(member.getMemberPw()));
+	        int result = mService.insertMember(member);
+	        if(result > 0) {
+	            return ResponseEntity.ok("회원가입 성공");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("회원가입 실패");
+	        }
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	            .body("서버 오류: " + e.getMessage());
+	    }
 	}
 
 }
