@@ -53,7 +53,8 @@ public class MemberController {
 				token,
 				loginMember.getMemberId(),
 				loginMember.getMemberName(),
-				loginMember.getAdminYn()
+				loginMember.getAdminYn(),
+				loginMember.getMemberNickname()
 			);
 
 			return ResponseEntity.ok(response);
