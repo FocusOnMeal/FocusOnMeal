@@ -1,0 +1,43 @@
+.container {
+    width: 100%;
+    max-width: 900px;
+    margin: 60px auto;
+    font-family: "Noto Sans KR", sans-serif;
+}
+
+.main {
+    width: 100%;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.searchBox {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.select, .input {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.noticeTable {
+    width: 100%;
+    border-collapse: collapse;
+    border-top: 1px solid #ccc;
+}
+
+.noticeTable th, .noticeTable td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}

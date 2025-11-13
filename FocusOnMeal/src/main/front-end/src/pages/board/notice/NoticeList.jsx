@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import Pagination from '../../../components/common/Pagination';
+import styles from './noticeList.module.css';
 
 const NoticeList = () => {
     const [noticeList , setNoticeList] = useState([]);
@@ -17,7 +18,7 @@ const NoticeList = () => {
             if(!Params.has('page')){
                 Params.set('page','1');
             }
-        fetch(`/board/notice/list?${Params.toString()}`)
+        fetch(`/api/notice/list?${Params.toString()}`)
         .then(res => res.json())
         .then(data => {
             console.log(data);
@@ -59,23 +60,13 @@ const NoticeList = () => {
 
     return(
         <>
-            <div className="container">
-                {/* 사이드바 */}
-                <aside className="sidebar">
-                    <ul>
-                        <li><Link to="/ingredient/list">식자재</Link></li>
-                        <li><Link to="/meal/mealAI">식단</Link></li>
-                        <li><Link to="/safety/list">안전정보</Link></li>
-                        <li><Link to="/notice/list" className="active">공지사항</Link></li>
-                    </ul>
-                </aside>
-
+            <div className={styles.container}>
                 {/* 메인 영역 */}
-                <div className="main">
-                    <h1>공지사항</h1>
+                <div className={styles.main}>
+                <h1>공지사항</h1>
 
                 {/* 검색영역 */}
-                <form onSubmit={handleSearch} className ="search-box">
+                <form onSubmit={handleSearch} className ={styles.searchBox}>
                     <select 
                         name="type"
                         value={searchParams.get('type') || 'all'}
@@ -91,12 +82,13 @@ const NoticeList = () => {
                         placeholder="검색어를 입력하세요."
                         value={searchParams.get('keyword') || ''}
                         onChange={handleSearchChange}
+                        className={styles.input}
                     />
-                    <button type="submit">🔍</button>
+                    <button type="submit" className={styles.searchBtn}>🔍</button>
                 </form>
 
                 {/* 공지사항 테이블 */}
-                <table className ="notice-table">
+                <table className ={styles.noticeTable}>
                     <thead>
                         <tr>
                             <th>번호</th>
