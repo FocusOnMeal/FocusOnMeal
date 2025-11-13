@@ -1,0 +1,51 @@
+.paginationWrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* 기본 리스트 스타일 제거 */
+.pagination {
+    list-style: none;
+    display: flex;
+    gap: 6px;
+    padding: 0;
+    margin: 0;
+}
+
+/* 기본 버튼 스타일 */
+.pageItem button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* hover */
+.pageItem button:hover:not(.disabledBtn) {
+    background-color: #f1f1f1;
+}
+
+/* active page */
+.active button {
+    background-color: #006104;
+    color: #fff;
+    border-color: #006104;
+    font-weight: bold;
+}
+
+/* disabled 상태 */
+.disabled button,
+.disabledBtn {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 화살표 버튼 */
+.arrow {
+    font-size: 14px;
+}

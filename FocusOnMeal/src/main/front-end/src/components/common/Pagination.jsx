@@ -1,36 +1,74 @@
 import React from "react";
+import styles from "./Pagination.module.css";
 
-const Pagination = ({pageInfo, currentPage, changePage}) => {
-    if(!pageInfo) return null;
+const Pagination = ({ pageInfo, currentPage, changePage }) => {
+    if (!pageInfo) return null;
 
-    return(
-        <>
-            <nav aria-label="Standard pagination example" style={{float: 'right'}}>
-                <ul className="pagination">
-                    <li className={`page-item ${currentPage <= 1 ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={() => currentPage > 1&& changePage(currentPage -1)} disabled={currentPage <= 1} aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
+    return (
+        <nav className={styles.paginationWrap}>
+            <ul className={styles.pagination}>
+
+                {/* 이전 */}
+                <li
+                    className={`${styles.pageItem} ${
+                        currentPage <= 1 ? styles.disabled : ""
+                    }`}
+                >
+                    <button
+                        className={currentPage <= 1 ? styles.disabledBtn : ""}
+                        onClick={() =>
+                            currentPage > 1 && changePage(currentPage - 1)
+                        }
+                    >
+                        <span className={styles.arrow}>&laquo;</span>
+                    </button>
+                </li>
+
+                {/* 페이지 번호 */}
+                {Array.from(
+                    {
+                        length:
+                            pageInfo.endNavi - pageInfo.startNavi + 1,
+                    },
+                    (_, i) => pageInfo.startNavi + i
+                ).map((pageNum) => (
+                    <li
+                        key={pageNum}
+                        className={`${styles.pageItem} ${
+                            currentPage === pageNum ? styles.active : ""
+                        }`}
+                    >
+                        <button onClick={() => changePage(pageNum)}>
+                            {pageNum}
                         </button>
                     </li>
+                ))}
 
-                    {Array.from(
-                        {length:pageInfo.endNavi - pageInfo.startNavi + 1},
-                        (_, i) => pageInfo.startNavi + i
-                    ).map(pageNum => (
-                        <li className={`page-item ${currentPage === pageNum ? 'active' : ''}`} key ={pageNum}>
-                            <button className = "page-link" onClick={() => changePage(pageNum)}>{pageNum}</button>
-                        </li>
-                    ))}
-
-                    <li className={`page-item ${currentPage >= pageInfo.maxPage ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={()=> currentPage < pageInfo.maxPage && changePage(currentPage + 1)} disabled={currentPage >= pageInfo.maxPage} aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-        </>
+                {/* 다음 */}
+                <li
+                    className={`${styles.pageItem} ${
+                        currentPage >= pageInfo.maxPage
+                            ? styles.disabled
+                            : ""
+                    }`}
+                >
+                    <button
+                        className={
+                            currentPage >= pageInfo.maxPage
+                                ? styles.disabledBtn
+                                : ""
+                        }
+                        onClick={() =>
+                            currentPage < pageInfo.maxPage &&
+                            changePage(currentPage + 1)
+                        }
+                    >
+                        <span className={styles.arrow}>&raquo;</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
     );
-
 };
+
 export default Pagination;
