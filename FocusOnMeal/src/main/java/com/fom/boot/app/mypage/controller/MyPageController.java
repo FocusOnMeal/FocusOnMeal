@@ -7,10 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
 import com.fom.boot.domain.mypage.model.service.MyPageService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +25,25 @@ public class MyPageController {
 	
 	private final MyPageService mService;
 	
-	// 논리 삭제 (IS_DELETED = 'Y')
+	@GetMapping("/dashboard")
+	public ResponseEntity<?> getDashboard(Authentication authentication) {
+		
+		// JWT 토큰에서 인증된 사용자 정보 가져오기
+    	// 로그인 확인
+	    if (authentication == null || !authentication.isAuthenticated()) {
+	        Map<String, String> error = new HashMap<>();
+	        error.put("message", "로그인이 필요합니다.");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+	    }
+
+	    String memberId = authentication.getName();
+	    MyPageDashboardDTO dashboard = mService.getDashboardData(memberId);
+
+	    return ResponseEntity.ok(dashboard);
+	}
+
+	
+	// 식단 논리 삭제 (IS_DELETED = 'Y')
 	@PutMapping("/mealDelete/{planId}")
 	public ResponseEntity<?> deleteMealPlan(@PathVariable("planId") int planId, Authentication authentication) {
 		

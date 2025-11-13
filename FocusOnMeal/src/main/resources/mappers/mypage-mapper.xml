@@ -10,4 +10,28 @@
 	          DELETED_AT = SYSTIMESTAMP
 	      WHERE PLAN_ID = #{planId}
 	  </update>
+	  
+	  <!-- 대시보드 -->
+	  <select id="getMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
+	    	SELECT MEMBER_ID, MEMBER_NAME, EMAIL
+		    FROM MEMBER
+		    WHERE MEMBER_ID = #{memberId}
+	  </select>
+	  <select id="getFavoriteIngredientCount" resultType="int">
+		    SELECT COUNT(*) FROM FAVORITE
+		    WHERE MEMBER_ID = #{memberId}
+	  </select>
+	  <select id="getFavoriteMealCount" resultType="int">
+		    SELECT COUNT(*) FROM MEAL_PLAN
+		    WHERE MEMBER_ID = #{memberId}
+		    ORDER BY CREATED_AT DESC
+	  </select>
+	  <select id="getRecentMeals" resultType="com.fom.boot.domain.meal.model.vo.MealPlan">
+		    SELECT PLAN_ID, PLAN_NAME, CREATED_AT
+		    FROM MEAL_PLAN
+		    WHERE MEMBER_ID = #{memberId}
+		    ORDER BY CREATED_AT DESC
+		    FETCH FIRST 5 ROWS ONLY
+	  </select>
+    
   </mapper>
