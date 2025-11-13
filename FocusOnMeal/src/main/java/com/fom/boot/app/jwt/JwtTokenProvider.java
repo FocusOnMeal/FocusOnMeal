@@ -52,6 +52,19 @@ public class JwtTokenProvider {
             .compact();
     }
 
+    // 1-1. username(memberId)로 직접 토큰 생성
+    public String createToken(String username) {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + this.accessTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+            .setSubject(username) // 토큰 주체 (사용자 ID)
+            .setIssuedAt(now) // 발급 시간
+            .setExpiration(validity) // 만료 시간
+            .signWith(key, SignatureAlgorithm.HS256) // 암호화 알고리즘
+            .compact();
+    }
+
     // 2. 토큰에서 인증 정보(Authentication) 조회
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()

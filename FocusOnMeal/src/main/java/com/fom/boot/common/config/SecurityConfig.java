@@ -35,12 +35,13 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
             .authorizeHttpRequests(authz -> authz
-                // TODO: MemberController 작업 완료 시, 로그인/회원가입 API 경로 permitAll()
-                .requestMatchers("/api/member/login", "/api/member/join").permitAll() 
-                
-                // TODO: 리소스 접근 권한 설정 (예: css, js, images)
-                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                
+                // 로그인/회원가입 API 경로 허용
+                .requestMatchers("/member/login", "/member/join").permitAll()
+                .requestMatchers("/api/member/login", "/api/member/join").permitAll()
+
+                // 리소스 접근 권한 설정
+                .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
+
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // /api/admin/ 경로는 ADMIN 권한 필요
                 .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
             )
