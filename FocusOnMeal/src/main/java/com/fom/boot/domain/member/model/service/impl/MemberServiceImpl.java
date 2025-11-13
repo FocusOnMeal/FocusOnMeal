@@ -21,4 +21,10 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
+	@Override
+	public int insertMember(Member member) {
+		int result = mapper.insertMember(member);
+		return result;
+	}
+
 }

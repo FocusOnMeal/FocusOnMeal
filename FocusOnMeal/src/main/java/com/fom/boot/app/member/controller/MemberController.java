@@ -64,12 +64,23 @@ public class MemberController {
 		}
 	}
 	
-	@GetMapping("logout")
-	public String processLogout(HttpSession session) {
-		if(session != null) {
-			session.invalidate();
+	
+	
+	@PostMapping("form")
+	public String sigupFormPage() {
+		return "member/join";
+	}
+	
+	@PostMapping("join")
+	public String joinMember(@ModelAttribute Member member, Model model) {
+		try {
+			member.setMemberPw(bcrypt.encode(member.getMemberPw()));
+			int resutl = mService.insertMember(member);
+			return "redirect:/member/login";
+		} catch (Exception e) {
+			model.addAttribute("errorMsg", e.getMessage());
+			return "common/error";
 		}
-		return "redirect:/";
 	}
 
 }

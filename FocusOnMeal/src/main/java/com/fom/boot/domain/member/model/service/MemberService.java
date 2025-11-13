@@ -7,4 +7,6 @@ public interface MemberService {
 
 	Member selectOneByLogin(LoginRequest member);
 
+	int insertMember(Member member);
+
 }
