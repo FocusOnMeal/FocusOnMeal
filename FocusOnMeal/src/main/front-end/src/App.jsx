@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Login from './pages/member/Login'
 import IngredientLayout from './components/IngredientLayout';
@@ -9,16 +9,16 @@ import Header from "./components/common/Header";
 function App() {
 
   return (
-    <BrowserRouter>
+    <>
+      <Header />
       <Routes>
-        <Header />
         <Route path="/member/login" element={<Login />} />
         <Route path="/" element={<div>홈페이지</div>} />
-        <Route path="/ingredient" element={<IngredientLayout/>} />
-        <Route path="list" element={<IngredientSearch/>}/>
-        <Route index element={<IngredientSearch/>}/>
+        <Route path="/ingredient" element={<IngredientLayout/>}>
+          <Route path="list" element={<IngredientSearch/>}/>
+        </Route>
       </Routes>
-    </BrowserRouter>
+    </>
   )
 }
 
