@@ -5,6 +5,7 @@ import com.fom.boot.domain.ingredient.model.service.PriceService;
 import com.fom.boot.domain.meal.model.service.ChamgaApiService;
 import com.fom.boot.domain.meal.model.service.GeminiApiService;
 import com.fom.boot.domain.meal.model.service.KamisApiService;
+import com.fom.boot.domain.meal.model.service.SeoulPriceApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class ApiTestController {
     private final GeminiApiService geminiApiService;
     private final KamisApiService kamisApiService;
     private final ChamgaApiService chamgaApiService;
+    private final SeoulPriceApiService seoulPriceApiService;
     private final PriceService priceService;
 
     /**
@@ -241,6 +243,66 @@ public class ApiTestController {
             ));
         } catch (Exception e) {
             log.error("참가격 API 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 서울시 생필품 가격 API 테스트
+     * GET /api/test/seoul
+     */
+    @GetMapping("/seoul")
+    public ResponseEntity<Map<String, Object>> testSeoul() {
+        log.info("서울시 생필품 가격 API 단독 테스트");
+
+        try {
+            String result = seoulPriceApiService.testConnection();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "message", result
+            ));
+        } catch (Exception e) {
+            log.error("서울시 API 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 서울시 API 품목 가격 조회 테스트
+     * GET /api/test/seoul/price?item=쌀
+     */
+    @GetMapping("/seoul/price")
+    public ResponseEntity<Map<String, Object>> testSeoulPrice(
+            @RequestParam(defaultValue = "쌀") String item
+    ) {
+        log.info("서울시 API 가격 조회 테스트 - 품목: {}", item);
+
+        try {
+            Integer price = seoulPriceApiService.getAveragePrice(item);
+
+            if (price != null) {
+                return ResponseEntity.ok(Map.of(
+                        "status", "SUCCESS",
+                        "item", item,
+                        "price", price,
+                        "unit", "원"
+                ));
+            } else {
+                return ResponseEntity.ok(Map.of(
+                        "status", "NOT_FOUND",
+                        "message", "품목을 찾을 수 없습니다: " + item
+                ));
+            }
+
+        } catch (Exception e) {
+            log.error("서울시 API 가격 조회 실패", e);
             return ResponseEntity.ok(Map.of(
                     "status", "ERROR",
                     "message", e.getMessage()

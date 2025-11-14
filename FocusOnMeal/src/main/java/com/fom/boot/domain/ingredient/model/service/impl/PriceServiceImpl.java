@@ -4,18 +4,21 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.fom.boot.domain.ingredient.model.mapper.PriceHistoryMapper;
 import com.fom.boot.domain.ingredient.model.service.PriceService;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
+import com.fom.boot.domain.meal.model.service.SeoulPriceApiService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 식자재 가격 조회 서비스 구현
- * 다층 Fallback 전략: DB 조회 → 기본 가격 상수
+ * 다층 Fallback 전략: DB 조회 → 서울시 API → 기본 가격 상수
  */
 @Slf4j
 @Service
@@ -23,6 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 public class PriceServiceImpl implements PriceService {
 
 	private final PriceHistoryMapper priceHistoryMapper;
+
+	@Autowired
+	@Lazy
+	private SeoulPriceApiService seoulPriceApiService;
 
 	/**
 	 * 기본 가격 상수 (원/kg)
@@ -136,7 +143,8 @@ public class PriceServiceImpl implements PriceService {
 	/**
 	 * 식자재 가격 조회 (Fallback 포함)
 	 * 1단계: DB 조회
-	 * 2단계: 기본 가격 상수
+	 * 2단계: 서울시 API 조회
+	 * 3단계: 기본 가격 상수
 	 *
 	 * @param ingredientName 식자재명
 	 * @return 가격 (원/kg), 모든 조회 실패 시 null
@@ -157,7 +165,18 @@ public class PriceServiceImpl implements PriceService {
 			log.warn("DB 가격 조회 실패 - 식자재: {}, 에러: {}", ingredientName, e.getMessage());
 		}
 
-		// 2단계: 기본 가격 상수 조회 (부분 매칭)
+		// 2단계: 서울시 API 조회
+		try {
+			Integer seoulPrice = seoulPriceApiService.getAveragePrice(ingredientName);
+			if (seoulPrice != null) {
+				log.info("서울시 API에서 가격 조회 성공 - 식자재: {}, 가격: {}원", ingredientName, seoulPrice);
+				return seoulPrice;
+			}
+		} catch (Exception e) {
+			log.warn("서울시 API 가격 조회 실패 - 식자재: {}, 에러: {}", ingredientName, e.getMessage());
+		}
+
+		// 3단계: 기본 가격 상수 조회 (부분 매칭)
 		Integer defaultPrice = getDefaultPrice(ingredientName);
 		if (defaultPrice != null) {
 			log.info("기본 가격 사용 - 식자재: {}, 가격: {}원/kg", ingredientName, defaultPrice);
