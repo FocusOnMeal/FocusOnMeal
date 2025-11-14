@@ -82,9 +82,19 @@ public class MemberController {
 	}
 	
 	
-	@PostMapping("form")
+	@PostMapping("forms")
 	public String sigupFormPage() {
 		return "member/join";
+	}
+	
+	@PostMapping("terms")
+	public String showterms() {
+		return "member/terms";
+	}
+	
+	@PostMapping("privacy")
+	public String showprivacy() {
+		return "member/privacy";
 	}
 	
 	@PostMapping("join")
@@ -103,5 +113,6 @@ public class MemberController {
 	            .body("서버 오류: " + e.getMessage());
 	    }
 	}
+	
 
 }

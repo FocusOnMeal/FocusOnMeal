@@ -92,7 +92,7 @@ const Header = () => {
                             로그인
                         </Link>
                         <span className="slash">/</span>
-                        <Link to="/member/join" className="join">
+                        <Link to="/member/form" className="form">
                             회원가입
                         </Link>
                     </>

@@ -20,5 +20,11 @@ public interface MemberMapper {
 
 	int insertMember(Member member);
 
+	Member selectOneById(String memberId);
+
+	String searchMemberId(String memberName, String email);
+
+	int updateMemberPassword(String memberId, String encodedPassword);
+
 }
 
