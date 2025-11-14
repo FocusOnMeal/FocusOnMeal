@@ -1,5 +1,7 @@
 package com.fom.boot.domain.member.model.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.fom.boot.app.member.dto.LoginRequest;
@@ -27,4 +29,29 @@ public class MemberServiceImpl implements MemberService {
 		return result;
 	}
 
+	// 관리자 목록 조회용
+	@Override
+	public List<Member> selectAllMembers() {
+		return mapper.selectAllMembers();
+	}
+
+	@Override
+	public Member findByMemberId(String memberId) {
+		return mapper.findByMemberId(memberId);
+	}
+/*
+	// 회원 등급 변경
+	@Override
+	public int updateAdminYn(String memberId, String adminYn) {
+		return mapper.updateAdminYn(memberId, adminYn);
+		
+	}
+
+	// 회원 상태 변경
+	@Override
+	public int updateStatusYn(String memberId, String statusYn) {
+		return mapper.updateStatusYn(memberId, statusYn);
+		
+	}
+*/
 }

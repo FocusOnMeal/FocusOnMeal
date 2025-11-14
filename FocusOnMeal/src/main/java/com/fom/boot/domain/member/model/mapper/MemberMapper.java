@@ -1,10 +1,12 @@
 package com.fom.boot.domain.member.model.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
-import com.fom.boot.domain.member.model.vo.Member; // Member 모델 import
+import org.apache.ibatis.annotations.Param;
 
 import com.fom.boot.app.member.dto.LoginRequest;
-import com.fom.boot.domain.member.model.vo.Member;
+import com.fom.boot.domain.member.model.vo.Member; // Member 모델 import
 
 @Mapper
 public interface MemberMapper {
@@ -19,6 +21,13 @@ public interface MemberMapper {
     Member findByMemberId(String memberId);
 
 	int insertMember(Member member);
+	
+	// 관리자 목록 조회용
+	List<Member> selectAllMembers();
+//
+//	int updateAdminYn(String memberId, String adminYn);
+//
+//	int updateStatusYn(String memberId, String statusYn);
 
 }
 

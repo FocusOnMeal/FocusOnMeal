@@ -5,7 +5,7 @@
 <mapper namespace="com.fom.boot.domain.member.model.mapper.MemberMapper">
 
 
-  	<select id="selectOneByLogin" parameterType="String" resultType="Member">
+  	<select id="selectOneByLogin" parameterType="com.fom.boot.app.member.dto.LoginRequest" resultType="Member">
   		SELECT 
   		MEMBER_ID,
   		MEMBER_PW,
@@ -56,13 +56,6 @@
         )
     </insert>
 
-    <!-- 관리자 권한 부여 -->
-    <update id="updateAdminStatus" parameterType="string">
-        UPDATE MEMBER
-        SET ADMIN_YN = 'Y'
-        WHERE MEMBER_ID = #{memberId}
-    </update>
-
     <!-- 관리자 권한 부여 및 닉네임 변경 -->
     <update id="updateAdminNickname" parameterType="map">
         UPDATE MEMBER
@@ -77,6 +70,38 @@
         SET MEMBER_NICKNAME = #{memberNickname}
         WHERE MEMBER_ID = #{memberId}
     </update>
-
     
+    <!-- 관리자: 전체 회원 목록 조회 -->
+	<select id="selectAllMembers" resultType="com.fom.boot.domain.member.model.vo.Member">
+	    SELECT
+	        MEMBER_ID,
+	        MEMBER_PW,
+	        MEMBER_NAME,
+	        MEMBER_NICKNAME,
+	        EMAIL,
+	        PHONE,
+	        GENDER,
+	        ENROLL_DATE,
+	        STATUS_YN,
+	        ADMIN_YN
+	    FROM MEMBER
+	    ORDER BY ENROLL_DATE DESC
+	</select>
+	
+	<!-- 관리자 : 회원 등급 변경 -->
+	<!-- 
+	<update id="updateAdminYn">
+	    UPDATE MEMBER
+	    SET ADMIN_YN = #{adminYn}
+	    WHERE MEMBER_ID = #{memberId}
+	</update>
+	 -->
+	<!-- 관리자 : 회원 상태 변경 -->
+	<!-- 
+	<update id="updateStatusYn">
+	    UPDATE MEMBER
+	    SET STATUS_YN = #{statusYn}
+	    WHERE MEMBER_ID = #{memberId}
+	</update>
+	 -->
   </mapper>
