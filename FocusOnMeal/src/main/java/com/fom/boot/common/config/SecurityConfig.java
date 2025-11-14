@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.fom.boot.app.jwt.JwtAuthenticationFilter;
 import com.fom.boot.app.jwt.JwtTokenProvider;
@@ -26,6 +27,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    	
+    	// === CORS 설정 추가 ===
+        http.cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.addAllowedOrigin("http://localhost:5173");  // 프론트 주소
+            config.addAllowedHeader("*");
+            config.addAllowedMethod("*");
+            config.setAllowCredentials(true);
+            return config;
+        }));
+    	
         http
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시)
             .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 비활성화
@@ -50,9 +62,14 @@ public class SecurityConfig {
 
                 // 채팅 API 경로 허용 (가격 정보 없이 테스트 가능)
                 .requestMatchers("/api/chat/**").permitAll()
+                
+
+                // 마이페이지 API 인증 필요
+                .requestMatchers("/api/mypage/**").authenticated()
 
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // /api/admin/ 경로는 ADMIN 권한 필요
                 .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
+                
             )
             
             // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가

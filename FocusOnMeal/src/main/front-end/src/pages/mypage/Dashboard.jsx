@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from './Dashboard.module.css';
-import React, { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "./Dashboard.module.css";
 import Sidebar from "../../components/mypage/Sidebar";
 
 const Dashboard = () => {
@@ -11,34 +9,45 @@ const Dashboard = () => {
     const [dashboard, setDashboard] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem("jwtToken"); // JWT 저장 위치에 따라 수정
+        const token = localStorage.getItem("token");
+
         if (!token) {
-        console.error("JWT 토큰이 없습니다. 로그인 필요");
+        console.error("JWT 토큰 없음 → 로그인 필요");
         return;
         }
 
-        axios.get("/api/mypage/dashboard", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+        axios.get("http://localhost:8080/api/mypage/dashboard", {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
         })
-        .then(res => setDashboard(res.data))
-        .catch(err => console.error(err));
+        .then(res => {
+            console.log(res.data);
+            setDashboard(res.data);
+        })
+        .catch(err => {
+        console.error(err);
+        });
+
     }, []);
 
-    if (!dashboard) return <p>로딩 중...</p>;
+    // dashboard가 null이면 로딩 화면 출력
+    if (!dashboard) return <div>Loading...</div>;
 
     return(
-        <>
-        <div className="mypage-dashboard">
-            <h2>{dashboard.memberInfo.name} 님의 마이페이지</h2>
-            <p>이메일: {dashboard.memberInfo.email}</p>
+    <>
+    <div className={styles.dashboardContainer}>
+        <Sidebar />
+
+        <div className={styles.dashboardContent}>
+            <h2>{dashboard.memberInfo.memberNickname} 님의 마이페이지</h2>
             <div>
                 <p>즐겨찾은 식자재: {dashboard.favoriteIngredientCount}개</p>
                 <p>즐겨찾은 식단: {dashboard.favoriteMealCount}개</p>
             </div>
         </div>
-        </>
+    </div>
+    </>
     )
 }
 

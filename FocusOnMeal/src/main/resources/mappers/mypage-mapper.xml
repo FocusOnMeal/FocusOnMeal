@@ -13,7 +13,7 @@
 	  
 	  <!-- 대시보드 -->
 	  <select id="getMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
-	    	SELECT MEMBER_ID, MEMBER_NAME, EMAIL
+	    	SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
 		    FROM MEMBER
 		    WHERE MEMBER_ID = #{memberId}
 	  </select>

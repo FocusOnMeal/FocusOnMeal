@@ -16,3 +16,16 @@
     font-weight: 700;
     color: #333;
 }
+
+.dashboardContainer {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.dashboardContent {
+    flex: 1;
+    padding: 40px;
+    margin-left: 20px;
+}
