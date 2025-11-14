@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Form } from 'react-router-dom'
 import './App.css'
 import Login from './pages/member/Login'
 import IngredientSearch from './pages/ingredient/list';
@@ -7,6 +7,9 @@ import NoticeList from './pages/board/notice/NoticeList';
 import Header from "./components/common/Header";
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Dashboard from './pages/mypage/Dashboard';
+import MyForm from './pages/member/MyForm';
+import Terms from './pages/member/TermsContent';
+import Privacy from './pages/member/PrivacyContent';
 import Join from './pages/member/Join';
 
 
@@ -21,7 +24,10 @@ function App() {
 
         {/* 회원 관련 */}
         <Route path="/member/login" element={<Login />} />
-        <Route path="/member/join" element={<Join />} />
+        <Route path="/member/form" element={<MyForm />} />
+        <Route path="/member/terms" element={<Terms />} />
+        <Route path="/member/privacy" element={<Privacy />} />
+        <Route path="/member/Join" element={<Join />} />
 
         {/* 마이페이지 관련 */}
         <Route path="/mypage" element={<Dashboard />} />
