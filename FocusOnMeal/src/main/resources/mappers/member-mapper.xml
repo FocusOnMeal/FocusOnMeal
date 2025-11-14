@@ -77,6 +77,41 @@
         SET MEMBER_NICKNAME = #{memberNickname}
         WHERE MEMBER_ID = #{memberId}
     </update>
+    
+    <!-- 비밀번호 업데이트 (비밀번호 재설정용) -->
+	<update id="updateMemberPassword">
+	    UPDATE MEMBER
+	    SET MEMBER_PW = #{encodedPw}
+	    WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<!-- 아이디 찾기 (이름과 이메일로 조회) -->
+	<select id="searchMemberId" resultType="String">
+	    SELECT MEMBER_ID
+	    FROM MEMBER
+	    WHERE MEMBER_NAME = #{memberName}
+	      AND EMAIL = #{email}
+	      AND STATUS_YN = 'Y'
+	    FETCH FIRST 1 ROW ONLY
+	</select>
+	
+	<!-- 회원 조회 (ID로) -->
+	<select id="selectOneById" parameterType="String" resultType="Member">
+	    SELECT 
+	        MEMBER_ID,
+	        MEMBER_PW,
+	        MEMBER_NAME,
+	        MEMBER_NICKNAME,
+	        EMAIL,
+	        PHONE,
+	        GENDER,
+	        ENROLL_DATE,
+	        STATUS_YN,
+	        ADMIN_YN
+	    FROM MEMBER
+	    WHERE MEMBER_ID = #{memberId}
+	      AND STATUS_YN = 'Y'
+	</select>
 
     
   </mapper>
