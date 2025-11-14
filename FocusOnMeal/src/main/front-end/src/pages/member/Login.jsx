@@ -88,7 +88,7 @@ const Login = () => {
                     <div className="login-links">
                         <a href="#">아이디 찾기</a>
                         <a href="#">비밀번호 찾기</a>
-                        <a href="/member/join">회원가입</a>
+                        <a href="/member/form">회원가입</a>
                     </div>
                 </div>
             </main>
