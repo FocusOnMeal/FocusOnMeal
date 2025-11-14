@@ -50,7 +50,10 @@ public class SecurityConfig {
 
                 // 채팅 API 경로 허용 (가격 정보 없이 테스트 가능)
                 .requestMatchers("/api/chat/**").permitAll()
-
+                
+                // Actuator 경로는 모두 허용
+                .requestMatchers("/actuator/**", "/actuator/prometheus", "/favicon.ico").permitAll()
+                
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // /api/admin/ 경로는 ADMIN 권한 필요
                 .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
             )
