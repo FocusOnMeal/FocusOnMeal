@@ -10,14 +10,9 @@ import Dashboard from './pages/mypage/Dashboard';
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
 import IngredientDetail from './pages/ingredient/detail';
-import NoticeList from './pages/board/notice/NoticeList';
-import Header from "./components/common/Header";
-import AdminDashboard from './pages/admin/AdminDashboard';
-import Dashboard from './pages/mypage/Dashboard';
 import MyForm from './pages/member/MyForm';
 import Terms from './pages/member/TermsContent';
 import Privacy from './pages/member/PrivacyContent';
-import Join from './pages/member/Join';
 import ProtectedRoute from './components/mypage/ProtectedRoute';
 
 //게시판
