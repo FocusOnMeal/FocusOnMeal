@@ -9,4 +9,7 @@ public interface NoticeService {
 	// 공지사항 목록 조회용
 	List<Notice> selectAllNotices();
 
+	// 공지사항 수정
+	int modifyNotice(Notice notice);
+
 }

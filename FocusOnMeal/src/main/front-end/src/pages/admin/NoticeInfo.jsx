@@ -8,9 +8,47 @@ import Sidebar from "../../components/admin/Sidebar";
 const NoticeInfo = () => {
 
     const [noticeInfo, setNoticeInfo] = useState([]);
+    
+    // 모달 선택 + 선택된 공지
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedNotice, setSelectedNotice] = useState(null);
+
+    // 제목 클릭 시 모달 열기
+    const openModal = (notice) => {
+        setSelectedNotice({...notice});
+        setIsModalOpen(true);
+    }
+
+    // modal close
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedNotice(null);
+    }
+
+    // save modify
+    const handleSave = () => {
+        const token = localStorage.getItem("token");
+
+        const payload = { ...selectedNotice };
+
+        delete payload.noticeCreateAt;   // 날짜 제외
+        delete payload.viewCount;       // 조회수 제외
+
+        axios.patch(`/api/admin/noticeInfo/modify`, payload, {
+            headers: { Authorization: `Bearer ${token}`}
+        })
+        .then(()=>{
+            setNoticeInfo(prev => 
+                prev.map(n=>
+                    n.noticeNo === selectedNotice.noticeNo ? selectedNotice : n
+                )
+            );
+            closeModal();
+        })
+        .catch(err => console.error(err));
+    };
 
     useEffect(() => {
-        
         const fetchNoticeInfo = () => {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -81,18 +119,21 @@ const NoticeInfo = () => {
                                     <td>
                                         {/* 필독 */}
                                         {notice.noticeImportant === "Y" && (
-                                            <span className={styles.badgeImportant}>필독</span>
+                                            <span className={styles.badgeImportant}>필독 !</span>
                                         )}
 
                                         {/* NEW */}
                                         {notice.noticeImportant !== "Y" &&
-                                            notice.noticeIsnew === "Y" && (
-                                                <span className="badge badge-new">NEW</span>
+                                            notice.noticeIsNew === "Y" && (
+                                                <span className={styles.badgeIsNew}>NEW</span>
                                             )}
 
-                                        <Link to={`/notice/detail?no=${notice.noticeNo}`}>
+                                        <span 
+                                            className={styles.subjectLink}
+                                            onClick={() => openModal(notice)}
+                                        >
                                             {notice.noticeSubject}
-                                        </Link>
+                                        </span>
                                     </td>
 
                                     <td>{notice.memberId}</td>
@@ -104,7 +145,9 @@ const NoticeInfo = () => {
                                     <td>{notice.viewCount}</td>
 
                                     <td>
-                                        <button className={styles.editBtn}>수정</button>
+                                        <button className={styles.editBtn} onClick={() => openModal(notice)}>
+                                            수정
+                                        </button>
                                         <button className={styles.deleteBtn}>삭제</button>
                                     </td>
                                 </tr>
@@ -119,6 +162,73 @@ const NoticeInfo = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Modal */}
+            {isModalOpen && selectedNotice && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <h2>공지사항 수정</h2>
+
+                        <label>제목</label>
+                        <input
+                            type="text"
+                            value={selectedNotice.noticeSubject}
+                            onChange={(e) =>
+                                setSelectedNotice({ ...selectedNotice, noticeSubject: e.target.value })
+                            }
+                        />
+
+                        <label>내용</label>
+                        <textarea
+                            value={selectedNotice.noticeContent}
+                            onChange={(e) =>
+                                setSelectedNotice({ ...selectedNotice, noticeContent: e.target.value })
+                            }
+                        />
+
+                        {/* NEW 여부 토글 */}
+                        <label>NEW 표시</label>
+                        <button
+                            className={
+                                selectedNotice.noticeIsNew === "Y" 
+                                ? styles.toggleOn 
+                                : styles.toggleOff
+                            }
+                            onClick={() =>
+                                setSelectedNotice({
+                                    ...selectedNotice,
+                                    noticeIsNew: selectedNotice.noticeIsNew === "Y" ? "N" : "Y"
+                                })
+                            }
+                        >
+                            {selectedNotice.noticeIsNew === "Y" ? "ON" : "OFF"}
+                        </button>
+
+                        {/* 필독 여부 토글 */}
+                        <label>필독 여부</label>
+                        <button
+                            className={
+                                selectedNotice.noticeImportant === "Y"
+                                ? styles.toggleOn 
+                                : styles.toggleOff
+                            }
+                            onClick={() =>
+                                setSelectedNotice({
+                                    ...selectedNotice,
+                                    noticeImportant: selectedNotice.noticeImportant === "Y" ? "N" : "Y"
+                                })
+                            }
+                        >
+                            {selectedNotice.noticeImportant === "Y" ? "필독" : "일반"}
+                        </button>
+
+                        <div className={styles.modalButtons}>
+                            <button onClick={handleSave} className={styles.saveBtn}>저장</button>
+                            <button onClick={closeModal} className={styles.closeBtn}>닫기</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

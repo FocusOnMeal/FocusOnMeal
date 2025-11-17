@@ -127,6 +127,87 @@
     margin-right: 6px;
     display: inline-block;
 } 
+.badgeIsNew {
+    background-color: #ffe15c;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 6px;
+    display: inline-block;
+} 
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modalContent {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.saveBtn {
+    background: #0796E5;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+}
+
+.closeBtn {
+    background: #ccc;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+}
+
+.linkTitle {
+    cursor: pointer;
+    color: #0796E5;
+    font-weight: 500;
+}
+
+.linkTitle:hover {
+    text-decoration: underline;
+}
+
+.toggleOn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.toggleOff {
+    background-color: #ccc;
+    color: #333;
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+}
 
 
 
