@@ -1,24 +1,21 @@
 import { Routes, Route, Form } from 'react-router-dom'
 import './App.css'
 import Header from "./components/common/Header";
+
 // 회원
 import Login from './pages/member/Login'
 import Join from './pages/member/Join';
+import MyForm from './pages/member/MyForm';
+import Terms from './pages/member/TermsContent';
+import Privacy from './pages/member/PrivacyContent';
+
 // 마이페이지
 import Dashboard from './pages/mypage/Dashboard';
+import ProtectedRoute from './components/mypage/ProtectedRoute';
 
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
 import IngredientDetail from './pages/ingredient/detail';
-import NoticeList from './pages/board/notice/NoticeList';
-import Header from "./components/common/Header";
-import AdminDashboard from './pages/admin/AdminDashboard';
-import Dashboard from './pages/mypage/Dashboard';
-import MyForm from './pages/member/MyForm';
-import Terms from './pages/member/TermsContent';
-import Privacy from './pages/member/PrivacyContent';
-import Join from './pages/member/Join';
-import ProtectedRoute from './components/mypage/ProtectedRoute';
 
 //게시판
 import NoticeList from './pages/board/notice/NoticeList';
@@ -26,6 +23,7 @@ import NoticeList from './pages/board/notice/NoticeList';
 //관리자
 import AdminDashboard from './pages/admin/AdminDashboard';
 import MemberInfo from './pages/admin/MemberInfo';
+import NoticeInfo from './pages/admin/NoticeInfo';
 
 function App() {
   
@@ -57,6 +55,7 @@ function App() {
         {/* 관리자 홈 (대시보드) */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/memberInfo" element={<MemberInfo />} />
+        <Route path="/admin/noticeInfo" element={<NoticeInfo/>} />
 
         {/* 마이페이지 홈 (대시보드) */}
         <Route path="/mypage" element={<Dashboard />} />
