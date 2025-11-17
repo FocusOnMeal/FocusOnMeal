@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
+import com.fom.boot.app.mypage.dto.MealPlanSummaryDTO;
 import com.fom.boot.domain.meal.model.vo.MealPlan;
 import com.fom.boot.domain.member.model.vo.Member;
 
@@ -18,5 +20,12 @@ public interface MyPageMapper {
 	int getFavoriteIngredientCount(String memberId);
 	int getFavoriteMealCount(String memberId);
 	List<MealPlan> getRecentMeals(String memberId);
+
+	// 대시보드 2
+	Member findMemberInfo(String memberId);
+	List<FavoriteIngredientSummaryDTO> findFavoriteIngredientSummary(@Param("memberId") String memberId, @Param("limit") int limit);
+	int countFavoriteIngredients(@Param("memberId") String memberId);
+	List<MealPlanSummaryDTO> findMealPlanSummary(@Param("memberId") String memberId, @Param("limit") int limit);
+	int countMealPlans(@Param("memberId") String memberId);
 
 }

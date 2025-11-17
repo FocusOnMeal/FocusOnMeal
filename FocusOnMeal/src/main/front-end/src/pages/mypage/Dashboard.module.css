@@ -1,31 +1,296 @@
-.container {
-    display: flex;
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    --background: #fafafa;
-}
-
-/* 우측 메인 */
-.main {
-    flex: 1;
-    padding: 40px 50px;
-}
-
-.mainTitle {
-    font-size: 26px;
-    font-weight: 700;
-    color: #333;
-}
+/* Dashboard.module.css */
 
 .dashboardContainer {
     display: flex;
-    flex-direction: row;
-    width: 100%;
     min-height: 100vh;
+    background-color: #f8f9fa;
 }
 
 .dashboardContent {
     flex: 1;
-    padding: 40px;
-    margin-left: 20px;
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboardContent h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* 로딩 & 에러 */
+.loading, .error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 18px;
+    color: #666;
+}
+
+/* 차트 섹션 */
+.chartSection {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chartSection h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.chartContainer h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.chartContainer .unit {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999;
+    margin-left: 8px;
+}
+
+/* 등락률 표시 */
+.changeRateInfo {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.changeRateInfo .currentPrice {
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+    border-right: 2px solid #e0e0e0;
+}
+
+.changeRateInfo .changeItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.changeRateInfo .label {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.changeRateInfo .value {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.changeRateInfo .value.up {
+    color: #f44336;
+}
+
+.changeRateInfo .value.down {
+    color: #2196F3;
+}
+
+.changeRateInfo .value.stable {
+    color: #999;
+}
+
+/* 차트 하단 정보 */
+.chartFooter {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+    font-size: 13px;
+    color: #666;
+}
+
+.noChart {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.noChart p {
+    margin: 10px 0;
+}
+
+/* 리스트 컨테이너 */
+.listsContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 1024px) {
+    .listsContainer {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 리스트 섹션 */
+.listSection {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.listHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.listHeader h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.count {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4CAF50;
+    background: #e8f5e9;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* 리스트 컨텐츠 */
+.listContent {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.listItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.listItem:hover {
+    background-color: #f8f9fa;
+    border-color: #4CAF50;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.itemInfo {
+    flex: 1;
+}
+
+.itemInfo h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.customBadge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: #FF9800;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.price {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.servings {
+    font-size: 13px;
+    color: #999;
+}
+
+.detailBtn {
+    padding: 8px 16px;
+    background: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+
+.detailBtn:hover {
+    background: #45a049;
+}
+
+.emptyMessage {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 15px;
+}
+
+.viewAll {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: color 0.2s ease;
+}
+
+.viewAll:hover {
+    color: #45a049;
+    text-decoration: underline;
+}
+
+/* 스크롤바 스타일링 */
+.listContent::-webkit-scrollbar {
+    width: 8px;
+}
+
+.listContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.listContent::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.listContent::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }

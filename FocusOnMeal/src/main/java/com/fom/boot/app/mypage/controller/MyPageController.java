@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
+import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
 import com.fom.boot.domain.mypage.model.service.MyPageService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class MyPageController {
 	
 	private final MyPageService mService;
 	
+	// 마이페이지 대시보드 이동
 	@GetMapping("/dashboard")
 	public ResponseEntity<?> getDashboard(Authentication authentication) {
 		
@@ -45,6 +47,26 @@ public class MyPageController {
 	    return ResponseEntity.ok(dashboard);
 	}
 
+	// 특정 식자재의 물가 추이 그래프 조회
+    @GetMapping("/price-chart/{ingredientId}")
+    public ResponseEntity<?> getPriceChart(
+            @PathVariable int ingredientId,
+            @RequestParam(defaultValue = "30") int days,
+            Authentication authentication) {
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "로그인이 필요합니다."));
+        }
+        
+        try {
+            PriceTrendResponse chartData = mService.getPriceChartData(ingredientId, days);
+            return ResponseEntity.ok(chartData);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", e.getMessage()));
+        }
+    }
 	
 	// 식단 논리 삭제 (IS_DELETED = 'Y')
 	@PutMapping("/mealDelete/{planId}")
