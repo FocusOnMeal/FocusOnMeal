@@ -1,0 +1,213 @@
+/* 전체 레이아웃 */
+.container {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    background: #f7f7f7;
+}
+
+/* 공통 메인 영역 */
+.main {
+    flex: 1;
+    padding: 40px;
+    background: #fafafa;
+}
+
+/* 페이지 제목 */
+.title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #222;
+    margin-top: 0;
+}
+
+/* 검색 영역 (선택사항) */
+.searchBox {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.selectBox{
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    padding: 4px;
+    margin: 0;
+}
+
+.searchInput {
+    width: 220px;
+    padding: 10px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.searchBtn {
+    background: #67932A;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.searchBtn:hover {
+    background: #587b24;
+}
+
+/* 테이블 박스 (화이트 카드 느낌) */
+.tableBox {
+    background: #fff;
+    padding: 25px;
+    border-radius: 14px;
+    border: 1px solid #e1e1e1;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+/* 테이블 */
+.noticeTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+/* 테이블 헤더 */
+.noticeTable thead th {
+    background: #f3f6ef;
+    padding: 14px 12px;
+    border-bottom: 2px solid #dcdcdc;
+    font-weight: 600;
+    text-align: left;
+    color: #333;
+}
+
+/* 테이블 행 */
+.noticeTable tbody tr {
+    transition: 0.2s;
+}
+
+/* 테이블 셀 */
+.noticeTable td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+/* hover 효과 */
+.noticeTable tbody tr:hover {
+    background: #f0f4e8;
+}
+
+/* 버튼 영역 */
+.actionBtn {
+    background: #67932A;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+}
+
+.actionBtn:hover {
+    background: #587b24;
+}
+
+/* 필독 뱃지 */
+.badgeImportant {
+    background-color: #ff4d4f;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 6px;
+    display: inline-block;
+} 
+.badgeIsNew {
+    background-color: #ffe15c;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 6px;
+    display: inline-block;
+} 
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modalContent {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.saveBtn {
+    background: #0796E5;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+}
+
+.closeBtn {
+    background: #ccc;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+}
+
+.linkTitle {
+    cursor: pointer;
+    color: #0796E5;
+    font-weight: 500;
+}
+
+.linkTitle:hover {
+    text-decoration: underline;
+}
+
+.toggleOn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.toggleOff {
+    background-color: #ccc;
+    color: #333;
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+
+

@@ -46,16 +46,6 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.insertMember(member);
     }
 
-    @Override
-    public List<Member> selectAllMembers() {
-        return memberMapper.selectAllMembers();
-    }
-
-    @Override
-    public Member findByMemberId(String memberId) {
-        return memberMapper.findByMemberId(memberId);
-    }
-
     // ===== 추가 메서드 =====
     @Override
     public Member selectOneById(String memberId) {
@@ -165,5 +155,31 @@ public class MemberServiceImpl implements MemberService {
 	public boolean checkEmailExists(Object email) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+
+	// 관리자 목록 조회용
+	@Override
+	public List<Member> selectAllMembers() {
+		return memberMapper.selectAllMembers();
+	}
+
+	@Override
+	public Member findByMemberId(String memberId) {
+		return memberMapper.findByMemberId(memberId);
+	}
+	
+	// 회원 등급 변경
+	@Override
+	public int updateAdminYn(String memberId, String adminYn) {
+		return memberMapper.updateAdminYn(memberId, adminYn);
+		
+	}
+
+	// 회원 상태 변경
+	@Override
+	public int updateStatusYn(String memberId, String statusYn) {
+		return memberMapper.updateStatusYn(memberId, statusYn);
+		
 	}
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.fom.boot.domain.notice.model.mapper.NoticeMapper">
+  
+	<!-- 관리자: 전체 공지사항 목록 조회 -->
+	<select id="selectAllNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
+	    SELECT
+	        *
+	    FROM NOTICE
+	    ORDER BY NOTICE_CREATEAT DESC
+	</select>
+	
+	<!-- 관리자 : 공지사항 수정  -->
+	<update id="modifyNotice" parameterType="com.fom.boot.domain.notice.model.vo.Notice">
+    UPDATE NOTICE
+	    SET 
+	        NOTICE_SUBJECT = #{noticeSubject},
+	        NOTICE_CONTENT = #{noticeContent},
+	        NOTICE_ISNEW = #{noticeIsNew},
+	        NOTICE_IMPORTANT = #{noticeImportant},
+	        IS_DELETED = #{isDeleted}
+	    WHERE NOTICE_NO = #{noticeNo}
+	</update>	
+  </mapper>

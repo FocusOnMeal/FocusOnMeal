@@ -107,6 +107,15 @@
 	</select>
 
     
+	 
+	 <!-- 이메일 중복 확인 -->
+	<select id="checkEmailExists" parameterType="String" resultType="int">
+	    SELECT COUNT(*)
+	    FROM MEMBER
+	    WHERE EMAIL = #{email}
+	      AND STATUS_YN = 'Y'
+	</select>
+	 
     <!-- 관리자: 전체 회원 목록 조회 -->
 	<select id="selectAllMembers" resultType="com.fom.boot.domain.member.model.vo.Member">
 	    SELECT
@@ -125,28 +134,17 @@
 	</select>
 	
 	<!-- 관리자 : 회원 등급 변경 -->
-	<!-- 
 	<update id="updateAdminYn">
 	    UPDATE MEMBER
 	    SET ADMIN_YN = #{adminYn}
 	    WHERE MEMBER_ID = #{memberId}
 	</update>
-	 -->
+	
 	<!-- 관리자 : 회원 상태 변경 -->
-	<!-- 
 	<update id="updateStatusYn">
 	    UPDATE MEMBER
 	    SET STATUS_YN = #{statusYn}
 	    WHERE MEMBER_ID = #{memberId}
 	</update>
-	 -->
-	 
-	 <!-- 이메일 중복 확인 -->
-<select id="checkEmailExists" parameterType="String" resultType="int">
-    SELECT COUNT(*)
-    FROM MEMBER
-    WHERE EMAIL = #{email}
-      AND STATUS_YN = 'Y'
-</select>
-	 
+	
   </mapper>

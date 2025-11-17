@@ -24,10 +24,10 @@ public interface MemberMapper {
 	
 	// 관리자 목록 조회용
 	List<Member> selectAllMembers();
-//
-//	int updateAdminYn(String memberId, String adminYn);
-//
-//	int updateStatusYn(String memberId, String statusYn);
+	
+	int updateAdminYn(String memberId, String adminYn);
+
+	int updateStatusYn(String memberId, String statusYn);
 
 	// package com.fom.boot.domain.member.model.mapper;
 	// public interface MemberMapper { ... } 내부에 추가

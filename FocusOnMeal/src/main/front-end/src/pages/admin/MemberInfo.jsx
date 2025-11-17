@@ -8,10 +8,12 @@ const MemberInfo = () => {
 
     const [memberInfo, setMemberInfo] = useState([]);
 
-    const handleToggleAdmin = (member) => {
+    const handleToggleAdminYn = (member) => {
         const newGrade = member.adminYn === "Y" ? "N" : "Y";
+        console.log("클릭된 member:", member);
+        console.log("계산된 newGrade:", newGrade)
 
-        axios.patch(`/api/admin/memberInfo/admin`, null, {
+        axios.patch(`/api/admin/memberInfo/adminYn`, null, {
             params: {
                 memberId: member.memberId,
                 adminYn: newGrade
@@ -90,7 +92,7 @@ const MemberInfo = () => {
                     } 
                     // --- 요청을 보내기 전 설정 단계에서 에러가 난 경우 ---
                     else {
-                        console.error("설정 에러] 요청 설정 중 오류:", err.message);
+                        console.error("[설정 에러] 요청 설정 중 오류:", err.message);
                     }
                 });
         };
@@ -128,28 +130,28 @@ const MemberInfo = () => {
                                 <td>{m.email}</td>
                                 <td>{m.gender}</td>
                                 <td>{new Date(m.enrollDate).toLocaleDateString("ko-KR")}</td>
-                                <td>{m.adminYn}</td>
-{/*                                토글 나중에 구현 예정
                                 <td>
-                                    <button
-                                        className={m.adminYn === "Y" ? styles.badgeAdmin : styles.badgeUser}
-                                        onClick={() => handleToggleAdmin(m)}
-                                    >
-                                        {m.adminYn === "Y" ? "관리자" : "일반회원"}
-                                    </button>
+                                    <label className={styles.toggleSwitch}>
+                                        <input
+                                        type="checkbox"
+                                        checked={m.adminYn === "Y"}
+                                        onChange={() => handleToggleAdminYn(m)}
+                                        />
+                                        <span className={styles.slider}></span>
+                                    </label>
                                 </td>
 
                                 <td>
-                                    <button
-                                        className={m.statusYn === "Y" ? styles.badgeStatus : styles.badgeUser}
-                                        onClick={() => handleToggleStatus(m)}
-                                    >
-                                        {m.statusYn === "Y" ? "활성" : "비활성"}
-                                    </button>
-                                </td> 
-                                */}
+                                    <label className={styles.toggleSwitch}>
+                                        <input
+                                        type="checkbox"
+                                        checked={m.statusYn === "Y"}
+                                        onChange={() => handleToggleStatus(m)}
+                                        />
+                                        <span className={styles.slider}></span>
+                                    </label>
+                                </td>
 
-                                <td>{m.statusYn}</td>
                             </tr>
                         ))}
                     </tbody>
