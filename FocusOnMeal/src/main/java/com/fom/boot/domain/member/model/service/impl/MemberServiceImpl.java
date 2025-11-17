@@ -29,13 +29,12 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private BCryptPasswordEncoder bcrypt;
 
-    // 이메일 인증 코드 저장소 (메모리: 운영환경에서는 Redis 추천)
+    // 이메일 인증 코드 저장소
     private final ConcurrentHashMap<String, VerificationData> verificationCodes = new ConcurrentHashMap<>();
 
-    // record를 사용 (Java 16+ 가정). 필드 접근은 data.code() 처럼 메서드 호출.
     private record VerificationData(String code, long expiryTime, boolean verified) {}
 
-    // ===== 기존/기본 메서드 구현 =====
+    // 기본 기능
     @Override
     public Member selectOneByLogin(LoginRequest loginRequest) {
         return memberMapper.selectOneByLogin(loginRequest);
@@ -46,7 +45,6 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.insertMember(member);
     }
 
-    // ===== 추가 메서드 =====
     @Override
     public Member selectOneById(String memberId) {
         return memberMapper.selectOneById(memberId);
@@ -72,32 +70,26 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.checkEmailExists(email) > 0;
     }
 
+    // 이메일 인증 코드 저장
     @Override
     public void saveVerificationCode(String email, String code) {
         long expiryTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
         verificationCodes.put(email, new VerificationData(code, expiryTime, false));
-        log.info("인증 코드 저장: email={}, code={}", email, code);
         cleanupExpiredCodes();
     }
 
+    // 인증 코드 확인
     @Override
     public boolean verifyEmailCode(String email, String code) {
         VerificationData data = verificationCodes.get(email);
-        if (data == null) {
-            log.warn("인증 코드 없음: {}", email);
-            return false;
-        }
+        if (data == null) return false;
         if (System.currentTimeMillis() > data.expiryTime()) {
-            log.warn("인증 코드 만료: {}", email);
             verificationCodes.remove(email);
             return false;
         }
-        if (!data.code().equals(code)) {
-            log.warn("인증 코드 불일치: {}, 입력={}", email, code);
-            return false;
-        }
-        // 인증 완료 표시
-        verificationCodes.put(email, new VerificationData(data.code(), data.expiryTime(), true));
+        if (!data.code().equals(code)) return false;
+
+        verificationCodes.put(email, new VerificationData(code, data.expiryTime(), true));
         return true;
     }
 
@@ -122,11 +114,31 @@ public class MemberServiceImpl implements MemberService {
         verificationCodes.entrySet().removeIf(e -> e.getValue().expiryTime() < now);
     }
 
-    // ========== 비밀번호 재설정 관련(간단한 스텁) ==========
+    // 관리자 기능
+    @Override
+    public List<Member> selectAllMembers() {
+        return memberMapper.selectAllMembers();
+    }
+
+    @Override
+    public Member findByMemberId(String memberId) {
+        return memberMapper.findByMemberId(memberId);
+    }
+
+    @Override
+    public int updateAdminYn(String memberId, String adminYn) {
+        return memberMapper.updateAdminYn(memberId, adminYn);
+    }
+
+    @Override
+    public int updateStatusYn(String memberId, String statusYn) {
+        return memberMapper.updateStatusYn(memberId, statusYn);
+    }
+
+    // 비밀번호 재설정 (실제 구현 X)
     @Override
     @Transactional
-    public boolean sendPasswordResetLink(String memberId, String email, String ipAddress, String userAgent) throws Exception {
-        // 실제 구현은 PasswordResetService에 위임하는 것이 좋음.
+    public boolean sendPasswordResetLink(String memberId, String email, String ipAddress, String userAgent) {
         return true;
     }
 
@@ -137,7 +149,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public boolean resetPassword(String token, String newPassword) throws Exception {
+    public boolean resetPassword(String token, String newPassword) {
         return true;
     }
 
@@ -150,36 +162,4 @@ public class MemberServiceImpl implements MemberService {
         emailService.sendMemberIdEmail(email, memberName, memberId);
         return true;
     }
-
-	@Override
-	public boolean checkEmailExists(Object email) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	// 관리자 목록 조회용
-	@Override
-	public List<Member> selectAllMembers() {
-		return memberMapper.selectAllMembers();
-	}
-
-	@Override
-	public Member findByMemberId(String memberId) {
-		return memberMapper.findByMemberId(memberId);
-	}
-	
-	// 회원 등급 변경
-	@Override
-	public int updateAdminYn(String memberId, String adminYn) {
-		return memberMapper.updateAdminYn(memberId, adminYn);
-		
-	}
-
-	// 회원 상태 변경
-	@Override
-	public int updateStatusYn(String memberId, String statusYn) {
-		return memberMapper.updateStatusYn(memberId, statusYn);
-		
-	}
 }

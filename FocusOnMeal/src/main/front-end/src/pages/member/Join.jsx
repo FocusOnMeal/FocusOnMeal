@@ -270,8 +270,10 @@ function Join() {
         
         try {
             const response = await authService.checkMemberId(formData.memberId);
+            console.log('아이디 중복 확인 응답:', response.data);
+            
             setIdChecked(true);
-            setIdAvailable(response.data.available);
+            setIdAvailable(response.data.available); // ✅ 수정된 구조
             
             if (response.data.available) {
                 alert('사용 가능한 아이디입니다.');
@@ -279,6 +281,7 @@ function Join() {
                 setErrors(prev => ({ ...prev, memberId: '이미 사용중인 아이디입니다.' }));
             }
         } catch (error) {
+            console.error('아이디 중복 확인 오류:', error);
             alert('아이디 중복 확인 중 오류가 발생했습니다.');
         }
     };

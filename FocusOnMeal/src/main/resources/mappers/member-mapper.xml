@@ -2,27 +2,31 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.fom.boot.domain.member.model.mapper.MemberMapper">
 
+    <!-- 로그인 -->
+    <select id="selectOneByLogin"
+            parameterType="com.fom.boot.app.member.dto.LoginRequest"
+            resultType="com.fom.boot.domain.member.model.vo.Member">
+        SELECT 
+            MEMBER_ID,
+            MEMBER_PW,
+            MEMBER_NAME,
+            MEMBER_NICKNAME,
+            EMAIL,
+            PHONE,
+            GENDER,
+            ENROLL_DATE,
+            STATUS_YN,
+            ADMIN_YN
+        FROM MEMBER
+        WHERE MEMBER_ID = #{memberId}
+    </select>
 
-  	<select id="selectOneByLogin" parameterType="com.fom.boot.app.member.dto.LoginRequest" resultType="Member">
-  		SELECT 
-  		MEMBER_ID,
-  		MEMBER_PW,
-        MEMBER_NAME,
-        MEMBER_NICKNAME,
-        EMAIL,
-        PHONE,
-        GENDER,
-        ENROLL_DATE,
-        STATUS_YN,
-        ADMIN_YN
-  		FROM MEMBER
-  		WHERE MEMBER_ID = #{memberId}
-  	</select>
-  	
-    <!-- Spring Security용 쿼리 -->
-    <select id="findByMemberId" parameterType="String"
+    <!-- Spring Security: 회원 조회 -->
+    <select id="findByMemberId"
+            parameterType="String"
             resultType="com.fom.boot.domain.member.model.vo.Member">
         SELECT
             MEMBER_ID,
@@ -37,12 +41,17 @@
             ADMIN_YN
         FROM MEMBER
         WHERE MEMBER_ID = #{memberId}
-          AND STATUS_YN = 'Y' 
+          AND STATUS_YN = 'Y'
     </select>
-    
+
     <!-- 회원가입 -->
-    <insert id="insertMember" parameterType="Member">
-        INSERT INTO MEMBER VALUES(
+    <insert id="insertMember"
+            parameterType="com.fom.boot.domain.member.model.vo.Member">
+        INSERT INTO MEMBER (
+            MEMBER_ID, MEMBER_PW, MEMBER_NAME,
+            MEMBER_NICKNAME, EMAIL, PHONE,
+            GENDER, ENROLL_DATE, STATUS_YN, ADMIN_YN
+        ) VALUES (
             #{memberId},
             #{memberPw},
             #{memberName},
@@ -50,101 +59,106 @@
             #{email},
             #{phone},
             #{gender},
-            default,
-            default,
-            default
+            DEFAULT,
+            DEFAULT,
+            DEFAULT
         )
     </insert>
 
-    <!-- 관리자 권한 부여 및 닉네임 변경 -->
-    <update id="updateAdminNickname" parameterType="map">
+    <!-- 관리자: 닉네임 변경 + 관리자 권한 부여 -->
+    <update id="updateAdminNickname">
         UPDATE MEMBER
-        SET ADMIN_YN = 'Y',
+        SET 
+            ADMIN_YN = 'Y',
             MEMBER_NICKNAME = #{newAdminNickname}
         WHERE MEMBER_ID = #{memberId}
     </update>
 
     <!-- 닉네임 변경 -->
-    <update id="updateNickname" parameterType="map">
+    <update id="updateNickname">
         UPDATE MEMBER
         SET MEMBER_NICKNAME = #{memberNickname}
         WHERE MEMBER_ID = #{memberId}
     </update>
-    
-    <!-- 비밀번호 업데이트 (비밀번호 재설정용) -->
-	<update id="updateMemberPassword">
-	    UPDATE MEMBER
-	    SET MEMBER_PW = #{encodedPw}
-	    WHERE MEMBER_ID = #{memberId}
-	</update>
-	
-	<!-- 아이디 찾기 (이름과 이메일로 조회) -->
-	<select id="searchMemberId" resultType="String">
-	    SELECT MEMBER_ID
-	    FROM MEMBER
-	    WHERE MEMBER_NAME = #{memberName}
-	      AND EMAIL = #{email}
-	      AND STATUS_YN = 'Y'
-	    FETCH FIRST 1 ROW ONLY
-	</select>
-	
-	<!-- 회원 조회 (ID로) -->
-	<select id="selectOneById" parameterType="String" resultType="Member">
-	    SELECT 
-	        MEMBER_ID,
-	        MEMBER_PW,
-	        MEMBER_NAME,
-	        MEMBER_NICKNAME,
-	        EMAIL,
-	        PHONE,
-	        GENDER,
-	        ENROLL_DATE,
-	        STATUS_YN,
-	        ADMIN_YN
-	    FROM MEMBER
-	    WHERE MEMBER_ID = #{memberId}
-	      AND STATUS_YN = 'Y'
-	</select>
 
-    
-	 
-	 <!-- 이메일 중복 확인 -->
-	<select id="checkEmailExists" parameterType="String" resultType="int">
-	    SELECT COUNT(*)
-	    FROM MEMBER
-	    WHERE EMAIL = #{email}
-	      AND STATUS_YN = 'Y'
-	</select>
-	 
-    <!-- 관리자: 전체 회원 목록 조회 -->
-	<select id="selectAllMembers" resultType="com.fom.boot.domain.member.model.vo.Member">
-	    SELECT
-	        MEMBER_ID,
-	        MEMBER_PW,
-	        MEMBER_NAME,
-	        MEMBER_NICKNAME,
-	        EMAIL,
-	        PHONE,
-	        GENDER,
-	        ENROLL_DATE,
-	        STATUS_YN,
-	        ADMIN_YN
-	    FROM MEMBER
-	    ORDER BY ENROLL_DATE DESC
-	</select>
-	
-	<!-- 관리자 : 회원 등급 변경 -->
-	<update id="updateAdminYn">
-	    UPDATE MEMBER
-	    SET ADMIN_YN = #{adminYn}
-	    WHERE MEMBER_ID = #{memberId}
-	</update>
-	
-	<!-- 관리자 : 회원 상태 변경 -->
-	<update id="updateStatusYn">
-	    UPDATE MEMBER
-	    SET STATUS_YN = #{statusYn}
-	    WHERE MEMBER_ID = #{memberId}
-	</update>
-	
-  </mapper>
+    <!-- 비밀번호 변경 -->
+    <update id="updateMemberPassword">
+        UPDATE MEMBER
+        SET MEMBER_PW = #{encodedPw}
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!-- 아이디 찾기 -->
+    <select id="searchMemberId"
+            resultType="String">
+        SELECT MEMBER_ID
+        FROM MEMBER
+        WHERE MEMBER_NAME = #{memberName}
+          AND EMAIL = #{email}
+          AND STATUS_YN = 'Y'
+        FETCH FIRST 1 ROW ONLY
+    </select>
+
+    <!-- 회원 조회 -->
+    <select id="selectOneById"
+            parameterType="String"
+            resultType="com.fom.boot.domain.member.model.vo.Member">
+        SELECT 
+            MEMBER_ID,
+            MEMBER_PW,
+            MEMBER_NAME,
+            MEMBER_NICKNAME,
+            EMAIL,
+            PHONE,
+            GENDER,
+            ENROLL_DATE,
+            STATUS_YN,
+            ADMIN_YN
+        FROM MEMBER
+        WHERE MEMBER_ID = #{memberId}
+          AND STATUS_YN = 'Y'
+    </select>
+
+    <!-- 이메일 중복 체크 -->
+    <select id="checkEmailExists"
+            parameterType="String"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM MEMBER
+        WHERE EMAIL = #{email}
+          AND STATUS_YN = 'Y'
+    </select>
+
+    <!-- 관리자: 전체 목록 -->
+    <select id="selectAllMembers"
+            resultType="com.fom.boot.domain.member.model.vo.Member">
+        SELECT
+            MEMBER_ID,
+            MEMBER_PW,
+            MEMBER_NAME,
+            MEMBER_NICKNAME,
+            EMAIL,
+            PHONE,
+            GENDER,
+            ENROLL_DATE,
+            STATUS_YN,
+            ADMIN_YN
+        FROM MEMBER
+        ORDER BY ENROLL_DATE DESC
+    </select>
+
+    <!-- 회원 등급 변경 -->
+    <update id="updateAdminYn">
+        UPDATE MEMBER
+        SET ADMIN_YN = #{adminYn}
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+    <!-- 회원 상태 변경 -->
+    <update id="updateStatusYn">
+        UPDATE MEMBER
+        SET STATUS_YN = #{statusYn}
+        WHERE MEMBER_ID = #{memberId}
+    </update>
+
+</mapper>
