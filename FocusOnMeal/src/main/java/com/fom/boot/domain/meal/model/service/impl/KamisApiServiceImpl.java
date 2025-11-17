@@ -354,4 +354,97 @@ public class KamisApiServiceImpl implements KamisApiService {
             return "ERROR: " + e.getMessage();
         }
     }
+
+    /**
+     * 기간별 품목 가격 조회 (periodProductList)
+     * 소매가격, 상품등급, 서울지역 기준
+     *
+     * @param startDay 시작일 (yyyy-MM-dd)
+     * @param endDay 종료일 (yyyy-MM-dd)
+     * @param itemCategoryCode 부류코드 (200:채소류 등)
+     * @param itemCode 품목코드
+     * @param kindCode 품종코드
+     * @return JSON 응답 문자열
+     */
+    @Override
+    public String getPeriodProductList(String startDay, String endDay, String itemCategoryCode,
+                                         String itemCode, String kindCode) {
+        log.info("KAMIS API periodProductList 호출 - 기간: {} ~ {}, 부류: {}, 품목: {}, 품종: {}",
+                startDay, endDay, itemCategoryCode, itemCode, kindCode);
+
+        try {
+            String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                    .queryParam("action", "periodProductList")
+                    .queryParam("p_cert_key", certKey)
+                    .queryParam("p_cert_id", certId)
+                    .queryParam("p_returntype", "json")
+                    .queryParam("p_startday", startDay)
+                    .queryParam("p_endday", endDay)
+                    .queryParam("p_productclscode", "01")  // 소매
+                    .queryParam("p_itemcategorycode", itemCategoryCode)
+                    .queryParam("p_itemcode", itemCode)
+                    .queryParam("p_kindcode", kindCode)
+                    .queryParam("p_productrankcode", "04")  // 상품 등급
+                    .queryParam("p_countrycode", "1101")    // 서울
+                    .queryParam("p_convert_kg_yn", "Y")
+                    .build()
+                    .toUriString();
+
+            log.debug("KAMIS API 요청 URL: {}", url);
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+            log.info("KAMIS API periodProductList 호출 성공");
+            return response.getBody();
+
+        } catch (Exception e) {
+            log.error("KAMIS API periodProductList 호출 실패", e);
+            return null;
+        }
+    }
+
+    /**
+     * 카테고리별 일일 가격 목록 조회 (dailyPriceByCategoryList)
+     * 소매가격, 서울지역 기준
+     *
+     * @param categoryCode 부류코드
+     * @param regDay 조회일 (yyyy-MM-dd), null이면 오늘
+     * @return JSON 응답 문자열
+     */
+    @Override
+    public String getDailyPriceByCategoryList(String categoryCode, String regDay) {
+        log.info("KAMIS API dailyPriceByCategoryList 호출 - 부류: {}, 날짜: {}", categoryCode, regDay);
+
+        try {
+            if (regDay == null || regDay.isEmpty()) {
+                regDay = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            }
+
+            String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
+                    .queryParam("action", "dailyPriceByCategoryList")
+                    .queryParam("p_cert_key", certKey)
+                    .queryParam("p_cert_id", certId)
+                    .queryParam("p_returntype", "json")
+                    .queryParam("p_product_cls_code", "01")  // 소매
+                    .queryParam("p_item_category_code", categoryCode)
+                    .queryParam("p_country_code", "1101")    // 서울
+                    .queryParam("p_regday", regDay)
+                    .queryParam("p_convert_kg_yn", "Y")
+                    .build()
+                    .toUriString();
+
+            log.debug("KAMIS API 요청 URL: {}", url);
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+            log.info("KAMIS API dailyPriceByCategoryList 호출 성공");
+            return response.getBody();
+
+        } catch (Exception e) {
+            log.error("KAMIS API dailyPriceByCategoryList 호출 실패", e);
+            return null;
+        }
+    }
 }
+
+

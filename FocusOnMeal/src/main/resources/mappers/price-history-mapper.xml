@@ -18,7 +18,7 @@
   	<select id="getRecentPriceByName" resultMap="PriceHistory">
   		SELECT ph.*
   		FROM PRICE_HISTORY ph
-  		JOIN INGREDIENT i ON ph.INGREDIENT_ID = i.INGREDIENT_ID
+  		JOIN INGREDIENT_MASTER i ON ph.INGREDIENT_ID = i.INGREDIENT_ID
   		WHERE i.NAME LIKE '%' || #{ingredientName} || '%'
   		ORDER BY ph.COLLECTED_DATE DESC
   		FETCH FIRST 1 ROWS ONLY
@@ -28,7 +28,7 @@
   	<select id="getRecentPricesByName" resultMap="PriceHistory">
   		SELECT ph.*
   		FROM PRICE_HISTORY ph
-  		JOIN INGREDIENT i ON ph.INGREDIENT_ID = i.INGREDIENT_ID
+  		JOIN INGREDIENT_MASTER i ON ph.INGREDIENT_ID = i.INGREDIENT_ID
   		WHERE i.NAME LIKE '%' || #{ingredientName} || '%'
   		ORDER BY ph.COLLECTED_DATE DESC
   		FETCH FIRST #{limit} ROWS ONLY
@@ -38,7 +38,7 @@
     <insert id="insertPrice" parameterType="com.fom.boot.domain.ingredient.model.vo.PriceHistory">
         <!-- 오라클 시퀀스를 사용한 자동 번호 생성 -->
         <selectKey keyProperty="priceHistoryId" resultType="int" order="BEFORE">
-            SELECT SEQ_PRICE_HISTORY_ID.NEXTVAL FROM DUAL
+            SELECT SEQ_PRICE_HISTORY.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO PRICE_HISTORY (
             PRICE_HISTORY_ID,
@@ -63,6 +63,14 @@
     	FROM PRICE_HISTORY
     	WHERE INGREDIENT_ID = #{ingredientId}
     	ORDER BY COLLECTED_DATE DESC
+    </select>
+
+    <!-- 특정 식자재의 오늘 가격이 이미 저장되어 있는지 확인 -->
+    <select id="checkTodayPriceExists" resultType="int">
+        SELECT COUNT(*)
+        FROM PRICE_HISTORY
+        WHERE INGREDIENT_ID = #{ingredientId}
+        AND TRUNC(COLLECTED_DATE) = TRUNC(SYSDATE)
     </select>
 
 </mapper>

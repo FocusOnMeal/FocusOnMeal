@@ -45,5 +45,57 @@
         WHERE MEMBER_ID = #{memberId}
         AND INGREDIENT_ID = #{ingredientId}
     </select>
-    
+
+    <!-- Ingredient  -->
+    <resultMap id="IngredientResultMap" type="com.fom.boot.domain.ingredient.model.vo.Ingredient">
+        <id property="ingredientId" column="INGREDIENT_ID" />
+        <result property="name" column="NAME" />
+        <result property="category" column="CATEGORY" />
+        <result property="standardUnit" column="STANDARD_UNIT" />
+        <result property="kamisItemCode" column="KAMIS_ITEM_CODE" />
+        <result property="kamisKindCode" column="KAMIS_KIND_CODE" />
+        <result property="kamisItemCategoryCode" column="KAMIS_ITEM_CATEGORY_CODE" />
+    </resultMap>
+
+    <!-- ID로 식자재 조회 -->
+    <select id="selectById" parameterType="int" resultMap="IngredientResultMap">
+        SELECT INGREDIENT_ID, NAME, CATEGORY, STANDARD_UNIT,
+               KAMIS_ITEM_CODE, KAMIS_KIND_CODE, KAMIS_ITEM_CATEGORY_CODE
+        FROM INGREDIENT_MASTER
+        WHERE INGREDIENT_ID = #{ingredientId}
+    </select>
+
+    <!-- KAMIS 코드로 식자재 조회 -->
+    <select id="selectByKamisCode" resultMap="IngredientResultMap">
+        SELECT INGREDIENT_ID, NAME, CATEGORY, STANDARD_UNIT,
+               KAMIS_ITEM_CODE, KAMIS_KIND_CODE, KAMIS_ITEM_CATEGORY_CODE
+        FROM INGREDIENT_MASTER
+        WHERE KAMIS_ITEM_CODE = #{kamisItemCode}
+        AND KAMIS_KIND_CODE = #{kamisKindCode}
+    </select>
+
+    <!-- 식자재 등록 -->
+    <insert id="insertIngredient" parameterType="com.fom.boot.domain.ingredient.model.vo.Ingredient">
+        <selectKey keyProperty="ingredientId" resultType="int" order="BEFORE">
+            SELECT SEQ_INGREDIENT_MASTER.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO INGREDIENT_MASTER (
+            INGREDIENT_ID,
+            NAME,
+            CATEGORY,
+            STANDARD_UNIT,
+            KAMIS_ITEM_CODE,
+            KAMIS_KIND_CODE,
+            KAMIS_ITEM_CATEGORY_CODE
+        ) VALUES (
+            #{ingredientId},
+            #{name},
+            #{category},
+            #{standardUnit},
+            #{kamisItemCode},
+            #{kamisKindCode},
+            #{kamisItemCategoryCode}
+        )
+    </insert>
+
   </mapper>

@@ -39,4 +39,11 @@ public interface IngredientPriceHistoryMapper {
 	 * @return 가격 이력 리스트
 	 */
 	List<PriceHistory> getPriceHistoryByIngredientId(@Param("ingredientId") int ingredientId);
+
+	/**
+	 * 특정 식자재의 오늘 가격이 이미 저장되어 있는지 확인
+	 * @param ingredientId 식자재 ID
+	 * @return 존재하면 1 이상, 없으면 0
+	 */
+	int checkTodayPriceExists(@Param("ingredientId") int ingredientId);
 }

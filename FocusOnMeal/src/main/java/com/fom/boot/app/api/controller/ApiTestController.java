@@ -1,6 +1,7 @@
 package com.fom.boot.app.api.controller;
 
 
+import com.fom.boot.domain.ingredient.model.service.KamisDataSyncService;
 import com.fom.boot.domain.ingredient.model.service.PriceService;
 import com.fom.boot.domain.meal.model.service.ChamgaApiService;
 import com.fom.boot.domain.meal.model.service.GeminiApiService;
@@ -29,6 +30,7 @@ public class ApiTestController {
     private final ChamgaApiService chamgaApiService;
     private final SeoulPriceApiService seoulPriceApiService;
     private final PriceService priceService;
+    private final KamisDataSyncService kamisDataSyncService;
 
     /**
      * 전체 API 연결 테스트
@@ -424,4 +426,118 @@ public class ApiTestController {
                 "message", "API Test Controller is running"
         ));
     }
+
+    /**
+     * KAMIS 데이터 동기화 테스트
+     * GET /api/test/kamis/sync?category=200&item=213&kind=00
+     * 예: 채소류(200), 시금치(213), 전체품종(00)
+     */
+    @GetMapping("/kamis/sync")
+    public ResponseEntity<Map<String, Object>> testKamisSync(
+            @RequestParam(defaultValue = "200") String category,
+            @RequestParam(defaultValue = "213") String item,
+            @RequestParam(defaultValue = "00") String kind
+    ) {
+        log.info("KAMIS 데이터 동기화 테스트 - 부류: {}, 품목: {}, 품종: {}", category, item, kind);
+
+        try {
+            String result = kamisDataSyncService.syncAndGetResult(category, item, kind);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", result.contains("성공") ? "SUCCESS" : "FAIL",
+                    "category", category,
+                    "itemCode", item,
+                    "kindCode", kind,
+                    "result", result
+            ));
+
+        } catch (Exception e) {
+            log.error("KAMIS 데이터 동기화 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * KAMIS periodProductList 원본 응답 조회
+     * GET /api/test/kamis/period?category=200&item=213&kind=00
+     */
+    @GetMapping("/kamis/period")
+    public ResponseEntity<String> testKamisPeriod(
+            @RequestParam(defaultValue = "200") String category,
+            @RequestParam(defaultValue = "213") String item,
+            @RequestParam(defaultValue = "00") String kind,
+            @RequestParam(required = false) String startDay,
+            @RequestParam(required = false) String endDay
+    ) {
+        log.info("KAMIS periodProductList 조회 - 부류: {}, 품목: {}, 품종: {}", category, item, kind);
+
+        try {
+            // 날짜 미지정시 오늘 날짜 사용
+            if (startDay == null || startDay.isEmpty()) {
+                startDay = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            }
+            if (endDay == null || endDay.isEmpty()) {
+                endDay = startDay;
+            }
+
+            String response = kamisApiService.getPeriodProductList(startDay, endDay, category, item, kind);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("KAMIS periodProductList 조회 실패", e);
+            return ResponseEntity.ok("ERROR: " + e.getMessage());
+        }
+    }
+
+    /**
+     * KAMIS 전체 카테고리 데이터 동기화
+     * GET /api/test/kamis/sync/all
+     * 모든 부류(식량작물, 채소류, 특용작물, 과일류, 축산물, 수산물)의 모든 품목을 동기화
+     */
+    @GetMapping("/kamis/sync/all")
+    public ResponseEntity<Map<String, Object>> testKamisSyncAll() {
+        log.info("KAMIS 전체 카테고리 데이터 동기화 시작");
+
+        try {
+            String result = kamisDataSyncService.syncAllCategoriesAndGetResult();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", result.contains("동기화 완료") ? "SUCCESS" : "FAIL",
+                    "result", result
+            ));
+
+        } catch (Exception e) {
+            log.error("KAMIS 전체 동기화 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * KAMIS dailyPriceByCategoryList 원본 응답 조회
+     * GET /api/test/kamis/daily?category=200
+     */
+    @GetMapping("/kamis/daily")
+    public ResponseEntity<String> testKamisDaily(
+            @RequestParam(defaultValue = "200") String category,
+            @RequestParam(required = false) String regDay
+    ) {
+        log.info("KAMIS dailyPriceByCategoryList 조회 - 부류: {}, 날짜: {}", category, regDay);
+
+        try {
+            String response = kamisApiService.getDailyPriceByCategoryList(category, regDay);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("KAMIS dailyPriceByCategoryList 조회 실패", e);
+            return ResponseEntity.ok("ERROR: " + e.getMessage());
+        }
+    }
 }
+
+
