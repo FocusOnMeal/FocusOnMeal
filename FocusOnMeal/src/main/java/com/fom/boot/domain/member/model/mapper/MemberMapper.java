@@ -15,23 +15,42 @@ public interface MemberMapper {
 
     Member findByMemberId(@Param("memberId") String memberId);
 
-    int insertMember(Member member);
+	int insertMember(Member member);
+	
 
     List<Member> selectAllMembers();
 
-    int updateAdminYn(@Param("memberId") String memberId,
-                      @Param("adminYn") String adminYn);
-
-    int updateStatusYn(@Param("memberId") String memberId,
-                       @Param("statusYn") String statusYn);
 
     Member selectOneById(@Param("memberId") String memberId);
 
     int updateMemberPassword(@Param("memberId") String memberId,
                              @Param("encodedPw") String encodedPw);
 
+    int checkEmailExists(String email);
+
+	// 관리자 목록 조회용
+	List<Member> selectAllMembers(
+			@Param("startRow") int startRow,
+			@Param("endRow") int endRow,
+			@Param("type") String type,
+			@Param("keyword") String keyword,
+			@Param("sortColumn") String sortColumn,
+			@Param("sortOrder") String sortOrder
+			);
+	
+	// 관리자 : 회원 등급 변경
+	int updateAdminYn(String memberId, String adminYn);
+	
+	// 관리자 : 회원 상태 변경
+	int updateStatusYn(String memberId, String statusYn);
+	
+	// 관리자 : 총 회원 수
+	int getTotalMembersBySearch(
+	        @Param("type") String type,
+	        @Param("keyword") String keyword
+	);
+
     String searchMemberId(@Param("memberName") String memberName,
                           @Param("email") String email);
 
-    int checkEmailExists(@Param("email") String email);
 }

@@ -127,37 +127,107 @@
         WHERE EMAIL = #{email}
           AND STATUS_YN = 'Y'
     </select>
+	 
+    <!-- 관리자: 전체 회원 목록 조회 -->
+	<select id="selectAllMembers" resultType="com.fom.boot.domain.member.model.vo.Member">
+	    SELECT *
+	    FROM (
+	        SELECT A.*, ROWNUM AS rnum
+	        FROM (
+	            SELECT *
+	            FROM MEMBER
+	            <where>
+	                <!-- 전체 검색 ('all')이면 아래 조건 무시 -->
+	                <if test="type == 'all' and keyword != null and keyword != ''">
+	                    (
+	                        MEMBER_ID LIKE '%' || #{keyword} || '%'
+	                        OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+	                        OR MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+	                    )
+	                </if>
+	
+	                <!-- 특정 항목 검색 -->
+	                <if test="type != 'all' and keyword != null and keyword != ''">
+	                    <choose>
+	                        <when test="type == 'memberId'">
+	                            AND MEMBER_ID LIKE '%' || #{keyword} || '%'
+	                        </when>
+	                        <when test="type == 'memberName'">
+	                            AND MEMBER_NAME LIKE '%' || #{keyword} || '%'
+	                        </when>
+	                        <when test="type == 'memberNickname'">
+	                            AND MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+	                        </when>
+	                    </choose>
+	                </if>
+	            </where>
+	            
+	            <!-- 정렬 추가 -->
+	            ORDER BY 
+            	<choose>
+	                <when test="sortColumn == 'memberId'"> MEMBER_ID </when>
+	                <when test="sortColumn == 'memberName'"> MEMBER_NAME </when>
+	                <when test="sortColumn == 'memberNickname'"> MEMBER_NICKNAME </when>
+	                <when test="sortColumn == 'phone'"> PHONE </when>
+	                <when test="sortColumn == 'email'"> EMAIL </when>
+	                <when test="sortColumn == 'gender'"> GENDER </when>
+	                <when test="sortColumn == 'enrollDate'"> ENROLL_DATE </when>
+	                <when test="sortColumn == 'adminYn'"> ADMIN_YN </when>
+	                <when test="sortColumn == 'statusYn'"> STATUS_YN </when>
+	
+	                <!-- 기본 정렬 = 가입일 최신순 -->
+	                <otherwise> ENROLL_DATE </otherwise>
+	            </choose>
+	            	
+	            <!-- asc / desc -->
+	            <choose>
+	                <when test="sortOrder == 'asc'"> ASC </when>
+	                <otherwise> DESC </otherwise>
+	            </choose>
+	        ) A
+	    )
+	    WHERE rnum BETWEEN #{startRow} AND #{endRow}
+	</select>
 
-    <!-- 관리자: 전체 목록 -->
-    <select id="selectAllMembers"
-            resultType="com.fom.boot.domain.member.model.vo.Member">
-        SELECT
-            MEMBER_ID,
-            MEMBER_PW,
-            MEMBER_NAME,
-            MEMBER_NICKNAME,
-            EMAIL,
-            PHONE,
-            GENDER,
-            ENROLL_DATE,
-            STATUS_YN,
-            ADMIN_YN
+	<!-- 관리자 : 회원 등급 변경 -->
+	<update id="updateAdminYn">
+	    UPDATE MEMBER
+	    SET ADMIN_YN = #{adminYn}
+	    WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<!-- 관리자 : 회원 상태 변경 -->
+	<update id="updateStatusYn">
+	    UPDATE MEMBER
+	    SET STATUS_YN = #{statusYn}
+	    WHERE MEMBER_ID = #{memberId}
+	</update>
+	
+	<!-- 관리자 : 총 회원 수 -->
+	<select id="getTotalMembersBySearch" resultType="int">
+    SELECT COUNT(*)
         FROM MEMBER
-        ORDER BY ENROLL_DATE DESC
+        <where>
+            <if test="type == 'all' and keyword != null and keyword != ''">
+                ( MEMBER_ID LIKE '%' || #{keyword} || '%'
+                  OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+                  OR MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+                )
+            </if>
+    
+            <if test="type != 'all' and keyword != null and keyword != ''">
+                <choose>
+                    <when test="type == 'memberId'">
+                        MEMBER_ID LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'memberName'">
+                        MEMBER_NAME LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'memberNickname'">
+                        MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+                    </when>
+                </choose>
+            </if>
+        </where>
     </select>
-
-    <!-- 회원 등급 변경 -->
-    <update id="updateAdminYn">
-        UPDATE MEMBER
-        SET ADMIN_YN = #{adminYn}
-        WHERE MEMBER_ID = #{memberId}
-    </update>
-
-    <!-- 회원 상태 변경 -->
-    <update id="updateStatusYn">
-        UPDATE MEMBER
-        SET STATUS_YN = #{statusYn}
-        WHERE MEMBER_ID = #{memberId}
-    </update>
-
-</mapper>
+  </mapper>

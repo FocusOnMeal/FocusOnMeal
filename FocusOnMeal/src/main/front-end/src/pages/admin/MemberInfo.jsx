@@ -1,13 +1,31 @@
 import Sidebar from "../../components/admin/Sidebar";
+import Pagination from "../../components/common/Pagination";
 import styles from "./MemberInfo.module.css";
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from "axios";
-
 
 const MemberInfo = () => {
 
     const [memberInfo, setMemberInfo] = useState([]);
+    
+    // 페이지네이션
+    const [pageInfo, setPageInfo] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
+    // api 요청용 검색
+    const [fetchSearchType, setFetchSearchType] = useState('all'); 
+    const [fetchSearchKeyword, setFetchSearchKeyword] = useState('');
+
+    // 화면용 검색
+    const [searchType, setSearchType] = useState('all');
+    const [searchKeyword, setSearchKeyword] = useState('');
+
+    // 정렬 기준 컬럼
+    const [sortColumn, setSortColumn] = useState(null);
+    // 정렬 순서(오름차순, 내림차순)
+    const [sortOrder, setSortOrder] = useState("asc");
+
+    // 회원 등급 변경 토글
     const handleToggleAdminYn = (member) => {
         const newGrade = member.adminYn === "Y" ? "N" : "Y";
         console.log("클릭된 member:", member);
@@ -32,6 +50,7 @@ const MemberInfo = () => {
         .catch(err => console.error(err));
     };
 
+    // 회원 상태 변경 토글
     const handleToggleStatus = (member) => {
         const newStatus = member.statusYn === "Y" ? "N" : "Y";
 
@@ -54,9 +73,34 @@ const MemberInfo = () => {
         .catch(err => console.error(err));
     };
 
+    // 검색 핸들러
+    const handleSearch = () =>{
+        setCurrentPage(1);
+        setFetchSearchType(searchType);
+        setFetchSearchKeyword(searchKeyword);
+    }
 
-    useEffect(() => {
+    // Enter 키로 검색
+    const handleSearchOnEnter = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    // 정렬 핸들러
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            // 같은 컬럼 클릭 → asc ↔ desc 토글
+            setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+        } else {
+            // 새로운 컬럼 클릭 → 오름차순으로 초기화
+            setSortColumn(column);
+            setSortOrder("asc");
+        }
         
+    };
+    
+    useEffect(() => {
         const fetchMemberInfo = () => {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -64,16 +108,29 @@ const MemberInfo = () => {
                 return;
             }
 
+            const params = {
+                page : currentPage,
+                type : fetchSearchType,
+                keyword : fetchSearchKeyword,
+                sortColumn,
+                sortOrder
+            };
+            if (!params.keyword){
+                params.type = 'all';
+            }
+
                 axios.get("/api/admin/memberInfo", {
-                                headers: {
-                                    Authorization: `Bearer ${token}`
-                                }
-                            })
+                    params: params,
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 .then(res => {
                     console.log("[API 성공] 서버 응답:", res);
                     console.log("[API 성공] 받은 데이터:", res.data);
                     
-                    setMemberInfo(res.data);
+                    setMemberInfo(res.data.memberList);
+                    setPageInfo(res.data.pageInfo);
                 })
                 .catch(err => {
                     console.error("[API 실패] 에러 발생:", err);
@@ -96,41 +153,152 @@ const MemberInfo = () => {
                     }
                 });
         };
-        fetchMemberInfo();
-    }, []);
+        fetchMemberInfo(currentPage);
+    }, [currentPage, fetchSearchType, fetchSearchKeyword, sortColumn,sortOrder]);
 
     return (
         <div className={styles.container}>
             <Sidebar />
-
             <main className={styles.main}>
                 <h2 className={styles.title}>회원 관리</h2>
+                <div className={styles.searchBox}>
+                    <select
+                        value={searchType}
+                        onChange={e => setSearchType(e.target.value)}
+                        className={styles.selectBox}
+                        >
+                            <option value="all">전체</option>
+                            <option value="memberId">아이디</option>
+                            <option value="memberName">이름</option>
+                            <option value="memberNickname">닉네임</option>
+                        </select>
+                    <input
+                        type="text"
+                        placeholder="검색어를 입력하세요"
+                        value={searchKeyword}
+                        onChange={e => setSearchKeyword(e.target.value)}
+                        onKeyDown={handleSearchOnEnter}
+                        className={styles.searchInput}
+                    />
+                    <button 
+                    onClick={handleSearch}
+                    className={styles.searchBtn}
+                    >
+                        검색
+                    </button>
+                </div>
                 <table className={styles.memberTable}>
                     <thead>
                         <tr>
-                            <th>아이디</th>
-                            <th>닉네임</th>
-                            <th>이름</th>
-                            <th>전화번호</th>
-                            <th>이메일</th>
-                            <th>성별</th>
-                            <th>가입일</th>
-                            <th>회원등급</th>
-                            <th>상태</th>
+                            <th className={styles.idCol} onClick={() => handleSort("memberId")}>
+                                아이디 
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "memberId" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "memberId" 
+                                    ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+
+                            <th className={styles.nicknameCol} onClick={() => handleSort("memberNickname")}>
+                                닉네임
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "memberNickname" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "memberNickname" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+
+                            <th className={styles.nameCol} onClick={() => handleSort("memberName")}>
+                                이름
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "memberName" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "memberName" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+
+                            <th className={styles.phoneCol} onClick={() => handleSort("phone")}>
+                                전화번호
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "phone" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "phone" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+
+                            <th className={styles.emailCol} onClick={() => handleSort("email")}>
+                                이메일
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "email" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "email" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+
+                            <th className={styles.genderCol} onClick={() => handleSort("gender")}>
+                                성별
+                                <span className={`${styles.sortArrow} ${sortColumn === "gender" ? styles.activeSort : ""}`}>
+                                    {sortColumn === "gender" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+
+                            <th className={styles.dateCol} onClick={() => handleSort("enrollDate")}>
+                                가입일
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "enrollDate" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "enrollDate" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+                            <th className={styles.gradeCol} onClick={() => handleSort("adminYn")}>
+                                등급
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "adminYn" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "adminYn" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+                            <th className={styles.statusCol} onClick={() => handleSort("statusYn")}>
+                                상태
+                                <span className={`${styles.sortArrow} ${
+                                    sortColumn === "statusYn" ? styles.activeSort : ""
+                                }`}>
+                                    {sortColumn === "statusYn" ? (sortOrder === "asc" ? "▲" : "▼") : "▲▼"}
+                                </span>
+                            </th>
+
                         </tr>
                     </thead>
 
                     <tbody>
+                        {/* 검색 결과 없을 때 */}
+                        {memberInfo?.length === 0 && (
+                            <tr>
+                                <td colSpan="9" style={{ textAlign: "center", padding: "20px" }}>
+                                    검색 결과가 없습니다.
+                                </td>
+                            </tr>
+                        )}
                         {memberInfo.map((m, i) => (
                             <tr key={i}>
-                                <td>{m.memberId}</td>
-                                <td>{m.memberNickname}</td>
-                                <td>{m.memberName}</td>
-                                <td>{m.phone}</td>
-                                <td>{m.email}</td>
-                                <td>{m.gender}</td>
-                                <td>{new Date(m.enrollDate).toLocaleDateString("ko-KR")}</td>
+                                <td className={styles.idCol}>{m.memberId}</td>
                                 <td>
+                                    <span className={styles.nicknameWrapper}>
+                                        <span className={styles.truncatedText}>
+                                            {m.memberNickname}
+                                        </span>
+                                        <span className={styles.nicknameTooltip}>
+                                            {m.memberNickname}
+                                        </span>
+                                    </span>
+                                </td>
+                                <td className={styles.nameCol}>{m.memberName}</td>
+                                <td className={styles.phoneCol}>{m.phone}</td>
+                                <td className={styles.emailCol}>{m.email}</td>
+                                <td className={styles.genderCol}>{m.gender}</td>
+                                <td className={styles.dateCol}>{new Date(m.enrollDate).toLocaleDateString("ko-KR")}</td>
+                                <td className={styles.toggle}>
                                     <label className={styles.toggleSwitch}>
                                         <input
                                         type="checkbox"
@@ -141,7 +309,7 @@ const MemberInfo = () => {
                                     </label>
                                 </td>
 
-                                <td>
+                                <td className={styles.toggle}>
                                     <label className={styles.toggleSwitch}>
                                         <input
                                         type="checkbox"
@@ -156,6 +324,11 @@ const MemberInfo = () => {
                         ))}
                     </tbody>
                 </table>
+                <Pagination 
+                    pageInfo={pageInfo}
+                    currentPage={currentPage}
+                    changePage={(page) => setCurrentPage(page)}
+                />
             </main>
         </div>
     );

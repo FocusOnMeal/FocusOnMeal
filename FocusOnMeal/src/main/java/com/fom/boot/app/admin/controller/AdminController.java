@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fom.boot.common.pagination.PageInfo;
+import com.fom.boot.common.pagination.Pagination;
 import com.fom.boot.domain.member.model.service.MemberService;
 import com.fom.boot.domain.member.model.vo.Member;
 import com.fom.boot.domain.notice.model.service.NoticeService;
@@ -35,7 +37,13 @@ public class AdminController {
 	
 	//회원 목록 조회
 	@GetMapping("/memberInfo")
-	public ResponseEntity<?> selectMembers(Authentication authentication) {
+	public ResponseEntity<?> selectMembers(
+			@RequestParam(defaultValue ="1") int page
+			,@RequestParam(defaultValue = "all") String type
+	        ,@RequestParam(defaultValue = "") String keyword
+	        ,@RequestParam(required = false) String sortColumn
+	        ,@RequestParam(required = false) String sortOrder
+			,Authentication authentication) {
 		// 1. 토큰 인증 체크
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, String> error = new HashMap<>();
@@ -56,11 +64,21 @@ public class AdminController {
         if (!"Y".equals(member.getAdminYn())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자만 접근 가능합니다.");
         }
+        
+        // 검색포함 총 데이터 개수 조회
+        int totalCount = mService.getTotalMembersBySearch(type, keyword);
 
-        // 3. 전체 회원 목록 조회
-        List<Member> list = mService.selectAllMembers();
-
-        return ResponseEntity.ok(list);
+        // Pagination
+        PageInfo pageInfo= Pagination.getPageInfo(page, totalCount);
+        
+        // 전체 회원 목록 조회
+        List<Member> mList = mService.selectAllMembers(pageInfo, type, keyword, sortColumn, sortOrder);
+        
+        Map<String, Object> data = new HashMap<>();
+    	data.put("pageInfo", pageInfo);
+    	data.put("memberList", mList);
+    	
+        return ResponseEntity.ok(data);
 	}
 	
 	// 관리자 등급 수정
@@ -163,8 +181,6 @@ public class AdminController {
 			@RequestBody Notice notice,
 			Authentication authentication) {
 
-		System.out.println("=== 받은 Notice JSON ===");
-		System.out.println(notice);
 		// 1. 토큰 인증 체크
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, String> error = new HashMap<>();
@@ -186,6 +202,8 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자만 접근 가능합니다.");
         }
 		
+        System.out.println("=== 받은 Notice JSON ===");
+        System.out.println(notice);
         
 	    int result = nService.modifyNotice(notice);
 

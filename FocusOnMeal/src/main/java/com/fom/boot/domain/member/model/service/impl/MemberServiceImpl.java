@@ -1,20 +1,23 @@
 package com.fom.boot.domain.member.model.service.impl;
 
-import com.fom.boot.domain.member.model.mapper.MemberMapper;
-import com.fom.boot.domain.member.model.service.MemberService;
-import com.fom.boot.domain.member.model.service.EmailService;
-import com.fom.boot.domain.member.model.vo.Member;
-import com.fom.boot.app.member.dto.LoginRequest;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
-import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import com.fom.boot.app.member.dto.LoginRequest;
+import com.fom.boot.common.pagination.PageInfo;
+import com.fom.boot.domain.member.model.mapper.MemberMapper;
+import com.fom.boot.domain.member.model.service.EmailService;
+import com.fom.boot.domain.member.model.service.MemberService;
+import com.fom.boot.domain.member.model.vo.Member;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -114,26 +117,6 @@ public class MemberServiceImpl implements MemberService {
         verificationCodes.entrySet().removeIf(e -> e.getValue().expiryTime() < now);
     }
 
-    // 관리자 기능
-    @Override
-    public List<Member> selectAllMembers() {
-        return memberMapper.selectAllMembers();
-    }
-
-    @Override
-    public Member findByMemberId(String memberId) {
-        return memberMapper.findByMemberId(memberId);
-    }
-
-    @Override
-    public int updateAdminYn(String memberId, String adminYn) {
-        return memberMapper.updateAdminYn(memberId, adminYn);
-    }
-
-    @Override
-    public int updateStatusYn(String memberId, String statusYn) {
-        return memberMapper.updateStatusYn(memberId, statusYn);
-    }
 
     // 비밀번호 재설정 (실제 구현 X)
     @Override
@@ -162,4 +145,49 @@ public class MemberServiceImpl implements MemberService {
         emailService.sendMemberIdEmail(email, memberName, memberId);
         return true;
     }
+
+	@Override
+	public boolean checkEmailExists(Object email) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	// 관리자 목록 조회용
+	@Override
+	public List<Member> selectAllMembers(PageInfo pageInfo, String type, String keyword, String sortColumn, String sortOrder) {
+		return memberMapper.selectAllMembers(
+	            pageInfo.getStartRow(),
+	            pageInfo.getEndRow(),
+	            type,
+	            keyword,
+	            sortColumn,
+	            sortOrder
+	    );
+	}
+
+	@Override
+	public Member findByMemberId(String memberId) {
+		return memberMapper.findByMemberId(memberId);
+	}
+	
+	// 회원 등급 변경
+	@Override
+	public int updateAdminYn(String memberId, String adminYn) {
+		return memberMapper.updateAdminYn(memberId, adminYn);
+		
+	}
+
+	// 회원 상태 변경
+	@Override
+	public int updateStatusYn(String memberId, String statusYn) {
+		return memberMapper.updateStatusYn(memberId, statusYn);
+		
+	}
+
+	// 총 회원수 + 검색
+	@Override
+	public int getTotalMembersBySearch(String type, String keyword) {
+		return memberMapper.getTotalMembersBySearch(type, keyword);
+	}
 }
