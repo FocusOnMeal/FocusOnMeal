@@ -58,9 +58,6 @@ function App() {
         <Route path="/admin/memberInfo" element={<MemberInfo />} />
         <Route path="/admin/noticeInfo" element={<NoticeInfo/>} />
 
-        {/* 마이페이지 홈 (대시보드) */}
-        <Route path="/mypage" element={<Dashboard />} />
-
         {/* 공지사항 게시판 관련 */}
         <Route path="/board/notice/list" element={<NoticeList /> }/>
         {/* <Route path="/notice/detail" element={<NoticeDetail />} /> */}

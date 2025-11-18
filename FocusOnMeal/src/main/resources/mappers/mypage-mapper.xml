@@ -35,6 +35,11 @@
 	  </select>
 	  
 	<!-- 대시보드2 -->
+	<select id="findMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
+	    SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
+	    FROM MEMBER
+	    WHERE MEMBER_ID = #{memberId}
+	</select>
 	<!-- 찜한 식자재 요약 목록 조회 (최신 가격 포함) -->
     <select id="findFavoriteIngredientSummary" resultType="FavoriteIngredientSummaryDTO">
         SELECT 
