@@ -88,10 +88,5 @@
           AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
     </select>
 
-    <select id="findMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
-        SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
-        FROM MEMBER
-        WHERE MEMBER_ID = #{memberId}
-    </select>
     
   </mapper>
