@@ -48,7 +48,7 @@
 .searchBtn {
     background: #67932A;
     color: #fff;
-    padding: 10px 22px;
+    padding: 10px 12px;
     border-radius: 8px;
     border: none;
     font-size: 14px;
@@ -62,7 +62,7 @@
 /* 테이블 박스 (화이트 카드 느낌) */
 .tableBox {
     background: #fff;
-    padding: 25px;
+    padding: 20px;
     border-radius: 14px;
     border: 1px solid #e1e1e1;
     box-shadow: 0 3px 8px rgba(0,0,0,0.05);
@@ -72,7 +72,7 @@
 .memberTable {
     width: 100%;
     border-collapse: collapse;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 /* 테이블 헤더 */
@@ -130,8 +130,8 @@
 /* 토글 전체 */
 .toggleSwitch {
     position: relative;
-    width: 48px;
-    height: 24px;
+    width: 36px;
+    height: 18px;
     display: inline-block;
 }
 
@@ -158,8 +158,8 @@
 .slider::before {
     content: "";
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 12px;
+    height: 12px;
     left: 3px;
     top: 3px;
     background: white;
@@ -169,12 +169,12 @@
 
 /* ON 상태일 때 */
 .toggleSwitch input:checked + .slider {
-  background-color: #0796E5;   /* 활성색 */
+  background-color: #67932A;   /* 활성색 */
 }
 
 /* 동그라미 이동 */
 .toggleSwitch input:checked + .slider::before {
-    transform: translateX(24px);
+    transform: translateX(18px);
 }
 
 

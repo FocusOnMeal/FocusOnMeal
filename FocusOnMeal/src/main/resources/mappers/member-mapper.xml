@@ -106,9 +106,8 @@
 	      AND STATUS_YN = 'Y'
 	</select>
 
-    
 	 
-	 <!-- 이메일 중복 확인 -->
+	<!-- 이메일 중복 확인 -->
 	<select id="checkEmailExists" parameterType="String" resultType="int">
 	    SELECT COUNT(*)
 	    FROM MEMBER
@@ -117,22 +116,41 @@
 	</select>
 	 
     <!-- 관리자: 전체 회원 목록 조회 -->
-	<select id="selectAllMembers" resultType="com.fom.boot.domain.member.model.vo.Member">
-	    SELECT
-	        MEMBER_ID,
-	        MEMBER_PW,
-	        MEMBER_NAME,
-	        MEMBER_NICKNAME,
-	        EMAIL,
-	        PHONE,
-	        GENDER,
-	        ENROLL_DATE,
-	        STATUS_YN,
-	        ADMIN_YN
-	    FROM MEMBER
-	    ORDER BY ENROLL_DATE DESC
-	</select>
-	
+	<select id="selectAllMembers" parameterType="map" resultType="com.fom.boot.domain.member.model.vo.Member">
+	    SELECT *
+	    FROM (
+	        SELECT ROWNUM, A.*
+	        FROM (
+	            SELECT *
+	            FROM MEMBER
+                <where>
+                    <if test="type == 'all' and keyword != null and keyword != ''">
+                        ( MEMBER_ID LIKE '%' || #{keyword} || '%'
+                          OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+                          OR MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+                        )
+                    </if>
+    
+                    <if test="type != 'all' and keyword != null and keyword != ''">
+                        <choose>
+                            <when test="type == 'memberId'">
+                                MEMBER_ID LIKE '%' || #{keyword} || '%'
+                            </when>
+                            <when test="type == 'memberName'">
+                                MEMBER_NAME LIKE '%' || #{keyword} || '%'
+                            </when>
+                            <when test="type == 'memberNickname'">
+                                MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+                            </when>
+                        </choose>
+                    </if>
+                </where>
+	            ORDER BY ENROLL_DATE DESC
+	        ) A
+	        WHERE ROWNUM &lt;= #{endRow} )
+	    WHERE ROWNUM &gt;= #{startRow} 
+    </select>
+
 	<!-- 관리자 : 회원 등급 변경 -->
 	<update id="updateAdminYn">
 	    UPDATE MEMBER
@@ -147,4 +165,31 @@
 	    WHERE MEMBER_ID = #{memberId}
 	</update>
 	
+	<!-- 관리자 : 총 회원 수 -->
+	<select id="getTotalMembersBySearch" resultType="int">
+    SELECT COUNT(*)
+        FROM MEMBER
+        <where>
+            <if test="type == 'all' and keyword != null and keyword != ''">
+                ( MEMBER_ID LIKE '%' || #{keyword} || '%'
+                  OR MEMBER_NAME LIKE '%' || #{keyword} || '%'
+                  OR MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+                )
+            </if>
+    
+            <if test="type != 'all' and keyword != null and keyword != ''">
+                <choose>
+                    <when test="type == 'memberId'">
+                        MEMBER_ID LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'memberName'">
+                        MEMBER_NAME LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'memberNickname'">
+                        MEMBER_NICKNAME LIKE '%' || #{keyword} || '%'
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
   </mapper>

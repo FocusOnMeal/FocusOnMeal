@@ -22,12 +22,6 @@ public interface MemberMapper {
 
 	int insertMember(Member member);
 	
-	// 관리자 목록 조회용
-	List<Member> selectAllMembers();
-	
-	int updateAdminYn(String memberId, String adminYn);
-
-	int updateStatusYn(String memberId, String statusYn);
 
 	// package com.fom.boot.domain.member.model.mapper;
 	// public interface MemberMapper { ... } 내부에 추가
@@ -42,6 +36,27 @@ public interface MemberMapper {
 	String searchMemberId(@Param("memberName") String memberName, @Param("email") String email);
 
 	int checkEmailExists(String email);
+
+	// 관리자 목록 조회용
+	List<Member> selectAllMembers(
+			@Param("startRow") int startRow,
+			@Param("endRow") int endRow,
+			@Param("type") String type,
+			@Param("keyword") String keyword
+			);
+	
+	// 관리자 : 회원 등급 변경
+	int updateAdminYn(String memberId, String adminYn);
+	
+	// 관리자 : 회원 상태 변경
+	int updateStatusYn(String memberId, String statusYn);
+	
+	// 관리자 : 총 회원 수
+//	int getTotalMembers();
+	int getTotalMembersBySearch(
+	        @Param("type") String type,
+	        @Param("keyword") String keyword
+	);
 	
 	
 

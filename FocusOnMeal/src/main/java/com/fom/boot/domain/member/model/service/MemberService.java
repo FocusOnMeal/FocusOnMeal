@@ -1,13 +1,15 @@
 package com.fom.boot.domain.member.model.service;
 
 import java.util.List;
+
 import com.fom.boot.app.member.dto.LoginRequest;
+import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.domain.member.model.vo.Member;
 
 public interface MemberService {
     Member selectOneByLogin(LoginRequest member);
     int insertMember(Member member);
-    List<Member> selectAllMembers();
+    
 
     // 추가로 Controller에서 호출하는 메서드들
     Member selectOneById(String memberId);
@@ -28,6 +30,9 @@ public interface MemberService {
     
     boolean sendMemberIdByEmail(String memberName, String email) throws Exception;
     boolean checkEmailExists(Object email);
+   
+    // 관리자 회원 조회
+    List<Member> selectAllMembers(PageInfo pageInfo, String type ,String keyword);
     
 	// 관리자 체크용
 	Member findByMemberId(String memberId);
@@ -37,5 +42,8 @@ public interface MemberService {
 
 	// 회원 상태 변경
 	int updateStatusYn(String memberId, String statusYn);
+	
+	// 총 회원 수 + 검색
+	int getTotalMembersBySearch(String type, String keyword);
 	
 }

@@ -2,12 +2,29 @@ import Sidebar from "../../components/admin/Sidebar";
 import styles from "./MemberInfo.module.css";
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
+import Pagination from "../../components/common/Pagination";
 
 
 const MemberInfo = () => {
 
     const [memberInfo, setMemberInfo] = useState([]);
+    //const [searchParams, setSearchParams] = useSearchParams();
+    
+    // 페이지네이션
+    const [pageInfo, setPageInfo] = useState(null);
+    // const currentPage = parseInt(searchParams.get('page') || '1');
+    const [currentPage, setCurrentPage] = useState(1);
 
+    // api 요청용 검색
+    const [fetchSearchType, setFetchSearchType] = useState('all'); 
+    const [fetchSearchKeyword, setFetchSearchKeyword] = useState('');
+
+    // 화면용 검색
+    const [searchType, setSearchType] = useState('all');
+    const [searchKeyword, setSearchKeyword] = useState('');
+
+    // 회원 등급 변경 토글
     const handleToggleAdminYn = (member) => {
         const newGrade = member.adminYn === "Y" ? "N" : "Y";
         console.log("클릭된 member:", member);
@@ -32,6 +49,7 @@ const MemberInfo = () => {
         .catch(err => console.error(err));
     };
 
+    // 회원 상태 변경 토글
     const handleToggleStatus = (member) => {
         const newStatus = member.statusYn === "Y" ? "N" : "Y";
 
@@ -54,9 +72,28 @@ const MemberInfo = () => {
         .catch(err => console.error(err));
     };
 
+    // 페이지 변경 핸들러
+    const changePage = page => {
+        setSearchParams({page:page.toString()})
+    }
+
+    // 검색 핸들러
+    const handleSearch = () =>{
+        setCurrentPage(1);
+        setFetchSearchType(searchType);
+        setFetchSearchKeyword(searchKeyword);
+
+    }
+
+    // Enter 키로 검색
+    const handleSearchOnEnter = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
 
     useEffect(() => {
-        
         const fetchMemberInfo = () => {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -64,16 +101,27 @@ const MemberInfo = () => {
                 return;
             }
 
+            const params = {
+                page : currentPage,
+                type : fetchSearchType,
+                keyword : fetchSearchKeyword
+            };
+            if (!params.keyword){
+                params.type = 'all';
+            }
+
                 axios.get("/api/admin/memberInfo", {
-                                headers: {
-                                    Authorization: `Bearer ${token}`
-                                }
-                            })
+                    params: params,
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 .then(res => {
                     console.log("[API 성공] 서버 응답:", res);
                     console.log("[API 성공] 받은 데이터:", res.data);
                     
-                    setMemberInfo(res.data);
+                    setMemberInfo(res.data.memberList);
+                    setPageInfo(res.data.pageInfo);
                 })
                 .catch(err => {
                     console.error("[API 실패] 에러 발생:", err);
@@ -96,15 +144,40 @@ const MemberInfo = () => {
                     }
                 });
         };
-        fetchMemberInfo();
-    }, []);
+        fetchMemberInfo(currentPage);
+    }, [currentPage, fetchSearchType, fetchSearchKeyword]);
 
     return (
         <div className={styles.container}>
             <Sidebar />
-
             <main className={styles.main}>
                 <h2 className={styles.title}>회원 관리</h2>
+                <div className={styles.searchBox}>
+                    <select
+                        value={searchType}
+                        onChange={e => setSearchType(e.target.value)}
+                        className={styles.selectBox}
+                        >
+                            <option value="all">전체</option>
+                            <option value="memberId">아이디</option>
+                            <option value="memberName">이름</option>
+                            <option value="memberNickname">닉네임</option>
+                        </select>
+                    <input
+                        type="text"
+                        placeholder="검색어를 입력하세요"
+                        value={searchKeyword}
+                        onChange={e => setSearchKeyword(e.target.value)}
+                        onKeyDown={handleSearchOnEnter}
+                        className={styles.searchInput}
+                    />
+                    <button 
+                    onClick={handleSearch}
+                    className={styles.searchBtn}
+                    >
+                        검색
+                    </button>
+                </div>
                 <table className={styles.memberTable}>
                     <thead>
                         <tr>
@@ -121,7 +194,15 @@ const MemberInfo = () => {
                     </thead>
 
                     <tbody>
-                        {memberInfo.map((m, i) => (
+                        {/* 검색 결과 없을 때 */}
+                        {memberInfo?.length === 0 && (
+                            <tr>
+                                <td colSpan="9" style={{ textAlign: "center", padding: "20px" }}>
+                                    검색 결과가 없습니다.
+                                </td>
+                            </tr>
+                        )}
+                        {memberInfo?.map((m, i) => (
                             <tr key={i}>
                                 <td>{m.memberId}</td>
                                 <td>{m.memberNickname}</td>
@@ -156,6 +237,11 @@ const MemberInfo = () => {
                         ))}
                     </tbody>
                 </table>
+                <Pagination 
+                    pageInfo={pageInfo}
+                    currentPage={currentPage}
+                    changePage={(page) => setCurrentPage(page)}
+                />
             </main>
         </div>
     );

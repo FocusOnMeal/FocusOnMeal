@@ -1,20 +1,23 @@
 package com.fom.boot.domain.member.model.service.impl;
 
-import com.fom.boot.domain.member.model.mapper.MemberMapper;
-import com.fom.boot.domain.member.model.service.MemberService;
-import com.fom.boot.domain.member.model.service.EmailService;
-import com.fom.boot.domain.member.model.vo.Member;
-import com.fom.boot.app.member.dto.LoginRequest;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
-import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import com.fom.boot.app.member.dto.LoginRequest;
+import com.fom.boot.common.pagination.PageInfo;
+import com.fom.boot.domain.member.model.mapper.MemberMapper;
+import com.fom.boot.domain.member.model.service.EmailService;
+import com.fom.boot.domain.member.model.service.MemberService;
+import com.fom.boot.domain.member.model.vo.Member;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -160,8 +163,13 @@ public class MemberServiceImpl implements MemberService {
 
 	// 관리자 목록 조회용
 	@Override
-	public List<Member> selectAllMembers() {
-		return memberMapper.selectAllMembers();
+	public List<Member> selectAllMembers(PageInfo pageInfo, String type, String keyword) {
+		return memberMapper.selectAllMembers(
+	            pageInfo.getStartRow(),
+	            pageInfo.getEndRow(),
+	            type,
+	            keyword
+	    );
 	}
 
 	@Override
@@ -181,5 +189,11 @@ public class MemberServiceImpl implements MemberService {
 	public int updateStatusYn(String memberId, String statusYn) {
 		return memberMapper.updateStatusYn(memberId, statusYn);
 		
+	}
+
+	// 총 회원수 + 검색
+	@Override
+	public int getTotalMembersBySearch(String type, String keyword) {
+		return memberMapper.getTotalMembersBySearch(type, keyword);
 	}
 }
