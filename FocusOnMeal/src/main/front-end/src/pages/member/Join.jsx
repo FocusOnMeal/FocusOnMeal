@@ -236,10 +236,32 @@ function Join() {
     // ============ 입력 변경 핸들러 ============
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        
+        // 전화번호 자동 하이픈 처리
+        if (name === 'phone') {
+            const numbers = value.replace(/[^0-9]/g, ''); // 숫자만 추출
+            let formattedPhone = numbers;
+            
+            if (numbers.length <= 3) {
+                formattedPhone = numbers;
+            } else if (numbers.length <= 7) {
+                formattedPhone = `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+            } else if (numbers.length <= 11) {
+                formattedPhone = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+            } else {
+                formattedPhone = `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+            }
+            
+            setFormData(prev => ({
+                ...prev,
+                [name]: formattedPhone
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
         
         // 아이디 변경 시 중복 확인 초기화
         if (name === 'memberId') {
@@ -309,12 +331,19 @@ function Join() {
         
         try {
             setLoading(true);
-            await authService.sendVerificationCode(email);
-            setVerificationSent(true);
-            setVerificationTimer(300); // 5분
-            alert('인증 코드가 이메일로 발송되었습니다.');
+            console.log('인증 코드 발송 요청:', email);
+            const response = await authService.sendVerificationCode(email);
+            console.log('인증 코드 발송 응답:', response.data);
+            
+            if (response.data.success) {
+                setVerificationSent(true);
+                setVerificationTimer(300); // 5분
+                alert('인증 코드가 이메일로 발송되었습니다.');
+            }
         } catch (error) {
-            alert(error.message || '인증 코드 발송에 실패했습니다.');
+            console.error('인증 코드 발송 오류:', error);
+            const errorMessage = error.response?.data?.error || error.message || '인증 코드 발송에 실패했습니다.';
+            alert(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -333,7 +362,9 @@ function Join() {
         
         try {
             setLoading(true);
+            console.log('이메일 인증 요청:', email, emailVerificationCode);
             const response = await authService.verifyEmailCode(email, emailVerificationCode);
+            console.log('이메일 인증 응답:', response.data);
             
             if (response.data.verified) {
                 setEmailVerified(true);
@@ -343,7 +374,9 @@ function Join() {
                 alert('인증 코드가 일치하지 않습니다.');
             }
         } catch (error) {
-            alert(error.message || '인증 코드 확인에 실패했습니다.');
+            console.error('이메일 인증 오류:', error);
+            const errorMessage = error.response?.data?.message || error.message || '인증 코드 확인에 실패했습니다.';
+            alert(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -360,13 +393,18 @@ function Join() {
             newErrors.memberId = '아이디 중복 확인이 필요합니다.';
         }
         
-        // 비밀번호
+        // 비밀번호 (✅ 수정: 숫자 + 특수문자만 있어도 OK)
         if (!formData.memberPw) {
             newErrors.memberPw = '비밀번호를 입력해주세요.';
         } else if (formData.memberPw.length < 8) {
             newErrors.memberPw = '비밀번호는 8자 이상이어야 합니다.';
-        } else if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(formData.memberPw)) {
-            newErrors.memberPw = '비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.';
+        } else {
+            const hasDigit = /\d/.test(formData.memberPw);
+            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.memberPw);
+            
+            if (!hasDigit || !hasSpecial) {
+                newErrors.memberPw = '비밀번호는 숫자와 특수문자를 포함해야 합니다.';
+            }
         }
         
         // 비밀번호 확인
@@ -424,11 +462,18 @@ function Join() {
         
         try {
             setLoading(true);
-            await authService.joinMember(memberData);
-            alert('회원가입이 완료되었습니다!');
-            navigate('/login');
+            console.log('회원가입 요청:', memberData);
+            const response = await authService.joinMember(memberData);
+            console.log('회원가입 응답:', response.data);
+            
+            if (response.data.success) {
+                alert('회원가입이 완료되었습니다!');
+                navigate('/login');
+            }
         } catch (error) {
-            alert(error.message || '회원가입에 실패했습니다.');
+            console.error('회원가입 오류:', error);
+            const errorMessage = error.response?.data?.error || error.message || '회원가입에 실패했습니다.';
+            alert(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -561,7 +606,7 @@ function Join() {
                             </p>
                         )}
                         <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                            영문 대소문자, 숫자, 특수문자를 모두 포함해야 합니다.
+                            숫자와 특수문자를 포함해야 합니다. (영문 선택)
                         </p>
                     </div>
                     
@@ -630,7 +675,7 @@ function Join() {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            placeholder="01012345678 (- 없이 입력)"
+                            placeholder="010-1234-5678"
                             style={{
                                 width: '100%',
                                 padding: '12px',

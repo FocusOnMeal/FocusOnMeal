@@ -440,9 +440,9 @@ public class MemberController {
         if (password == null || password.length() < 8) {
             return false;
         }
-        boolean hasLetter = password.matches(".*[A-Za-z].*");
+        // ✅ 수정: 숫자 + 특수문자만 있어도 OK (영문은 선택)
         boolean hasDigit = password.matches(".*\\d.*");
         boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*");
-        return hasLetter && hasDigit && hasSpecial;
+        return hasDigit && hasSpecial;
     }
 }
