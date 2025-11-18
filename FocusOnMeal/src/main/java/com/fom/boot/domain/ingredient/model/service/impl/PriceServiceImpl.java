@@ -142,9 +142,8 @@ public class PriceServiceImpl implements PriceService {
 
 	/**
 	 * 식자재 가격 조회 (Fallback 포함)
-	 * 1단계: DB 조회
-	 * 2단계: 서울시 API 조회
-	 * 3단계: 기본 가격 상수
+	 * 1단계: DB 조회 (KAMIS PRICE_HISTORY)
+	 * 2단계: 기본 가격 상수
 	 *
 	 * @param ingredientName 식자재명
 	 * @return 가격 (원/kg), 모든 조회 실패 시 null
@@ -153,11 +152,11 @@ public class PriceServiceImpl implements PriceService {
 	public Integer getPrice(String ingredientName) {
 		log.debug("가격 조회 시작 - 식자재: {}", ingredientName);
 
-		// 1단계: DB 조회
+		// 1단계: DB 조회 (KAMIS 데이터)
 		try {
 			PriceHistory priceHistory = priceHistoryMapper.getRecentPriceByName(ingredientName);
 			if (priceHistory != null) {
-				log.info("DB에서 가격 조회 성공 - 식자재: {}, 가격: {}원/kg (수집일: {})",
+				log.info("KAMIS DB에서 가격 조회 성공 - 식자재: {}, 가격: {}원/kg (수집일: {})",
 						ingredientName, priceHistory.getPriceValue(), priceHistory.getCollectedDate());
 				return priceHistory.getPriceValue();
 			}
@@ -165,18 +164,7 @@ public class PriceServiceImpl implements PriceService {
 			log.warn("DB 가격 조회 실패 - 식자재: {}, 에러: {}", ingredientName, e.getMessage());
 		}
 
-		// 2단계: 서울시 API 조회
-		try {
-			Integer seoulPrice = seoulPriceApiService.getAveragePrice(ingredientName);
-			if (seoulPrice != null) {
-				log.info("서울시 API에서 가격 조회 성공 - 식자재: {}, 가격: {}원", ingredientName, seoulPrice);
-				return seoulPrice;
-			}
-		} catch (Exception e) {
-			log.warn("서울시 API 가격 조회 실패 - 식자재: {}, 에러: {}", ingredientName, e.getMessage());
-		}
-
-		// 3단계: 기본 가격 상수 조회 (부분 매칭)
+		// 2단계: 기본 가격 상수 조회 (서울시 API 제거됨)
 		Integer defaultPrice = getDefaultPrice(ingredientName);
 		if (defaultPrice != null) {
 			log.info("기본 가격 사용 - 식자재: {}, 가격: {}원/kg", ingredientName, defaultPrice);

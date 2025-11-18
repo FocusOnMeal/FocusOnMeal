@@ -23,9 +23,9 @@
             <label>신체 정보 입력</label>
             <div class="input-row">
                 <span>키 :</span>
-                <input type="number" id="height" placeholder="170" min="100" max="250">
+                <input type="number" id="height" value="170" placeholder="170" min="100" max="250">
                 <span>몸무게</span>
-                <input type="number" id="weight" placeholder="70" min="30" max="200">
+                <input type="number" id="weight" value="70" placeholder="70" min="30" max="200">
             </div>
         </div>
     </div>
@@ -118,11 +118,11 @@
                 <div id="chatPlaceholder">AI에게 식단 추천받기</div>
                 <div id="chatMessages" class="chat-messages"></div>
                 <div class="chat-input-area">
-                    <input type="text" id="chatInput" class="chat-input" placeholder="메시지를 입력하세요...">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="ex) 건강한 한 끼 식사 추천해줘.">
                     <button id="chatSendBtn" class="chat-send-btn">전송</button>
                 </div>
             </div>
-            <button class="generate-btn" id="generateBtn">식단 정보 보기</button>
+            <button class="generate-btn" id="generateBtn" hidden="hidden"></button>
             <div id="errorMessage" class="error-message"></div>
         </div>
 

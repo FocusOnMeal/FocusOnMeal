@@ -136,6 +136,7 @@ h1 {
     border-radius: 10px;
     padding: 20px;
     min-height: 550px;
+    max-height: 550px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -149,6 +150,7 @@ h1 {
 .chat-messages {
     width: 100%;
     flex: 1;
+    max-height: 450px;
     overflow-y: auto;
     display: none;
     padding: 10px;
@@ -567,6 +569,27 @@ h1 {
 
 .modal-body {
     padding: 30px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* 모달 본문 스크롤바 스타일 */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #667eea;
 }
 
 .serving-input-group {
@@ -691,6 +714,177 @@ h1 {
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
 }
 
+/* 식단 카드 스타일 */
+.meal-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.meal-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.meal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.meal-card-header h3 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.meal-type-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.meal-description {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.meal-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.ingredients-section {
+    margin-bottom: 20px;
+}
+
+.ingredients-section h4 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.ingredients-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+}
+
+.ingredients-list li {
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #555;
+}
+
+.meal-card-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.meal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.recipe-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.recipe-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.save-btn-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.save-btn-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+/* 레시피 모달 스타일 */
+.recipe-ingredients {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 24px;
+}
+
+.recipe-ingredients li {
+    padding: 10px 16px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.recipe-steps {
+    padding-left: 20px;
+}
+
+.recipe-steps li {
+    margin-bottom: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.recipe-steps li::marker {
+    font-weight: 600;
+    color: #667eea;
+}
+
 @media (max-width: 768px) {
     .main-content {
         flex-direction: column;
@@ -702,5 +896,22 @@ h1 {
 
     .input-section {
         flex-direction: column;
+    }
+
+    .meal-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ingredients-list {
+        grid-template-columns: 1fr;
+    }
+
+    .meal-card-buttons {
+        flex-direction: column;
+    }
+
+    .meal-btn {
+        width: 100%;
+        justify-content: center;
     }
 }

@@ -133,8 +133,11 @@ function showError(message) {
     }, 5000);
 }
 
-// 식단 생성 버튼 클릭
-generateBtn.addEventListener('click', async () => {
+// 현재 식단 데이터 저장 (레시피 모달용)
+let currentMealPlan = null;
+
+// 식단 생성 (채팅 또는 버튼 클릭)
+async function generateMeal(message) {
     const height = heightInput.value;
     const weight = weightInput.value;
     const allergies = getAllergies();
@@ -163,10 +166,10 @@ generateBtn.addEventListener('click', async () => {
     generateBtn.disabled = true;
 
     // 사용자 메시지 추가
-    addMessage('건강한 식단을 추천해주세요!', 'user');
+    addMessage(message, 'user');
 
     try {
-        // 실제 API 호출 (가격 정보 포함)
+        // API 호출
         const response = await fetch(`${API_BASE_URL}/chat/meal-recommendation`, {
             method: 'POST',
             headers: {
@@ -177,7 +180,7 @@ generateBtn.addEventListener('click', async () => {
                 weight: parseInt(weight),
                 servingSize: 1,
                 allergies: allergies,
-                message: '건강한 식단을 추천해주세요'
+                message: message
             })
         });
 
@@ -192,25 +195,10 @@ generateBtn.addEventListener('click', async () => {
 
         if (data.status === 'SUCCESS') {
             // AI 응답 메시지 추가
-            addMessage('당신의 체형에 맞는 건강한 식단을 추천해드렸습니다!', 'ai');
+            addMessage(`${data.mealPlan.mealName}을(를) 추천해드렸습니다!`, 'ai');
 
-            // 식단 결과 표시
-            mealPlanArea.classList.add('active');
-            emptyState.style.display = 'none';
-
-            // AI 응답을 식단 카드로 표시
-            const currentTime = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-
-            // AI 응답을 그대로 표시 (파싱은 나중에 개선 가능)
-            const mealPlanDiv = document.createElement('div');
-            mealPlanDiv.className = 'meal-plan-group';
-            mealPlanDiv.innerHTML = `
-                <div class="meal-plan-header">추천 식단 - ${currentTime}</div>
-                <div class="meal-plan-content" style="white-space: pre-wrap; padding: 20px; background: white; border-radius: 8px;">
-                    ${data.mealPlan}
-                </div>
-            `;
-            mealPlanArea.appendChild(mealPlanDiv);
+            // 식단 카드 표시
+            displayMealCard(data.mealPlan);
         } else {
             throw new Error(data.message || 'AI 응답 오류');
         }
@@ -224,6 +212,83 @@ generateBtn.addEventListener('click', async () => {
     } finally {
         generateBtn.disabled = false;
     }
+}
+
+// 식단 카드 표시
+function displayMealCard(mealPlan) {
+    mealPlanArea.classList.add('active');
+    emptyState.style.display = 'none';
+
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'meal-card';
+
+    cardDiv.innerHTML = `
+        <div class="meal-card-header">
+            <h3>${mealPlan.mealName}</h3>
+            <span class="meal-type-badge">${mealPlan.mealType}</span>
+        </div>
+        <p class="meal-description">${mealPlan.description}</p>
+
+        <div class="meal-info-grid">
+            <div class="info-item">
+                <span class="info-label">예상 가격</span>
+                <span class="info-value">${mealPlan.calculatedPrice.toLocaleString()}원</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">칼로리</span>
+                <span class="info-value">${mealPlan.nutrition?.calories || '-'} kcal</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">탄수화물</span>
+                <span class="info-value">${mealPlan.nutrition?.carbs || '-'} g</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">단백질</span>
+                <span class="info-value">${mealPlan.nutrition?.protein || '-'} g</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">지방</span>
+                <span class="info-value">${mealPlan.nutrition?.fat || '-'} g</span>
+            </div>
+        </div>
+
+        <div class="ingredients-section">
+            <h4>재료</h4>
+            <ul class="ingredients-list">
+                ${mealPlan.ingredients.map(ing => `
+                    <li>${ing.name} ${ing.amount}${ing.unit}</li>
+                `).join('')}
+            </ul>
+        </div>
+
+        <div class="meal-card-buttons">
+            <button class="meal-btn recipe-btn">
+                <span>📖</span> 레시피 보기
+            </button>
+            <button class="meal-btn save-btn-card">
+                <span>❤</span> 저장하기
+            </button>
+        </div>
+    `;
+
+    mealPlanArea.appendChild(cardDiv);
+
+    // 버튼 이벤트 리스너 추가 (각 카드의 mealPlan을 클로저로 캡처)
+    const recipeBtn = cardDiv.querySelector('.recipe-btn');
+    const saveBtn = cardDiv.querySelector('.save-btn-card');
+
+    recipeBtn.addEventListener('click', () => {
+        showRecipeModal(mealPlan);
+    });
+
+    saveBtn.addEventListener('click', () => {
+        alert('저장 기능은 준비 중입니다');
+    });
+}
+
+// 식단 생성 버튼 클릭
+generateBtn.addEventListener('click', () => {
+    generateMeal('건강한 식단을 추천해주세요');
 });
 
 // 버튼 이벤트 바인딩
@@ -248,7 +313,69 @@ function handleMealButtonClick(e) {
     }
 }
 
-// 채팅 전송 함수
+// 레시피 모달 표시
+function showRecipeModal(mealPlan) {
+    if (!mealPlan || !mealPlan.recipe) {
+        alert('레시피 정보가 없습니다.');
+        return;
+    }
+
+    // 기존 모달이 있으면 제거
+    const existingModal = document.getElementById('recipeModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // 레시피 모달 생성
+    const modal = document.createElement('div');
+    modal.id = 'recipeModal';
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>${mealPlan.mealName} 레시피</h2>
+                <span class="modal-close" onclick="closeRecipeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h3>재료</h3>
+                <ul class="recipe-ingredients">
+                    ${mealPlan.ingredients.map(ing => `
+                        <li>${ing.name} ${ing.amount}${ing.unit}</li>
+                    `).join('')}
+                </ul>
+
+                <h3>조리법</h3>
+                <ol class="recipe-steps">
+                    ${mealPlan.recipe.map(step => `
+                        <li>${step}</li>
+                    `).join('')}
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel-btn" onclick="closeRecipeModal()">닫기</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 모달 바깥 클릭 시 닫기
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeRecipeModal();
+        }
+    });
+}
+
+// 레시피 모달 닫기
+function closeRecipeModal() {
+    const modal = document.getElementById('recipeModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// 채팅 전송 함수 (활성화)
 function sendChatMessage() {
     const message = chatInput.value.trim();
 
@@ -256,20 +383,11 @@ function sendChatMessage() {
         return;
     }
 
-    // 채팅창 활성화
-    chatPlaceholder.style.display = 'none';
-    chatMessages.classList.add('active');
-
-    // 사용자 메시지 추가
-    addMessage(message, 'user');
-
     // 입력창 초기화
     chatInput.value = '';
 
-    // AI 응답 시뮬레이션 (실제로는 API 호출)
-    setTimeout(() => {
-        addMessage('죄송합니다. 채팅 기능은 아직 개발 중입니다. "식단 정보 보기" 버튼을 눌러주세요!', 'ai');
-    }, 500);
+    // 식단 생성 함수 호출
+    generateMeal(message);
 }
 
 // 채팅 전송 버튼 클릭
