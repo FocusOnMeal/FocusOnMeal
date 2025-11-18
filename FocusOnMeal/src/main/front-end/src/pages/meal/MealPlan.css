@@ -858,6 +858,37 @@
     margin-bottom: 8px;
     font-size: 14px;
     color: #555;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ingredient-name {
+    flex: 1;
+}
+
+.ingredient-price {
+    color: #667eea;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.ingredient-price-na {
+    color: #999;
+    font-size: 12px;
+    font-style: italic;
+    margin-left: 10px;
+}
+
+.ingredients-total {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #667eea;
+    color: white;
+    border-radius: 6px;
+    text-align: right;
+    font-size: 16px;
+    margin-bottom: 24px;
 }
 
 .recipe-steps {

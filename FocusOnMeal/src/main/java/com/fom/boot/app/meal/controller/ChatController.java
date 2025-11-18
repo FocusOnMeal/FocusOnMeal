@@ -132,6 +132,7 @@ public class ChatController {
                             .amount(amount)
                             .unit(unit)
                             .price(pricePerKg)
+                            .calculatedPrice(ingredientPrice)  // 실제 계산된 가격 저장
                             .build());
                 }
             }

@@ -367,9 +367,19 @@ const MealPlan = () => {
                             <h3>재료</h3>
                             <ul className="recipe-ingredients">
                                 {selectedRecipe.ingredients.map((ing, i) => (
-                                    <li key={i}>{ing.name} {ing.amount}{ing.unit}</li>
+                                    <li key={i}>
+                                        <span className="ingredient-name">{ing.name} {ing.amount}{ing.unit}</span>
+                                        {ing.calculatedPrice !== null && ing.calculatedPrice !== undefined ? (
+                                            <span className="ingredient-price">({ing.calculatedPrice.toLocaleString()}원)</span>
+                                        ) : (
+                                            <span className="ingredient-price-na">(가격 정보 없음)</span>
+                                        )}
+                                    </li>
                                 ))}
                             </ul>
+                            <div className="ingredients-total">
+                                <strong>총 재료비: {selectedRecipe.calculatedPrice.toLocaleString()}원</strong>
+                            </div>
 
                             <h3>조리법</h3>
                             <ol className="recipe-steps">
