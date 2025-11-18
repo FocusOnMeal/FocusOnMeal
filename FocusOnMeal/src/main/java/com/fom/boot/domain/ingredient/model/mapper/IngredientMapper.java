@@ -1,8 +1,11 @@
 package com.fom.boot.domain.ingredient.model.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.fom.boot.app.ingredient.dto.IngredientDTO;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 
@@ -34,4 +37,11 @@ public interface IngredientMapper {
 	 */
 	int insertIngredient(Ingredient ingredient);
 
+	/**
+	 * React 리스트 페이지용: 식재료 전체 목록 + 최신 가격 조회
+	 * (IngredientMapper.xml의 selectListWithLatestPrice 쿼리 호출)
+	 * @return List<IngredientDTO>
+	 */
+	List<IngredientDTO> selectListWithLatestPrice();
+	
 }

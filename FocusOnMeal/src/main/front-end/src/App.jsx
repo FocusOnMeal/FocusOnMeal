@@ -54,11 +54,12 @@ function App() {
 
         {/* 식자재 관련 */}
         <Route path="/ingredient/list" element={<IngredientSearch />} />
-        <Route path="/ingredient/:id" element={<IngredientDetail />} />
 
         {/* 식단 관련 */}
         <Route path="/meal/mealAI" element={<MealPlan />} />
 
+        <Route path="/ingredient/detail/:id" element={<IngredientDetail />} />
+      
         {/* 관리자 홈 (대시보드) */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/memberInfo" element={<MemberInfo />} />

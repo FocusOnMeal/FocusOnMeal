@@ -1,19 +1,24 @@
 package com.fom.boot.app.ingredient.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fom.boot.app.ingredient.dto.IngredientDTO;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
+import com.fom.boot.domain.ingredient.model.vo.Ingredient;
+import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,10 +29,31 @@ public class IngredientController {
 
 	private final IngredientService iService;
 	
-	@GetMapping("/list")
-	public String showListPage() {
-		return "forward:/index.html";
-	}
+    // --- [API 1] React 리스트 페이지용 ---
+    @GetMapping("/api/list")
+    @ResponseBody // JSON 반환
+    public ResponseEntity<List<IngredientDTO>> getIngredientList() {
+        List<IngredientDTO> list = iService.getIngredientListWithPrice();
+        return ResponseEntity.ok(list);
+    }
+
+    // --- [API 2] React 상세 페이지용 ---
+    @GetMapping("/api/detail/{id}")
+    @ResponseBody // JSON 반환
+    public ResponseEntity<Map<String, Object>> getIngredientDetail(@PathVariable int id) {
+        
+        Ingredient ingredientInfo = iService.getIngredientById(id);
+        if (ingredientInfo == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<PriceHistory> priceHistory = iService.getPriceHistory(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("info", ingredientInfo);     // 식재료 기본 정보
+        response.put("history", priceHistory); // 가격 이력 (그래프용)
+
+        return ResponseEntity.ok(response);
+    }
 	
     // 찜 등록 및 해제
     @PostMapping("detail/{ingredientId}/favorite")

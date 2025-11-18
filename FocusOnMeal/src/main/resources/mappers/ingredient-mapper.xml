@@ -97,5 +97,44 @@
             #{kamisItemCategoryCode}
         )
     </insert>
+    
+	<resultMap id="IngredientWithPriceMap" 
+               type="com.fom.boot.app.ingredient.dto.IngredientDTO" 
+               extends="IngredientResultMap">
+        
+        <!-- DTO에 추가된 필드만 매핑 -->
+        <result property="currentPrice" column="PRICE_VALUE" />
+        <result property="collectedDate" column="COLLECTED_DATE" />
+    </resultMap>
+
+    <!-- 리스트 페이지용: 전체 목록 + 최신 가격 조회 (서울/소매 기준) -->
+    <select id="selectListWithLatestPrice" resultMap="IngredientWithPriceMap">
+        SELECT 
+            M.INGREDIENT_ID,
+            M.NAME,
+            M.CATEGORY,
+            M.STANDARD_UNIT,
+            M.KAMIS_ITEM_CODE,
+            M.KAMIS_KIND_CODE,
+            M.KAMIS_ITEM_CATEGORY_CODE,
+            P.PRICE_VALUE,
+            P.COLLECTED_DATE
+        FROM INGREDIENT_MASTER M
+        LEFT JOIN (
+            SELECT INGREDIENT_ID, PRICE_VALUE, COLLECTED_DATE
+            FROM (
+                SELECT 
+                    INGREDIENT_ID, 
+                    PRICE_VALUE, 
+                    COLLECTED_DATE,
+                    ROW_NUMBER() OVER(PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) as RN
+                FROM PRICE_HISTORY
+                WHERE REGION = '서울' 
+                  AND PRICE_TYPE = '소매'
+            )
+            WHERE RN = 1
+        ) P ON M.INGREDIENT_ID = P.INGREDIENT_ID
+        ORDER BY M.NAME ASC
+    </select>
 
   </mapper>
