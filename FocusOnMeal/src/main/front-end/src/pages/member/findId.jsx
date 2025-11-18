@@ -1,25 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-
-const mockSearchMemberId = (memberName, email) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (memberName.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                resolve({ 
-                    data: { success: true } 
-                });
-            } else {
-                reject({ 
-                    response: { 
-                        data: { 
-                            error: '입력하신 정보와 일치하는 회원 정보를 찾을 수 없습니다.' 
-                        } 
-                    } 
-                });
-            }
-        }, 1500);
-    });
-};
+import { useNavigate } from 'react-router-dom';
+import authService from '../../services/authService'; // ⭐ Mock 대신 실제 API 사용
 
 function findId() {
     const navigate = useNavigate();
@@ -72,16 +53,20 @@ function findId() {
         
         try {
             setLoading(true);
-
-            const response = await mockSearchMemberId(
+            
+            // ⭐ 실제 API 호출
+            const response = await authService.sendMemberIdByEmail(
                 formData.memberName,
                 formData.email
             );
+            
+            console.log('아이디 찾기 API 응답:', response); // 디버깅용
             
             if (response.data.success) {
                 setEmailSent(true);
             }
         } catch (error) {
+            console.error('아이디 찾기 오류:', error); // 디버깅용
             const errorMessage = error.response?.data?.error || '일치하는 회원 정보를 찾을 수 없습니다.';
             setErrors({ general: errorMessage });
         } finally {
@@ -110,7 +95,6 @@ function findId() {
 
                 {!emailSent ? (
                     <form onSubmit={handleSubmit}>
-                        {/* 이름 */}
                         <div style={{ marginBottom: '20px' }}>
                             <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
                                 이름 <span style={{ color: '#dc2626' }}>*</span>
@@ -138,7 +122,6 @@ function findId() {
                             )}
                         </div>
                         
-                        {/* 이메일 */}
                         <div style={{ marginBottom: '30px' }}>
                             <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
                                 이메일 <span style={{ color: '#dc2626' }}>*</span>
@@ -166,7 +149,6 @@ function findId() {
                             )}
                         </div>
                         
-                        {/* 제출 버튼 */}
                         <button
                             type="submit"
                             disabled={loading}
@@ -187,9 +169,7 @@ function findId() {
                             {loading ? '처리 중...' : '아이디 찾기'}
                         </button>
                         
-                        {/* 하단 링크 */}
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', fontSize: '14px', flexWrap: 'wrap' }}>
-                            
                             <button
                                 type="button"
                                 onClick={() => navigate('/member/login')}
@@ -224,7 +204,7 @@ function findId() {
 
                             <button
                                 type="button"
-                                onClick={() => navigate('/member/Join')}
+                                onClick={() => navigate('/member/join')}
                                 style={{
                                     background: 'none',
                                     border: 'none',

@@ -1,28 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../../services/authService'; // ⭐ Mock 대신 실제 API 사용
 
-// Mock 함수 (그대로 유지)
-const mockSendPasswordResetLink = (memberId, email) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            if (memberId && email && email.includes('@') && email.includes('.')) {
-                resolve({
-                    success: true,
-                    message: `비밀번호 재설정 링크가 ${email} 주소로 성공적으로 전송되었습니다.`
-                });
-            } else {
-                resolve({
-                    success: false,
-                    message: '입력하신 아이디 또는 이메일 정보와 일치하는 계정을 찾을 수 없거나 형식이 잘못되었습니다.'
-                });
-            }
-        }, 2000);
-    });
-};
-
-const findPassword = () => {
-
-    const navigate = useNavigate(); // ⭐ 페이지 이동 기능 추가
+function findPassword() {
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         memberId: '',
@@ -49,24 +30,27 @@ const findPassword = () => {
         setLoading(true);
 
         try {
-            const response = await mockSendPasswordResetLink(
+            // ⭐ 실제 API 호출
+            const response = await authService.sendPasswordResetLink(
                 formData.memberId,
                 formData.email
             );
+            
+            console.log('비밀번호 재설정 API 응답:', response); // 디버깅용
 
-            if (response.success) {
+            if (response.data.success) {
                 setIsSuccess(true);
-            } else {
-                setError(response.message);
             }
         } catch (err) {
-            setError('요청 처리 중 오류가 발생했습니다.');
+            console.error('비밀번호 재설정 오류:', err); // 디버깅용
+            const errorMessage = err.response?.data?.error || '요청 처리 중 오류가 발생했습니다.';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
-    // ------ 성공 화면 ------
+    // 성공 화면
     if (isSuccess) {
         return (
             <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
@@ -118,7 +102,7 @@ const findPassword = () => {
         );
     }
 
-    // ------ 기본 비밀번호 찾기 화면 ------
+    // 기본 비밀번호 찾기 화면
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
             <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', padding: '40px', maxWidth: '450px', width: '100%' }}>
@@ -182,7 +166,6 @@ const findPassword = () => {
                     </button>
                 </form>
 
-                {/* 하단 링크 - 정상 라우팅 적용 */}
                 <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px' }}>
                     <span
                         onClick={() => navigate('/member/login')}
@@ -212,6 +195,6 @@ const findPassword = () => {
             </div>
         </div>
     );
-};
+}
 
 export default findPassword;

@@ -226,7 +226,7 @@ public class MemberController {
             if (!isValidPassword(request.getMemberPw())) {
                 log.warn("[회원가입 실패] 비밀번호 형식 오류: {}", request.getMemberId());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "비밀번호는 8자 이상이며, 영문, 숫자, 특수문자를 포함해야 합니다."));
+                    .body(Map.of("error", "비밀번호는 8자 이상이며, 숫자와 특수문자를 포함해야 합니다."));
             }
             
             // 5. Member 객체 생성
@@ -356,7 +356,7 @@ public class MemberController {
             
             if (!isValidPassword(request.getNewPassword())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "비밀번호는 8자 이상이며, 영문, 숫자, 특수문자를 포함해야 합니다."));
+                    .body(Map.of("error", "비밀번호는 8자 이상이며, 숫자와 특수문자를 포함해야 합니다."));
             }
             
             boolean success = passwordResetService.resetPassword(
@@ -421,6 +421,36 @@ public class MemberController {
     }
 
     // ========== 유틸리티 메서드 ==========
+
+    /**
+     * ⭐ 테스트용: 이메일 발송 테스트 (개발 환경에서만 사용)
+     */
+    @GetMapping("/test-email")
+    public ResponseEntity<?> testEmail(@RequestParam(required = false) String email) {
+        if (email == null || email.isEmpty()) {
+            email = "dofvm1004@gmail.com"; // 기본 테스트 이메일
+        }
+        
+        try {
+            log.info("[이메일 테스트] 시작: {}", email);
+            emailService.sendVerificationEmail(email, "123456");
+            log.info("[이메일 테스트] 성공: {}", email);
+            return ResponseEntity.ok(
+                Map.of(
+                    "success", true,
+                    "message", "테스트 이메일 발송 성공! " + email + " 확인해주세요."
+                )
+            );
+        } catch (Exception e) {
+            log.error("[이메일 테스트] 실패: {}, error: {}", email, e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                    "error", "이메일 발송 실패: " + e.getMessage(),
+                    "detail", e.getClass().getName()
+                ));
+        }
+    }
 
     private String getClientIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");

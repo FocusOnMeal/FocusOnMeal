@@ -1,4 +1,4 @@
-// src/pages/auth/ResetPassword.jsx
+// src/pages/member/ResetPassword.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import authService from '../../services/authService';
@@ -24,7 +24,7 @@ function ResetPassword() {
         const validateToken = async () => {
             if (!token) {
                 alert('유효하지 않은 접근입니다.');
-                navigate('/login');
+                navigate('/member/login');
                 return;
             }
             
@@ -34,11 +34,11 @@ function ResetPassword() {
                 
                 if (!response.data.valid) {
                     alert('유효하지 않거나 만료된 링크입니다.');
-                    navigate('/find-password');
+                    navigate('/member/findPassword');
                 }
             } catch (error) {
                 alert('링크 검증에 실패했습니다.');
-                navigate('/find-password');
+                navigate('/member/findPassword');
             } finally {
                 setValidating(false);
             }
@@ -84,7 +84,6 @@ function ResetPassword() {
         } else if (formData.newPassword.length < 8) {
             newErrors.newPassword = '비밀번호는 8자 이상이어야 합니다.';
         } else {
-            // ✅ 수정: 숫자 + 특수문자만 있어도 OK
             const hasDigit = /\d/.test(formData.newPassword);
             const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.newPassword);
             
@@ -120,7 +119,7 @@ function ResetPassword() {
             
             if (response.data.success) {
                 alert('비밀번호가 성공적으로 변경되었습니다.\n새 비밀번호로 로그인해주세요.');
-                navigate('/login');
+                navigate('/member/login');
             }
         } catch (error) {
             const errorMessage = error.response?.data?.error || '비밀번호 변경에 실패했습니다.';
@@ -162,7 +161,6 @@ function ResetPassword() {
         <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', padding: '40px 20px' }}>
             <div style={{ maxWidth: '500px', margin: '0 auto', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', padding: '40px' }}>
                 
-                {/* 제목 */}
                 <div style={{ textAlign: 'center', marginBottom: '30px' }}>
                     <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '10px' }}>
                         🔐 비밀번호 재설정
@@ -173,7 +171,6 @@ function ResetPassword() {
                 </div>
                 
                 <form onSubmit={handleSubmit}>
-                    {/* 새 비밀번호 */}
                     <div style={{ marginBottom: '20px' }}>
                         <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
                             새 비밀번호 <span style={{ color: '#dc2626' }}>*</span>
@@ -183,7 +180,7 @@ function ResetPassword() {
                             name="newPassword"
                             value={formData.newPassword}
                             onChange={handleChange}
-                            placeholder="8자 이상, 영문+숫자+특수문자"
+                            placeholder="8자 이상, 숫자+특수문자"
                             style={{
                                 width: '100%',
                                 padding: '12px',
@@ -215,11 +212,10 @@ function ResetPassword() {
                             </p>
                         )}
                         <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '5px' }}>
-                            영문 대소문자, 숫자, 특수문자를 모두 포함해야 합니다.
+                            숫자와 특수문자를 포함해야 합니다. (영문 선택)
                         </p>
                     </div>
                     
-                    {/* 비밀번호 확인 */}
                     <div style={{ marginBottom: '30px' }}>
                         <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>
                             비밀번호 확인 <span style={{ color: '#dc2626' }}>*</span>
@@ -250,7 +246,6 @@ function ResetPassword() {
                         )}
                     </div>
                     
-                    {/* 제출 버튼 */}
                     <button
                         type="submit"
                         disabled={loading}

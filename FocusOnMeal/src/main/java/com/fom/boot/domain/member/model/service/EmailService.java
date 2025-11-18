@@ -14,7 +14,7 @@ import java.security.SecureRandom;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "spring.mail.host")
+@ConditionalOnProperty(name = "spring.mail.host", matchIfMissing = false)
 public class EmailService {
     
     @Autowired(required = false)
