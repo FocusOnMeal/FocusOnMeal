@@ -110,8 +110,8 @@ public class AlertServiceImpl implements AlertService {
                 return;
             }
             
-            // 알림 수신 설정이 활성화된 회원 목록 조회
-            List<String> memberIds = alertMapper.selectMembersWithSafetyAlertEnabled();
+            // 🔥 개인화: 해당 식재료(INGREDIENT_ID)에 대해 알림을 설정한 회원만 조회
+            List<String> memberIds = alertMapper.selectMembersWithIngredientAlertEnabled(alert.getIngredientId());
             
             // 각 회원에게 알림 생성
             for (String memberId : memberIds) {
@@ -122,10 +122,12 @@ public class AlertServiceImpl implements AlertService {
                 
                 alertMapper.insertNotificationLog(memberId, "위험공표", message, alertId);
                 
-                log.info("안전 알림 생성: memberId={}, alertId={}", memberId, alertId);
+                log.info("안전 알림 생성: memberId={}, alertId={}, ingredientId={}", 
+                        memberId, alertId, alert.getIngredientId());
             }
             
-            log.info("안전 알림 발송 완료: alertId={}, 수신자 수={}", alertId, memberIds.size());
+            log.info("안전 알림 발송 완료: alertId={}, ingredientId={}, 수신자 수={}", 
+                    alertId, alert.getIngredientId(), memberIds.size());
             
         } catch (Exception e) {
             log.error("안전 알림 생성 실패: alertId={}", alertId, e);

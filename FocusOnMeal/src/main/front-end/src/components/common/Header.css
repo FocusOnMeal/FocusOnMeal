@@ -136,3 +136,131 @@
     width: 100%;
     margin-top: 5px;
 } */
+
+/* 알림 벨 래퍼 */
+.notification-bell-wrapper {
+    position: relative;
+    margin-right: 15px;
+}
+
+/* 알림 벨 버튼 */
+.notification-bell-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 5px;
+}
+
+/* 읽지 않은 알림 빨간 점 */
+.notification-unread-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background-color: #ff4444;
+    border-radius: 50%;
+}
+
+/* 알림 드롭다운 */
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    width: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+
+/* 로그인 필요 메시지 */
+.notification-login-required {
+    padding: 20px;
+    text-align: center;
+}
+
+.login-link {
+    color: #4CAF50;
+    text-decoration: underline;
+}
+
+/* 알림 없음 */
+.notification-empty {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+}
+
+/* 알림 아이템 */
+.notification-item {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    background-color: white;
+    transition: background-color 0.2s;
+}
+
+/* Hover 효과 */
+.notification-item.hover {
+    background-color: #f0f0f0;
+}
+
+/* 읽지 않은 알림 강조 */
+.notification-item.unread {
+    background-color: #f8f9fa;
+}
+
+/* 상단 행 (타입, 시간) */
+.notification-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+/* 알림 타입 배지 */
+.notification-type {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    color: white;
+}
+
+.notification-type.danger {
+    background-color: #ff4444;
+}
+
+.notification-type.normal {
+    background-color: #4CAF50;
+}
+
+/* 시간 */
+.notification-time {
+    font-size: 12px;
+    color: #999;
+}
+
+/* 알림 제목 */
+.notification-title {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.notification-title.bold {
+    font-weight: bold;
+}
+
+/* 알림 메시지 */
+.notification-message {
+    font-size: 13px;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

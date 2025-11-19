@@ -35,26 +35,6 @@ const Header = () => {
         };
     }, []);
 
-    // 알림 목록 가져오기
-    const fetchNotifications = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await fetch("/api/alert/notifications", {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setNotifications(data);
-                setHasUnread(data.some(n => n.isRead === 'N'));
-            }
-        } catch (error) {
-            console.error("알림 조회 실패:", error);
-        }
-    };
-
     // 알림 클릭 시
     const handleNotificationClick = async (notification) => {
         try {
@@ -123,6 +103,35 @@ const Header = () => {
         return `${diffDays}일 전`;
     };
 
+    // 알림 목록 가져오기
+const fetchNotifications = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            console.log("🔍 Token:", token); // 토큰 확인
+            
+            const response = await fetch("/api/alert/notifications", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            console.log("📡 Response status:", response.status); // 상태 확인
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("📦 받은 데이터:", data); // 데이터 확인
+                console.log("📦 데이터 길이:", data.length); // 배열 길이 확인
+                
+                setNotifications(data);
+                setHasUnread(data.some(n => n.isRead === 'N'));
+            } else {
+                console.error("❌ 응답 실패:", response.status);
+            }
+        } catch (error) {
+            console.error("❌ 알림 조회 실패:", error);
+        }
+    };
+
     return (
         <header className="header">
             <div className="header-inner">
@@ -155,93 +164,47 @@ const Header = () => {
                         <>
                             <span className="welcome">{memberNickname}님</span>
                             {/* 알림 벨 */}
-                            <div className="notification-bell-wrapper" style={{ position: 'relative', marginRight: '15px' }}>
+                            <div className="notification-bell-wrapper">
                                 <button 
+                                    className="notification-bell-button"
                                     onClick={handleBellClick}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        position: 'relative',
-                                        padding: '5px'
-                                    }}
                                 >
                                     <Bell size={24} color="#333" />
-                                    {hasUnread && (
-                                        <span style={{
-                                            position: 'absolute',
-                                            top: '0',
-                                            right: '0',
-                                            width: '8px',
-                                            height: '8px',
-                                            backgroundColor: '#ff4444',
-                                            borderRadius: '50%'
-                                        }}></span>
-                                    )}
+                                    {hasUnread && <span className="notification-unread-dot"></span>}
                                 </button>
 
                                 {/* 알림 드롭다운 */}
                                 {showNotifications && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        right: '0',
-                                        marginTop: '10px',
-                                        width: '350px',
-                                        maxHeight: '400px',
-                                        overflowY: 'auto',
-                                        backgroundColor: 'white',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '8px',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                        zIndex: 1000
-                                    }}>
+                                    <div className="notification-dropdown">
                                         {!isLoggedIn ? (
-                                            <div style={{ padding: '20px', textAlign: 'center' }}>
+                                            <div className="notification-login-required">
                                                 <p>로그인이 필요합니다.</p>
-                                                <Link to="/member/login" style={{ color: '#4CAF50', textDecoration: 'underline' }}>
-                                                    로그인하기
-                                                </Link>
+                                                <Link to="/member/login" className="login-link">로그인하기</Link>
                                             </div>
                                         ) : notifications.length === 0 ? (
-                                            <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
-                                                알림이 없습니다.
-                                            </div>
+                                            <div className="notification-empty">알림이 없습니다.</div>
                                         ) : (
                                             <div>
                                                 {notifications.map((notif) => (
                                                     <div
                                                         key={notif.notificationId}
+                                                        className={`notification-item ${notif.isRead === 'N' ? 'unread' : ''}`}
                                                         onClick={() => handleNotificationClick(notif)}
-                                                        style={{
-                                                            padding: '15px',
-                                                            borderBottom: '1px solid #f0f0f0',
-                                                            cursor: 'pointer',
-                                                            backgroundColor: notif.isRead === 'N' ? '#f8f9fa' : 'white',
-                                                            transition: 'background-color 0.2s'
-                                                        }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f0f0f0'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = notif.isRead === 'N' ? '#f8f9fa' : 'white'}
+                                                        onMouseEnter={(e) => e.currentTarget.classList.add('hover')}
+                                                        onMouseLeave={(e) => e.currentTarget.classList.remove('hover')}
                                                     >
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                                            <span style={{
-                                                                display: 'inline-block',
-                                                                padding: '2px 8px',
-                                                                fontSize: '12px',
-                                                                borderRadius: '4px',
-                                                                backgroundColor: notif.type === '위험공표' ? '#ff4444' : '#4CAF50',
-                                                                color: 'white'
-                                                            }}>
+                                                        <div className="notification-item-header">
+                                                            <span className={`notification-type ${notif.type === '위험공표' ? 'danger' : 'normal'}`}>
                                                                 {getTypeLabel(notif.type)}
                                                             </span>
-                                                            <span style={{ fontSize: '12px', color: '#999' }}>
-                                                                {formatTime(notif.sentAt)}
-                                                            </span>
+                                                            <span className="notification-time">{formatTime(notif.sentAt)}</span>
                                                         </div>
-                                                        <div style={{ fontSize: '14px', fontWeight: notif.isRead === 'N' ? 'bold' : 'normal', marginBottom: '5px' }}>
+
+                                                        <div className={`notification-title ${notif.isRead === 'N' ? 'bold' : ''}`}>
                                                             {notif.title}
                                                         </div>
-                                                        <div style={{ fontSize: '13px', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+
+                                                        <div className="notification-message">
                                                             {notif.message}
                                                         </div>
                                                     </div>

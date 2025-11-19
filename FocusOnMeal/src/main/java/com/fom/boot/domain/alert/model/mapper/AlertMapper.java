@@ -75,10 +75,11 @@ public interface AlertMapper {
     SafetyAlert selectSafetyAlertById(@Param("alertId") int alertId);
     
     /**
-     * 안전 알림 수신이 활성화된 회원 목록 조회
+     * 특정 식재료에 대해 알림 수신이 활성화된 회원 목록 조회 (개인화)
+     * @param ingredientId 식재료 ID
      * @return 회원 ID 목록
      */
-    List<String> selectMembersWithSafetyAlertEnabled();
+    List<String> selectMembersWithIngredientAlertEnabled(@Param("ingredientId") int ingredientId);
     
     /**
      * 알림 로그 생성
