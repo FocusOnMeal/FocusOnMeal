@@ -51,9 +51,6 @@ apiClient.interceptors.response.use(
 const authService = {
     // ========== 로그인/로그아웃 ==========
     
-    /**
-     * 로그인
-     */
     login: async (memberId, memberPw) => {
         try {
             const response = await apiClient.post('/login', {
@@ -61,7 +58,6 @@ const authService = {
                 memberPw
             });
             
-            // 토큰과 사용자 정보 저장
             if (response.data.data?.token) {
                 localStorage.setItem('token', response.data.data.token);
                 localStorage.setItem('user', JSON.stringify({
@@ -78,16 +74,12 @@ const authService = {
         }
     },
 
-    /**
-     * 로그아웃
-     */
     logout: async () => {
         try {
             await apiClient.post('/logout');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
         } catch (error) {
-            // 에러가 나도 로컬 스토리지는 정리
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             throw error;
@@ -96,9 +88,6 @@ const authService = {
 
     // ========== 회원가입 ==========
 
-    /**
-     * 아이디 중복 확인
-     */
     checkMemberId: async (memberId) => {
         try {
             const response = await apiClient.get(`/check-id/${memberId}`);
@@ -110,9 +99,6 @@ const authService = {
         }
     },
 
-    /**
-     * 이메일 인증 코드 발송
-     */
     sendVerificationCode: async (email) => {
         try {
             const response = await apiClient.post('/send-verification-code', {
@@ -126,9 +112,6 @@ const authService = {
         }
     },
 
-    /**
-     * 이메일 인증 코드 확인
-     */
     verifyEmailCode: async (email, code) => {
         try {
             const response = await apiClient.post('/verify-email-code', {
@@ -143,9 +126,6 @@ const authService = {
         }
     },
 
-    /**
-     * 회원가입
-     */
     joinMember: async (memberData) => {
         try {
             const response = await apiClient.post('/join', memberData);
@@ -157,11 +137,28 @@ const authService = {
         }
     },
 
+    // ========== 아이디 찾기 ==========
+
+    sendMemberIdByEmail: async (memberName, email) => {
+        try {
+            const response = await apiClient.post('/id/search', {
+                memberName,
+                email
+            });
+            console.log('✅ 아이디 찾기 응답:', response.data);
+            return response;
+        } catch (error) {
+            console.error('❌ 아이디 찾기 오류:', error);
+            throw error;
+        }
+    },
+
+    searchMemberId: async (memberName, email) => {
+        return authService.sendMemberIdByEmail(memberName, email);
+    },
+
     // ========== 비밀번호 찾기 ==========
 
-    /**
-     * 비밀번호 재설정 링크 발송
-     */
     sendPasswordResetLink: async (memberId, email) => {
         try {
             const response = await apiClient.post('/password/reset-request', {
@@ -176,9 +173,6 @@ const authService = {
         }
     },
 
-    /**
-     * 토큰 유효성 검증
-     */
     validatePasswordResetToken: async (token) => {
         try {
             const response = await apiClient.get('/password/validate-token', {
@@ -192,12 +186,9 @@ const authService = {
         }
     },
 
-    /**
-     * 비밀번호 재설정
-     */
     resetPassword: async (token, newPassword, confirmPassword) => {
         try {
-            const response = await apiClient.post('/password/reset', {
+            const response = await apiClient.post('/password/reset-confirm', {
                 token,
                 newPassword,
                 confirmPassword
@@ -210,45 +201,17 @@ const authService = {
         }
     },
 
-    // ========== 아이디 찾기 ==========
-
-    /**
-     * 아이디 찾기
-     */
-    searchMemberId: async (memberName, email) => {
-        try {
-            const response = await apiClient.post('/id/search', {
-                memberName,
-                email
-            });
-            console.log('✅ 아이디 찾기 응답:', response.data);
-            return response;
-        } catch (error) {
-            console.error('❌ 아이디 찾기 오류:', error);
-            throw error;
-        }
-    },
-
     // ========== 유틸리티 ==========
 
-    /**
-     * 현재 로그인된 사용자 정보 가져오기
-     */
     getCurrentUser: () => {
         const userStr = localStorage.getItem('user');
         return userStr ? JSON.parse(userStr) : null;
     },
 
-    /**
-     * 로그인 여부 확인
-     */
     isLoggedIn: () => {
         return !!localStorage.getItem('token');
     },
 
-    /**
-     * 토큰 가져오기
-     */
     getToken: () => {
         return localStorage.getItem('token');
     }

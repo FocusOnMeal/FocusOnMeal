@@ -22,20 +22,12 @@ public class EmailService {
     private static final String CHARACTERS = "0123456789";
     private static final SecureRandom random = new SecureRandom();
     
-    /**
-     * 서버 도메인 (application.properties에서 설정)
-     * 예: http://localhost:8080 또는 https://focusonmale.com
-     */
-    @Value("${app.domain:http://localhost:8080}")
-    private String appDomain;
+    // ✅ 추가: React 앱 URL 설정 (application.properties에서 관리)
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
     
     /**
      * 비밀번호 재설정 이메일 발송
-     * 
-     * @param toEmail 수신자 이메일
-     * @param memberId 회원 ID
-     * @param token 재설정 토큰
-     * @throws RuntimeException 이메일 발송 실패 시
      */
     public void sendPasswordResetEmail(String toEmail, String memberId, String token) {
         try {
@@ -44,16 +36,14 @@ public class EmailService {
             
             helper.setTo(toEmail);
             helper.setSubject("[FocusOnMale] 비밀번호 재설정 안내");
-            helper.setFrom("noreply@focusonmale.com"); // 발신자 주소
+            helper.setFrom("noreply@focusonmale.com");
             
-            // 재설정 링크 생성
-            String resetUrl = "http://localhost:3000/member/resetPassword?token=" + token;
+            // ✅ 수정: React 앱 주소 사용
+            String resetUrl = frontendUrl + "/member/resetPassword?token=" + token;
             
-            // HTML 이메일 내용 생성
             String content = buildPasswordResetEmailHtml(memberId, resetUrl);
-            helper.setText(content, true); // true = HTML 형식
+            helper.setText(content, true);
             
-            // 이메일 발송
             mailSender.send(message);
             
             log.info("비밀번호 재설정 이메일 발송 성공: memberId={}, email={}", memberId, toEmail);
@@ -124,10 +114,7 @@ public class EmailService {
     
     /**
      * 아이디 찾기 이메일 발송
-     * 
-     * @param toEmail 수신자 이메일
-     * @param memberName 회원 이름
-     * @param memberId 회원 ID (일부 마스킹)
+     * ✅ 수정: 전체 아이디를 이메일로 보냄
      */
     public void sendMemberIdEmail(String toEmail, String memberName, String memberId) {
         try {
@@ -138,14 +125,10 @@ public class EmailService {
             helper.setSubject("[FocusOnMale] 아이디 찾기 결과");
             helper.setFrom("noreply@focusonmale.com");
             
-            // 아이디 마스킹
-            String maskedId = maskMemberId(memberId);
-            
-            // HTML 이메일 내용 생성
-            String content = buildMemberIdEmailHtml(memberName, maskedId);
+            // ✅ 수정: 마스킹 제거, 전체 아이디 표시
+            String content = buildMemberIdEmailHtml(memberName, memberId);
             helper.setText(content, true);
             
-            // 이메일 발송
             mailSender.send(message);
             
             log.info("아이디 찾기 이메일 발송 성공: name={}, email={}", memberName, toEmail);
@@ -156,12 +139,13 @@ public class EmailService {
             throw new RuntimeException("이메일 발송에 실패했습니다: " + e.getMessage());
         }
     }
-    
+
     /**
      * 아이디 찾기 이메일 HTML 생성
+     * ✅ 수정: 전체 아이디 표시
      */
-    private String buildMemberIdEmailHtml(String memberName, String maskedId) {
-        String loginLink = appDomain + "/member/login";
+    private String buildMemberIdEmailHtml(String memberName, String memberId) {
+        String loginLink = frontendUrl + "/member/login";
         
         return "<!DOCTYPE html>" +
                 "<html>" +
@@ -179,7 +163,7 @@ public class EmailService {
                 "        .button { display: inline-block; padding: 14px 32px; background-color: #2563eb; color: #ffffff !important; " +
                 "                  text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; margin-top: 20px; }" +
                 "        .button:hover { background-color: #1d4ed8; }" +
-                "        .notice { color: #6b7280; font-size: 14px; margin-top: 20px; }" +
+                "        .notice { color: #6b7280; font-size: 14px; margin-top: 20px; background-color: #fef3c7; padding: 15px; border-radius: 6px; }" +
                 "        .footer { background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; }" +
                 "        .footer p { color: #6b7280; margin: 5px 0; font-size: 12px; }" +
                 "    </style>" +
@@ -193,13 +177,13 @@ public class EmailService {
                 "            <p>안녕하세요, <strong>" + memberName + "</strong>님</p>" +
                 "            <p>회원님의 아이디는 다음과 같습니다.</p>" +
                 "            <div class='id-box'>" +
-                "                <p>" + maskedId + "</p>" +
+                "                <p>" + memberId + "</p>" +
                 "            </div>" +
                 "            <p class='notice'>" +
-                "                * 보안을 위해 아이디 일부가 가려져 있습니다.<br>" +
-                "                전체 아이디는 로그인 페이지에서 확인 가능합니다." +
+                "                ⚠️ 이 이메일은 본인만 확인할 수 있습니다.<br>" +
+                "                타인에게 공유하지 마세요." +
                 "            </p>" +
-                "            <a href='" + loginLink + "' class='button'>로그인 페이지로 이동</a>" +
+                "            <a href='" + loginLink + "' class='button'>로그인하러 가기</a>" +
                 "        </div>" +
                 "        <div class='footer'>" +
                 "            <p>FocusOnMale</p>" +
@@ -212,7 +196,6 @@ public class EmailService {
     
     /**
      * 아이디 마스킹 처리
-     * 예: "focusonmale" → "foc*******"
      */
     private String maskMemberId(String memberId) {
         if (memberId == null || memberId.length() < 3) {
@@ -220,7 +203,7 @@ public class EmailService {
         }
         
         int length = memberId.length();
-        int visibleChars = Math.max(3, length / 3); // 최소 3자는 보이게
+        int visibleChars = Math.max(3, length / 3);
         
         String visible = memberId.substring(0, visibleChars);
         String masked = "*".repeat(length - visibleChars);

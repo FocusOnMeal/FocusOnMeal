@@ -2,45 +2,46 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-  <mapper namespace="com.fom.boot.domain.mypage.model.mapper.MyPageMapper">
-  
-	  <update id="logicalDeleteMealPlan">
-	      UPDATE MEAL_PLAN
-	      SET IS_DELETED = 'Y',
-	          DELETED_AT = SYSTIMESTAMP
-	      WHERE PLAN_ID = #{planId}
-	  </update>
-	  
-	  <!-- 대시보드 -->
-	  <select id="getMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
-	    	SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
-		    FROM MEMBER
-		    WHERE MEMBER_ID = #{memberId}
-	  </select>
-	  <select id="getFavoriteIngredientCount" resultType="int">
-		    SELECT COUNT(*) FROM FAVORITE
-		    WHERE MEMBER_ID = #{memberId}
-	  </select>
-	  <select id="getFavoriteMealCount" resultType="int">
-		    SELECT COUNT(*) FROM MEAL_PLAN
-		    WHERE MEMBER_ID = #{memberId}
-		    ORDER BY CREATED_AT DESC
-	  </select>
-	  <select id="getRecentMeals" resultType="com.fom.boot.domain.meal.model.vo.MealPlan">
-		    SELECT PLAN_ID, PLAN_NAME, CREATED_AT
-		    FROM MEAL_PLAN
-		    WHERE MEMBER_ID = #{memberId}
-		    ORDER BY CREATED_AT DESC
-		    FETCH FIRST 5 ROWS ONLY
-	  </select>
-	  
-	<!-- 대시보드2 -->
-	<select id="findMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
-	    SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
-	    FROM MEMBER
-	    WHERE MEMBER_ID = #{memberId}
-	</select>
-	<!-- 찜한 식자재 요약 목록 조회 (최신 가격 포함) -->
+
+<mapper namespace="com.fom.boot.domain.mypage.model.mapper.MyPageMapper">
+
+    <update id="logicalDeleteMealPlan">
+         UPDATE MEAL_PLAN
+         SET IS_DELETED = 'Y',
+             DELETED_AT = SYSTIMESTAMP
+         WHERE PLAN_ID = #{planId}
+     </update>
+     
+     <!-- 대시보드 -->
+     <select id="getMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
+          SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
+          FROM MEMBER
+          WHERE MEMBER_ID = #{memberId}
+     </select>
+     <select id="getFavoriteIngredientCount" resultType="int">
+          SELECT COUNT(*) FROM FAVORITE
+          WHERE MEMBER_ID = #{memberId}
+     </select>
+     <select id="getFavoriteMealCount" resultType="int">
+          SELECT COUNT(*) FROM MEAL_PLAN
+          WHERE MEMBER_ID = #{memberId}
+          ORDER BY CREATED_AT DESC
+     </select>
+     <select id="getRecentMeals" resultType="com.fom.boot.domain.meal.model.vo.MealPlan">
+          SELECT PLAN_ID, PLAN_NAME, CREATED_AT
+          FROM MEAL_PLAN
+          WHERE MEMBER_ID = #{memberId}
+          ORDER BY CREATED_AT DESC
+          FETCH FIRST 5 ROWS ONLY
+     </select>
+     
+   <!-- 대시보드2 -->
+   <select id="findMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
+       SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
+       FROM MEMBER
+       WHERE MEMBER_ID = #{memberId}
+   </select>
+   <!-- 찜한 식자재 요약 목록 조회 (최신 가격 포함) -->
     <select id="findFavoriteIngredientSummary" resultType="FavoriteIngredientSummaryDTO">
         SELECT 
             f.FAVORITE_ID AS favoriteId,
@@ -87,5 +88,35 @@
         WHERE MEMBER_ID = #{memberId}
           AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
     </select>
-    
-  </mapper>
+
+
+    <!-- ====== 알레르기 기능 ====== -->
+
+    <!-- 전체 알레르기 목록 -->
+    <select id="getAllAllergies" resultType="com.fom.boot.app.mypage.dto.Allergy">
+        SELECT ALLERGY_ID AS id,
+               ALLERGY_NAME AS name
+        FROM ALLERGY
+        ORDER BY ALLERGY_ID
+    </select>
+
+    <!-- 특정 회원의 알레르기 ID 조회 -->
+    <select id="getUserAllergyIds" parameterType="string" resultType="int">
+        SELECT ALLERGY_ID
+        FROM MEMBER_ALLERGY
+        WHERE MEMBER_ID = #{memberId}
+    </select>
+
+    <!-- 기존 알레르기 삭제 -->
+    <delete id="deleteUserAllergies" parameterType="string">
+        DELETE FROM MEMBER_ALLERGY
+        WHERE MEMBER_ID = #{memberId}
+    </delete>
+
+    <!-- 알레르기 하나씩 insert -->
+    <insert id="insertUserAllergy">
+        INSERT INTO MEMBER_ALLERGY (MEMBER_ID, ALLERGY_ID)
+        VALUES (#{memberId}, #{allergyId})
+    </insert>
+
+</mapper>

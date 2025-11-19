@@ -121,4 +121,45 @@ public class MyPageServiceImpl implements MyPageService {
             null   // 모든 지역
         );
     }
+
+	@Override
+	public boolean updateMemberAllergies(String memberId, List<?> allergyIds) {
+		// 기존 알레르기 전체 삭제
+		mMapper.deleteMemberAllergies(memberId);
+
+	    // 새 알레르기 입력
+	    if (allergyIds != null && !allergyIds.isEmpty()) {
+	    	mMapper.insertMemberAllergies(memberId, allergyIds);
+	    }
+
+	    return true;
+	}
+
+	@Override
+	public List<Integer> getMemberAllergies(String memberId) {
+		return mMapper.findMemberAllergies(memberId);
+	}
+
+	@Override
+	public void saveUserAllergies(String memberId, List<Integer> allergyIds) {
+		mMapper.deleteUserAllergies(memberId);
+
+	    // 2) 새로운 알레르기 입력
+	    if (allergyIds != null && !allergyIds.isEmpty()) {
+	        for (Integer allergyId : allergyIds) {
+	        	mMapper.insertUserAllergy(memberId, allergyId);
+	        }
+	    }
+		
+	}
+
+	@Override
+	public Object getUserAllergyIds(String memberId) {
+		return mMapper.getUserAllergyIds(memberId);
+	}
+
+	@Override
+	public Object getAllAllergies() {
+		return mMapper.getAllAllergies();
+	}
 }

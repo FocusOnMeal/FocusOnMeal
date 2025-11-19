@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../services/authService'; // ⭐ Mock 대신 실제 API 사용
+import authService from '../../services/authService';
 
 function findPassword() {
     const navigate = useNavigate();
@@ -30,19 +30,18 @@ function findPassword() {
         setLoading(true);
 
         try {
-            // ⭐ 실제 API 호출
             const response = await authService.sendPasswordResetLink(
                 formData.memberId,
                 formData.email
             );
             
-            console.log('비밀번호 재설정 API 응답:', response); // 디버깅용
+            console.log('비밀번호 재설정 API 응답:', response);
 
             if (response.data.success) {
                 setIsSuccess(true);
             }
         } catch (err) {
-            console.error('비밀번호 재설정 오류:', err); // 디버깅용
+            console.error('비밀번호 재설정 오류:', err);
             const errorMessage = err.response?.data?.error || '요청 처리 중 오류가 발생했습니다.';
             setError(errorMessage);
         } finally {
@@ -50,7 +49,6 @@ function findPassword() {
         }
     };
 
-    // 성공 화면
     if (isSuccess) {
         return (
             <div style={{ minHeight: '100vh', backgroundColor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Malgun Gothic, sans-serif' }}>
@@ -116,7 +114,6 @@ function findPassword() {
         );
     }
 
-    // 기본 비밀번호 찾기 화면
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Malgun Gothic, sans-serif' }}>
             <div style={{ background: 'white', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', padding: '50px 40px', maxWidth: '450px', width: '100%', animation: 'slideUp 0.5s ease' }}>

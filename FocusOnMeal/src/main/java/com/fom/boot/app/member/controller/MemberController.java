@@ -90,9 +90,6 @@ public class MemberController {
 
     // ========== 회원가입 ==========
 
-    /**
-     * ✅ 수정: 아이디 중복 확인 - 응답 구조 단순화
-     */
     @GetMapping("/check-id/{memberId}")
     public ResponseEntity<?> checkMemberId(@PathVariable String memberId) {
         log.info("[아이디 중복 확인] memberId: {}", memberId);
@@ -101,7 +98,6 @@ public class MemberController {
             Member existMember = mService.selectOneById(memberId);
             boolean available = (existMember == null);
             
-            // ✅ 수정: Map으로 직접 응답하여 구조 단순화
             Map<String, Object> response = new HashMap<>();
             response.put("available", available);
             response.put("message", available ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.");
@@ -117,15 +113,11 @@ public class MemberController {
         }
     }
 
-    /**
-     * ✅ 수정: 이메일 인증 코드 발송 - 로깅 강화
-     */
     @PostMapping("/send-verification-code")
     public ResponseEntity<?> sendVerificationCode(@RequestBody EmailVerificationRequest request) {
         log.info("[이메일 인증 코드 발송 요청] email: {}", request.getEmail());
         
         try {
-            // 이메일 중복 확인
             boolean exists = mService.checkEmailExists(request.getEmail());
             if (exists) {
                 log.warn("[이메일 인증 실패] 이미 사용중인 이메일: {}", request.getEmail());
@@ -133,11 +125,9 @@ public class MemberController {
                     .body(Map.of("error", "이미 사용중인 이메일입니다."));
             }
             
-            // 6자리 인증 코드 생성
             String verificationCode = emailService.generateVerificationCode();
             log.info("[인증 코드 생성] email: {}, code: {}", request.getEmail(), verificationCode);
             
-            // 이메일 발송
             try {
                 emailService.sendVerificationEmail(request.getEmail(), verificationCode);
                 log.info("[이메일 발송 성공] email: {}", request.getEmail());
@@ -147,7 +137,6 @@ public class MemberController {
                     .body(Map.of("error", "이메일 발송에 실패했습니다. 메일 서버 설정을 확인해주세요."));
             }
             
-            // 인증 코드 저장 (5분 유효)
             mService.saveVerificationCode(request.getEmail(), verificationCode);
             log.info("[인증 코드 저장 완료] email: {}", request.getEmail());
             
@@ -160,15 +149,12 @@ public class MemberController {
             
         } catch (Exception e) {
             log.error("[이메일 인증 코드 발송 오류] email: {}, error: {}", request.getEmail(), e.getMessage());
-            e.printStackTrace(); // 전체 스택 트레이스 출력
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "서버 오류: " + e.getMessage()));
         }
     }
 
-    /**
-     * ✅ 수정: 이메일 인증 코드 확인 - 응답 구조 단순화
-     */
     @PostMapping("/verify-email-code")
     public ResponseEntity<?> verifyEmailCode(@RequestBody EmailCodeVerificationRequest request) {
         log.info("[이메일 인증 코드 확인] email: {}, code: {}", request.getEmail(), request.getCode());
@@ -195,15 +181,11 @@ public class MemberController {
         }
     }
 
-    /**
-     * 회원가입
-     */
     @PostMapping("/join")
     public ResponseEntity<?> joinMember(@Valid @RequestBody JoinRequest request) {
         log.info("[회원가입 시도] memberId: {}, email: {}", request.getMemberId(), request.getEmail());
         
         try {
-            // 1. 아이디 중복 확인
             Member existMember = mService.selectOneById(request.getMemberId());
             if (existMember != null) {
                 log.warn("[회원가입 실패] 중복 아이디: {}", request.getMemberId());
@@ -211,28 +193,24 @@ public class MemberController {
                     .body(Map.of("error", "이미 사용중인 아이디입니다."));
             }
             
-            // 2. 이메일 중복 확인
             if (mService.checkEmailExists(request.getEmail())) {
                 log.warn("[회원가입 실패] 중복 이메일: {}", request.getEmail());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "이미 사용중인 이메일입니다."));
             }
             
-            // 3. 이메일 인증 여부 확인
             if (!mService.isEmailVerified(request.getEmail())) {
                 log.warn("[회원가입 실패] 이메일 미인증: {}", request.getEmail());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "이메일 인증이 필요합니다."));
             }
             
-            // 4. 비밀번호 유효성 검증
             if (!isValidPassword(request.getMemberPw())) {
                 log.warn("[회원가입 실패] 비밀번호 형식 오류: {}", request.getMemberId());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "비밀번호는 8자 이상이며, 숫자와 특수문자를 포함해야 합니다."));
             }
             
-            // 5. Member 객체 생성
             Member member = new Member();
             member.setMemberId(request.getMemberId());
             member.setMemberPw(bcrypt.encode(request.getMemberPw()));
@@ -242,13 +220,11 @@ public class MemberController {
             member.setPhone(request.getPhone());
             member.setGender(request.getGender());
             
-            log.info("[회원 정보] nickname: {}", request.getMemberNickname()); // 닉네임 로깅
+            log.info("[회원 정보] nickname: {}", request.getMemberNickname());
             
-            // 6. 회원가입 처리
             int result = mService.insertMember(member);
             
             if (result > 0) {
-                // 인증 완료된 이메일 정보 삭제
                 mService.deleteVerificationCode(request.getEmail());
                 
                 log.info("[회원가입 성공] memberId: {}, nickname: {}", request.getMemberId(), request.getMemberNickname());
@@ -272,11 +248,41 @@ public class MemberController {
         }
     }
 
+    // ========== 아이디 찾기 ==========
+
+    @PostMapping("/id/search")
+    public ResponseEntity<?> searchMemberId(@Valid @RequestBody IdSearchRequest request) {
+        log.info("[아이디 찾기] name: {}, email: {}", request.getMemberName(), request.getEmail());
+        
+        try {
+            boolean success = passwordResetService.sendMemberIdByEmail(
+                request.getMemberName(),
+                request.getEmail()
+            );
+            
+            if (success) {
+                log.info("[아이디 찾기 성공] email: {}", request.getEmail());
+                return ResponseEntity.ok(
+                    Map.of(
+                        "success", true,
+                        "message", "아이디 찾기 결과가 이메일로 발송되었습니다.",
+                        "email", request.getEmail()
+                    )
+                );
+            } else {
+                log.error("[아이디 찾기 실패] email: {}", request.getEmail());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "처리 중 오류가 발생했습니다."));
+            }
+        } catch (Exception e) {
+            log.error("[아이디 찾기 실패] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", e.getMessage()));
+        }
+    }
+
     // ========== 비밀번호 찾기 ==========
 
-    /**
-     * 비밀번호 재설정 링크 발송
-     */
     @PostMapping("/password/reset-request")
     public ResponseEntity<?> sendPasswordResetLink(
             @Valid @RequestBody PasswordResetLinkRequest request,
@@ -316,9 +322,6 @@ public class MemberController {
         }
     }
 
-    /**
-     * 토큰 유효성 검증
-     */
     @GetMapping("/password/validate-token")
     public ResponseEntity<?> validateToken(@RequestParam("token") String token) {
         log.info("[토큰 검증] token: {}", token.substring(0, Math.min(20, token.length())) + "...");
@@ -344,94 +347,50 @@ public class MemberController {
         }
     }
 
-    /**
-     * 비밀번호 재설정
-     */
-    @PostMapping("/password/reset")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetRequest request) {
-        log.info("[비밀번호 재설정 시도]");
+    @PostMapping("/password/reset-confirm")
+    public ResponseEntity<?> confirmPasswordReset(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
         
         try {
-            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "비밀번호가 일치하지 않습니다."));
+            String token = request.get("token");
+            String newPassword = request.get("newPassword");
+            String confirmPassword = request.get("confirmPassword");
+            
+            log.info("비밀번호 재설정 확인: token={}", 
+                    token != null && token.length() > 8 ? token.substring(0, 8) + "****" : "****");
+            
+            if (!newPassword.equals(confirmPassword)) {
+                response.put("success", false);
+                response.put("error", "비밀번호가 일치하지 않습니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             
-            if (!isValidPassword(request.getNewPassword())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "비밀번호는 8자 이상이며, 숫자와 특수문자를 포함해야 합니다."));
-            }
-            
-            boolean success = passwordResetService.resetPassword(
-                request.getToken(), 
-                request.getNewPassword()
-            );
-            
-            if (success) {
-                log.info("[비밀번호 재설정 성공]");
-                return ResponseEntity.ok(
-                    Map.of(
-                        "success", true,
-                        "message", "비밀번호가 성공적으로 변경되었습니다."
-                    )
-                );
-            } else {
-                log.error("[비밀번호 재설정 실패]");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "비밀번호 변경에 실패했습니다."));
-            }
-        } catch (Exception e) {
-            log.error("[비밀번호 재설정 실패] error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    // ========== 아이디 찾기 ==========
-
-    /**
-     * 아이디 찾기
-     */
-    @PostMapping("/id/search")
-    public ResponseEntity<?> searchMemberId(@Valid @RequestBody IdSearchRequest request) {
-        log.info("[아이디 찾기] name: {}, email: {}", request.getMemberName(), request.getEmail());
-        
-        try {
-            boolean success = passwordResetService.sendMemberIdByEmail(
-                request.getMemberName(),
-                request.getEmail()
-            );
+            boolean success = passwordResetService.resetPassword(token, newPassword);
             
             if (success) {
-                log.info("[아이디 찾기 성공] email: {}", request.getEmail());
-                return ResponseEntity.ok(
-                    Map.of(
-                        "success", true,
-                        "message", "아이디 찾기 결과가 이메일로 발송되었습니다.",
-                        "email", request.getEmail()
-                    )
-                );
+                response.put("success", true);
+                response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+                return ResponseEntity.ok(response);
             } else {
-                log.error("[아이디 찾기 실패] email: {}", request.getEmail());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "처리 중 오류가 발생했습니다."));
+                response.put("success", false);
+                response.put("error", "비밀번호 변경에 실패했습니다.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
+            
         } catch (Exception e) {
-            log.error("[아이디 찾기 실패] error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", e.getMessage()));
+            log.error("비밀번호 재설정 오류: {}", e.getMessage());
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
     // ========== 유틸리티 메서드 ==========
 
-    /**
-     * ⭐ 테스트용: 이메일 발송 테스트 (개발 환경에서만 사용)
-     */
     @GetMapping("/test-email")
     public ResponseEntity<?> testEmail(@RequestParam(required = false) String email) {
         if (email == null || email.isEmpty()) {
-            email = "dofvm1004@gmail.com"; // 기본 테스트 이메일
+            email = "dofvm1004@gmail.com";
         }
         
         try {
@@ -473,16 +432,8 @@ public class MemberController {
         if (password == null || password.length() < 8) {
             return false;
         }
-        // ✅ 수정: 숫자 + 특수문자만 있어도 OK (영문은 선택)
         boolean hasDigit = password.matches(".*\\d.*");
         boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*");
         return hasDigit && hasSpecial;
-    }
-    
-    @GetMapping("/password/resetPage")
-    public RedirectView passwordResetPage(@RequestParam("token") String token) {
-        // 프론트 리셋 페이지 URL로 리다이렉트 (프론트 포트에 맞게 변경)
-        String frontendUrl = "http://localhost:5173/member/reset-password?token=" + token;
-        return new RedirectView(frontendUrl);
     }
 }

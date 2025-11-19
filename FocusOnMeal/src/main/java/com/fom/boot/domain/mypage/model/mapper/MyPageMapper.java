@@ -28,4 +28,22 @@ public interface MyPageMapper {
 	List<MealPlanSummaryDTO> findMealPlanSummary(@Param("memberId") String memberId, @Param("limit") int limit);
 	int countMealPlans(@Param("memberId") String memberId);
 
+	void deleteMemberAllergies(String memberId);
+
+	void insertMemberAllergies(
+		    @Param("memberId") String memberId,
+		    @Param("list") List<?> allergyIds
+		);
+
+	List<Integer> findMemberAllergies(String memberId);
+
+	Object getUserAllergyIds(String memberId);
+
+	Object getAllAllergies();
+
+	int insertUserAllergy(@Param("memberId") String memberId,
+            					@Param("allergyId") int allergyId);
+
+	void deleteUserAllergies(String memberId);
+
 }

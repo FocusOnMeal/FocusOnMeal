@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../services/authService'; // ⭐ Mock 대신 실제 API 사용
+import authService from '../../services/authService';
 
 function findId() {
     const navigate = useNavigate();
@@ -54,19 +54,18 @@ function findId() {
         try {
             setLoading(true);
             
-            // ⭐ 실제 API 호출
             const response = await authService.sendMemberIdByEmail(
                 formData.memberName,
                 formData.email
             );
             
-            console.log('아이디 찾기 API 응답:', response); // 디버깅용
+            console.log('아이디 찾기 API 응답:', response);
             
             if (response.data.success) {
                 setEmailSent(true);
             }
         } catch (error) {
-            console.error('아이디 찾기 오류:', error); // 디버깅용
+            console.error('아이디 찾기 오류:', error);
             const errorMessage = error.response?.data?.error || '일치하는 회원 정보를 찾을 수 없습니다.';
             setErrors({ general: errorMessage });
         } finally {
