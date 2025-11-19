@@ -3,69 +3,73 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './detail.module.css';
 
+// 🚨 UI 테스트를 위한 임의 함수 (실제 데이터가 없는 경우 대체)
+const getDummyInfo = (id) => ({
+    id,
+    name: "감자",
+    category: "채소류",
+    standardUnit: "1kg",
+    currentPrice: 5000,
+    pricePer100g: 500, // 5000원/10=500원 (1kg 기준)
+    safetyStatus: 'warning', // 'safe', 'warning', 'danger'
+    
+    // 가격 변동 더미 데이터 (주간/월간 변동)
+    priceChangeWeek: { amount: 200, percent: 5.5, direction: 'up' }, // 1주일 전 대비
+    priceChangeMonth: { amount: 200, percent: 5.0, direction: 'down' }, // 1개월 전 대비
+    
+    // 식자재 정보 더미
+    productionOrigin: '강원, 경기 등',
+    harvestSeason: '6월~10월',
+    storageMethod: '서늘한 곳',
+    efficacy: '피로회복, 혈압 안정',
+    registeredDate: '2025-11-04'
+});
+
 function IngredientDetail() {
-    const { id } = useParams(); // URL에서 식재료 ID 가져오기
+    const { id } = useParams();
     const navigate = useNavigate(); 
     
-    // 서버에서 받아올 데이터 상태
-    const [itemInfo, setItemInfo] = useState(null);     // 식재료 기본 정보
-    const [priceHistory, setPriceHistory] = useState([]); // 가격 이력 (그래프용)
+    const [itemInfo, setItemInfo] = useState(null); 
+    const [_priceHistory, setPriceHistory] = useState([]); 
     const [loading, setLoading] = useState(true);
-    const [isWished, setIsWished] = useState(false); // 찜 상태
+    const [isWished, setIsWished] = useState(false); 
 
-    // API 연동: id가 바뀔 때마다 실행
     useEffect(() => {
         const fetchDetail = async () => {
             try {
-                // Spring Boot 상세 API 호출
                 const response = await axios.get(`/ingredient/api/detail/${id}`);
+                const info = response.data.info || getDummyInfo(id);
+                const history = response.data.history || [];
                 
-                setItemInfo(response.data.info);      // "info" 키에 담긴 기본 정보
-                setPriceHistory(response.data.history); // "history" 키에 담긴 가격 이력
+                if (info && info.nutrition) {
+                    delete info.nutrition; 
+                }
                 
-                // (추후 찜 여부도 API로 받아오면 좋습니다)
-                // setIsWished(response.data.isFavorite); 
+                setItemInfo(info); 
+                setPriceHistory(history); 
 
             } catch (error) {
                 console.error("상세 정보 로딩 실패:", error);
-                setItemInfo(null); // 오류 발생 시 null 처리
+                setItemInfo(getDummyInfo(id)); 
             } finally {
                 setLoading(false);
             }
         };
         fetchDetail();
-    }, [id]); // id가 바뀔 때마다 다시 API 호출
+    }, [id]);
 
-    // 찜하기 버튼 클릭 핸들러 (API 호출)
-    const handleWishClick = async () => {
-        try {
-            // Spring Boot 찜하기 API(@PostMapping) 호출
-            const response = await axios.post(`/ingredient/detail/${id}/favorite`);
-            
-            // Controller가 보내준 응답(isFavorite, message) 사용
-            setIsWished(response.data.isFavorite); 
-            alert(response.data.message);
-
-        } catch (error) {
-            // 401: Unauthorized (로그인 안 됨)
-            if (error.response && error.response.status === 401) {
-                alert("로그인이 필요합니다.");
-                 // navigate('/login'); // (로그인 페이지가 있다면)
-            } else {
-                alert("찜 처리에 실패했습니다.");
-                console.error("찜하기 오류:", error);
-            }
-        }
+    const handleWishClick = () => {
+        setIsWished(prev => !prev);
+        alert(isWished ? "찜 취소되었습니다." : "찜 목록에 추가되었습니다.");
     };
 
     if (loading) return <div className={styles.container}>로딩 중...</div>;
     
-    // 데이터 로딩이 끝났는데 itemInfo가 null인 경우 (오류 또는 데이터 없음)
     if (!itemInfo) {
         return (
             <div className={styles.container}>
-                <h2>오류</h2>
-                <p>'{id}'에 해당하는 식자재 정보를 찾을 수 없습니다.</p>
+                <h2>식품성분표 상세 페이지</h2>
+                <p>'{id}'에 해당하는 정보를 찾을 수 없습니다.</p>
                 <button onClick={() => navigate(-1)} className={styles.backButton}>
                 목록으로 돌아가기
                 </button>
@@ -73,70 +77,156 @@ function IngredientDetail() {
         );
     }
 
+    // 템플릿 변수 계산
+    const safetyText = itemInfo.safetyStatus === 'safe' ? '안전'
+                        : itemInfo.safetyStatus === 'warning' ? '주의'
+                        : '위험';
+    const safetyClass = itemInfo.safetyStatus === 'safe' ? styles.safe 
+                        : itemInfo.safetyStatus === 'warning' ? styles.warning 
+                        : styles.danger;
+                    
+    const priceChangeWeek = itemInfo.priceChangeWeek || {};
+    const priceChangeMonth = itemInfo.priceChangeMonth || {};
+
+    const getChangeDisplay = (change) => {
+        if (!change || change.amount === undefined) return '-';
+        const indicator = change.direction === 'up' ? '▲' : '▼';
+        const colorClass = change.direction === 'up' ? styles.priceUp : styles.priceDown;
+        const sign = change.direction === 'up' ? '+' : '-';
+        
+        return (
+            <span className={colorClass}>
+                *{change.amount.toLocaleString()}원 / ({indicator} {sign}{change.percent}%)
+            </span>
+        );
+    };
+
+
     // 정상 렌더링
     return (
         <div className={styles.container}>
+            <h2 className={styles.pageTitle}>식품성분표 상세 페이지</h2>
+            
             <button onClick={() => navigate(-1)} className={styles.backButton}>
-            목록으로
+                뒤로가기
             </button>
-            <br/><br/>
-        
-            <div className={styles.header}>
-                <h2>식품 상세 정보</h2>
-            </div>
-
-            <div className={styles.main}>
-                {/* 왼쪽 컬럼 */}
+            
+            <div className={styles.mainContent}>
+                
+                {/* 1. 왼쪽 컬럼: 이미지 및 영양 성분 */}
                 <div className={styles.leftColumn}>
+                    
+                    {/* 식자재 이미지 [300x300] */}
                     <div className={styles.imagePlaceholder}>
-                        {itemInfo.name} 이미지
+                        식자재 이미지 [300x300]
                     </div>
-                    <h3 className={styles.subTitle}>영양 성분 표</h3>
-                    <div className={styles.nutritionTable}>
-                        (영양 성분 표 컴포넌트)
+                    
+                    {/* 영양 성분 섹션 */}
+                    <div className={styles.nutritionSection}>
+                        <h3 className={styles.sectionTitle}>영양 성분 표</h3>
+                        
+                        <div className={styles.nutritionTablePlaceholder}>
+                            <table className={styles.nutritionTable}>
+                                <thead>
+                                    <tr>
+                                        <th>&nbsp; 구분</th>
+                                        <th>&nbsp; 함량</th>
+                                        <th>&nbsp; 수치</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className={styles.noDataRow}><td colSpan="3">NUTRITION_MASTER 테이블에 데이터가 없습니다.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                {/* 오른쪽 컬럼 */}
+                {/* 2. 오른쪽 컬럼: 정보 박스들 */}
                 <div className={styles.rightColumn}>
-                    <h1 className={styles.title}>
-                        {itemInfo.name}
-                    </h1>
-                    <span className={styles.categoryBadge}>{itemInfo.category}</span>
+                    <h1 className={styles.itemTitle}>{itemInfo.name}</h1>
                     
-                    <div className={styles.buttonGroup}>
-                        <button onClick={handleWishClick} className={styles.wishButton}>
-                            {isWished ? '❤️ 찜 취소' : '♥ 찜하기'}
-                        </button>
-                        {/* (안전 정보 표시는 기존 로직 유지) */}
-                    </div>
+                    {/* 2-1. 상단 요약 박스 (가격, 안전, 찜하기) */}
+                    <div className={styles.infoBoxTop}>
+                        <div className={styles.itemSummary}>
+                            
+                            {/* 🚨 가격 정보: list.jsx와 동일한 간결한 형식 */}
+                            <div className={styles.priceLine}>
+                                <strong>가격 ({itemInfo.standardUnit}):</strong> 
+                                <span className={styles.currentPriceValue}>
+                                    {itemInfo.currentPrice ? `${itemInfo.currentPrice.toLocaleString()}원` : '정보 없음'}
+                                </span>
+                                
+                                {itemInfo.pricePer100g > 0 && ( 
+                                    <span className={styles.pricePer100g}>
+                                        (100g당 {itemInfo.pricePer100g.toLocaleString()}원)
+                                    </span>
+                                )}
+                            </div>
 
-                    {/* 가격 정보 */}
-                    <div className={styles.infoBox}>
-                        <h3 className={styles.subTitle}>
-                            가격 변동 추이
-                            <span style={{fontSize:'0.7em', color:'#888', marginLeft:'10px', fontWeight:'normal'}}> (서울 / 소매 / 1kg)</span>
-                        </h3>
-                        <div className={styles.priceInfo}>
-                            <p><span>최근 가격:</span> <b>
-                                {priceHistory.length > 0 ? `${priceHistory[0].priceValue.toLocaleString()}원` : '정보 없음'}
-                            </b></p>
-                            <p><span>(기준일:</span> {priceHistory.length > 0 ? priceHistory[0].collectedDate.substring(0, 10) : '-'}<span>)</span></p>
+                            {/* 🚨 안전 위험도 + 툴팁 추가 */}
+                            <div className={styles.safetyLine}>
+                                <strong>안전 위험도:</strong> 
+                                <span className={safetyClass}>{safetyText}</span>
+                                
+                                <span className={styles.tooltipContainer}>
+                                    <span className={styles.helpIcon}>?</span>
+                                    <div className={styles.tooltipBox}>
+                                        <h4 className={styles.tooltipTitle}>안전 위험도 기준</h4>
+                                        {/* 🚨 툴팁 텍스트 구조 변경 */}
+                                        <p className={styles.tooltipDanger}>
+                                            <strong>🔴 위험:</strong> 
+                                            <span className={styles.tooltipTextContent}>
+                                                최근 3개월 이내 식약처 회수 명령, 또는 농약/중금속 부적합 판정 등이 있었을 경우.
+                                            </span>
+                                        </p>
+                                        <p className={styles.tooltipWarning}>
+                                            <strong>🟠 주의:</strong> 
+                                            <span className={styles.tooltipTextContent}>
+                                                가격 변동률 ±20% 이상 등 급격한 불안정, 또는 계절적 품질 저하 우려가 있는 경우.
+                                            </span>
+                                        </p>
+                                        <p className={styles.tooltipSafe}>
+                                            <strong>🟢 안전:</strong> 
+                                            <span className={styles.tooltipTextContent}>
+                                                위의 위험 및 주의 조건에 해당하지 않는 경우.
+                                            </span>
+                                        </p>
+                                    </div>
+                                </span>
+                            </div>
                         </div>
-                        <div className={styles.chartPlaceholder}>
-                            [그래프 영역: priceHistory 데이터를 여기에 전달]
+                        <div className={styles.topActions}>
+                            <button onClick={handleWishClick} className={`${styles.wishButton} ${isWished ? styles.wished : ''}`}>
+                                {isWished ? '❤️ 찜하기' : '🤍 찜하기'}
+                            </button>
+                            <span className={styles.safetyBadge}>안전 알림</span>
                         </div>
                     </div>
                     
-                    {/* 상세 정보 */}
+                    {/* 2-2. 가격 변동 추이 그래프 박스 */}
                     <div className={styles.infoBox}>
-                        <h3 className={styles.subTitle}>상세 정보</h3>
+                        <h3 className={styles.boxTitle}>가격 변동 추이 그래프</h3>
+                        
+                        <div className={styles.chartArea}>
+                            [가격 변동 그래프 영역]
+                        </div>
+                        
+                        <div className={styles.priceChangeSummary}>
+                            <p>1주일 전 대비: {getChangeDisplay(priceChangeWeek)}</p>
+                            <p>1개월 전 대비: {getChangeDisplay(priceChangeMonth)}</p>
+                        </div>
+                    </div>
+                    
+                    {/* 2-3. 식자재 정보 박스 */}
+                    <div className={styles.infoBox}>
+                        <h3 className={styles.boxTitle}>식자재 정보</h3>
                         <div className={styles.specInfo}>
-                            <p><span>단위 :</span> {itemInfo.standardUnit}</p> 
-                            <hr />
-                            <p>KAMIS 품목코드 : {itemInfo.kamisItemCode || '-'}</p>
-                            <p>KAMIS 품종코드 : {itemInfo.kamisKindCode || '-'}</p>
-                            <p>분류 코드 : {itemInfo.kamisItemCategoryCode || '-'}</p>
+                            <div className={styles.specRow}><span>생산지:</span> {itemInfo.productionOrigin || '-'}</div> 
+                            <div className={styles.specRow}><span>주요 산지:</span> {itemInfo.harvestSeason || '-'}</div>
+                            <div className={styles.specRow}><span>보관 방법:</span> {itemInfo.storageMethod || '-'}</div>
+                            <div className={styles.specRow}><span>효능:</span> {itemInfo.efficacy || '-'}</div>
+                            <div className={styles.specRow}><span>등록일:</span> {itemInfo.registeredDate || '-'}</div>
                         </div>
                     </div>
                 </div>

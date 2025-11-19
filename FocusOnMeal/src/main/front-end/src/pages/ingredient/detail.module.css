@@ -1,187 +1,355 @@
 /* detail.module.css */
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-  font-family: 'Pretendard', sans-serif; /* (추천) Pretendard 같은 깔끔한 폰트 사용 */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 24px;
+    font-family: 'Pretendard', sans-serif;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-}
-
-.header h2 {
-  margin: 0;
+/* --- 상단 제목 및 뒤로가기 버튼 --- */
+.pageTitle {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
 }
 
 .backButton {
-  background-color: #f0f2f5;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #333;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 8px 15px;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
 }
-
 .backButton:hover {
-  background-color: #e4e6e8;
+    background-color: #e0e0e0;
 }
 
-.main {
-  display: flex;
-  gap: 32px;
+/* --- 메인 2분할 레이아웃 --- */
+.mainContent {
+    display: flex;
+    gap: 40px;
+    margin-top: 10px;
 }
 
 .leftColumn {
-  flex: 1;
-  min-width: 250px;
+    flex-basis: 300px; 
+    flex-shrink: 0;
 }
 
 .rightColumn {
-  flex: 2;
+    flex: 1; 
+    min-width: 0;
 }
 
+.itemTitle {
+    font-size: 32px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* --- 왼쪽 컬럼: 이미지 및 영양 정보 --- */
 .imagePlaceholder {
-  width: 100%;
-  aspect-ratio: 1 / 1; /* 정사각형 비율 */
-  background-color: #f7f7f7;
-  border: 1px dashed #ccc;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-  font-size: 16px;
-  margin-bottom: 24px;
+    width: 300px; 
+    height: 300px; 
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 30px;
 }
 
+.nutritionSection {
+    margin-top: 30px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* 영양 성분 테이블 스타일 (데이터 없음 반영) */
 .nutritionTable {
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 16px;
-  min-height: 200px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    border: 1px solid #ddd;
+}
+.nutritionTable th, .nutritionTable td {
+    padding: 8px 5px;
+    text-align: left;
+    border: 1px solid #f0f0f0;
+}
+.nutritionTable thead th {
+    background-color: #f7f7f7;
+    font-weight: 600;
+    color: #555;
+}
+.noDataRow td {
+    text-align: center;
+    color: #999;
+    font-style: italic;
 }
 
-.title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-top: 0;
-  margin-bottom: 16px;
+
+/* --- 오른쪽 컬럼: 정보 박스들 --- */
+.infoBox, .infoBoxTop {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    background-color: #f7f7f7; 
 }
 
-.subTitle {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
+/* 🚨 2-1. 상단 요약 박스 스타일 */
+.infoBoxTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
-.buttonGroup {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+.itemSummary strong {
+    font-weight: 600;
+    margin-right: 10px;
 }
 
-.buttonGroup button {
-  padding: 10px 18px;
-  font-size: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  font-weight: 600;
-  transition: all 0.2s;
+/* 🚨 가격 및 안전 라인 (list.jsx 구조 반영) */
+.priceLine, .safetyLine {
+    font-size: 16px;
+    margin-bottom: 8px;
+    position: relative;
+    display: flex; 
+    align-items: center;
+}
+
+/* 🚨 현재 가격 값 (list.jsx의 currentPrice 값) */
+.currentPriceValue {
+    font-weight: 700;
+    color: #111;
+    margin-right: 10px;
+}
+
+/* 🚨 100g당 가격 (list.jsx의 0.9em 스타일) */
+.pricePer100g {
+    color: #666;
+    font-size: 0.9em;
+    font-weight: normal; 
+}
+
+
+.topActions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    align-items: center;
 }
 
 .wishButton {
-  background-color: #f0f2f5;
-  border: 1px solid #ddd;
-  color: #333;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    border: 1px solid #dc3545;
+    background-color: white;
+    color: #dc3545;
+    transition: all 0.2s;
 }
 
-.wishButton:hover {
-  background-color: #e4e6e8;
-  border-color: #ccc;
+.wishButton.wished {
+    background-color: #dc3545;
+    color: white;
 }
 
-.actionButton {
-  background-color: #f0f2f5; /* (예시) 메인 컬러 */
-  border: 1px solid #ddd;
-  color: #333;
+.safetyBadge {
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    border: 1px solid #ddd;
+    display: flex; 
+    align-items: center;
 }
 
-.actionButton:hover {
-  background-color: #e4e6e8;
-  border-color: #ccc;
+/* 🚨 안전 위험도 아이콘 (list.jsx 스타일 반영) */
+.safetyIcon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+/* 🚨 안전 등급별 배경색 설정 (아이콘용) */
+.safetyIcon.safe { background-color: #28a745; }
+.safetyIcon.warning { background-color: #ffc107; }
+.safetyIcon.danger { background-color: #dc3545; }
+
+
+/* ------------------------------------- */
+/* 🚨 안전 위험도 툴팁 CSS (들여쓰기 적용) */
+/* ------------------------------------- */
+.tooltipContainer {
+    position: relative;
+    display: inline-block;
+    margin-left: 8px;
+    cursor: pointer;
+    flex-shrink: 0; 
 }
 
-.infoBox {
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-  background-color: #fafafa;
+.helpIcon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #007aff; 
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
 }
 
-.priceInfo p,
-.specInfo p {
-  font-size: 15px;
-  color: #333;
-  margin: 8px 0;
-  display: flex;
+.tooltipBox {
+    visibility: hidden;
+    opacity: 0;
+    width: 320px; 
+    background-color: #333;
+    color: white;
+    text-align: left;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 10;
+    bottom: 125%; 
+    left: -20px; 
+    transition: opacity 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    white-space: normal;
+    font-size: 12px;
+    line-height: 1.4;
 }
 
-.priceInfo p span,
-.specInfo p span {
-  display: inline-block;
-  width: 90px;
-  color: #777;
-  font-weight: 500;
+.tooltipContainer:hover .tooltipBox {
+    visibility: visible;
+    opacity: 1;
 }
 
-.priceInfo p b {
-  color: #d90000; /* (예시) 강조색 */
+.tooltipBox::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 29px; 
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
 }
 
-.specInfo hr {
-  border: none;
-  border-top: 1px solid #eee;
-  margin: 16px 0;
+.tooltipTitle {
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 5px;
 }
 
-/* 찜하기 옆 안전도 표시용 */
-.safetyDisplay {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 18px; /* 버튼과 동일한 V/H 패딩 */
-  font-size: 15px;
-  border-radius: 8px;
-  border: 1px solid #eee;
-  background-color: #f9f9f9;
-  font-weight: 600;
-  color: #333; /* 기본 색상 */
+/* 🚨 툴팁 박스 p 태그 (들여쓰기를 위해 flex 적용) */
+.tooltipBox p {
+    font-size: 12px;
+    margin: 5px 0;
+    line-height: 1.4;
+    display: flex; /* 🔴 아이콘과 텍스트를 flex로 분리 */
+    align-items: flex-start;
 }
 
-/* 안전도 등급별 색상 */
-.safe {
-  color: #28a745; /* Green */
-}
-.warning {
-  color: #ffc107; /* Orange */
-}
-.danger {
-  color: #dc3545; /* Red */
+/* 🚨 툴팁 내 안전 등급 아이콘/제목 */
+.tooltipBox strong {
+    font-weight: 700;
+    flex-shrink: 0; 
+    margin-right: 5px; /* 제목과 내용 분리 */
+    /* 아이콘과 제목의 고정 너비를 설정하여, 내용이 정렬될 기준을 만듭니다. */
+    width: 65px; 
 }
 
-/* 반응형: 화면이 768px보다 작아지면 세로로 쌓임 */
-@media (max-width: 768px) {
-  .main {
-    flex-direction: column;
-  }
+/* 🚨 툴팁 내 내용 영역 (줄바꿈 시 들여쓰기 효과) */
+.tooltipTextContent {
+    flex-grow: 1;
+}
+
+.tooltipDanger strong { color: #dc3545; }
+.tooltipWarning strong { color: #ffc107; }
+.tooltipSafe strong { color: #28a745; }
+/* ------------------------------------- */
+
+
+/* --- 안전 등급 텍스트 색상 --- */
+.safe { color: #28a745; }
+.warning { color: #ffc107; }
+.danger { color: #dc3545; }
+
+
+/* 🚨 2-2. 가격 변동 추이 박스 스타일 */
+.boxTitle {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.chartArea {
+    width: 100%;
+    height: 150px; 
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.priceChangeSummary p {
+    margin: 5px 0;
+    font-size: 15px;
+    text-align: right;
+}
+
+/* --- 가격 변동 색상 --- */
+.priceUp { color: #dc3545; font-weight: 700; margin-left: 5px; }
+.priceDown { color: #007aff; font-weight: 700; margin-left: 5px; }
+
+
+/* 🚨 2-3. 식자재 정보 박스 스타일 */
+.specInfo {
+    font-size: 15px;
+}
+
+.specRow {
+    display: flex;
+    padding: 5px 0;
+    line-height: 1.5;
+}
+
+.specRow span {
+    font-weight: 600;
+    color: #333;
+    width: 100px; 
+    flex-shrink: 0;
 }
