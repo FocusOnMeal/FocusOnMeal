@@ -72,7 +72,7 @@
         SELECT 
             PLAN_ID AS planId,
             PLAN_NAME AS planName,
-            TOTAL_COST AS totalCost,
+            TOTAL_COST AS totalCost
             SERVING_SIZE AS servingSize
         FROM MEAL_PLAN
         WHERE MEMBER_ID = #{memberId}
@@ -86,12 +86,6 @@
         FROM MEAL_PLAN
         WHERE MEMBER_ID = #{memberId}
           AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
-    </select>
-
-    <select id="findMemberInfo" resultType="com.fom.boot.domain.member.model.vo.Member">
-        SELECT MEMBER_ID, MEMBER_NAME, EMAIL, MEMBER_NICKNAME
-        FROM MEMBER
-        WHERE MEMBER_ID = #{memberId}
     </select>
     
   </mapper>
