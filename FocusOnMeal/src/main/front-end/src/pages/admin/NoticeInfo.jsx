@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./NoticeInfo.module.css";
@@ -8,6 +8,9 @@ import Sidebar from "../../components/admin/Sidebar";
 const NoticeInfo = () => {
 
     const [noticeInfo, setNoticeInfo] = useState([]);
+
+    // 뱃지 필터
+    const [filterType, setFilterType] = useState("ALL"); 
     
     // 모달 선택 + 선택된 공지
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,15 +100,72 @@ const NoticeInfo = () => {
             <Sidebar/>
             <div className={styles.main}>
                 <h1>공지사항</h1>
+                <div className={styles.controlsContainer}>
+                    {/* NEW / 필독 버튼 필터 */}
+                    <div className={styles.filterButtons}>
+                        <button
+                            className={`${styles.filterBtn} ${filterType === "ALL" ? styles.activeFilter : ""}`}
+                            onClick={() => setFilterType("ALL")}
+                        >
+                            전체
+                        </button>
 
+                        <button
+                            className={`${styles.filterBtn} ${filterType === "NEW" ? styles.activeFilter : ""}`}
+                            onClick={() => setFilterType("NEW")}
+                        >
+                            NEW
+                        </button>
+
+                        <button
+                            className={`${styles.filterBtn} ${filterType === "IMPORTANT" ? styles.activeFilter : ""}`}
+                            onClick={() => setFilterType("IMPORTANT")}
+                        >
+                            필독!
+                        </button>
+                    </div>
+                    
+                    {/* 🔎 검색 UI */}
+                    <div className={styles.searchBox}>
+                        <select className={styles.selectBox}>
+                            <option>전체</option>
+                            <option>제목</option>
+                            <option>작성자</option>
+                            <option>내용</option>
+                        </select>
+
+                        <input
+                            type="text"
+                            placeholder="검색어를 입력하세요"
+                            className={styles.searchInput}
+                            />
+
+                        <button className={styles.searchBtn}>검색</button>
+                    </div>
+                </div>
                 <table className={styles.noticeTable}>
                     <thead>
                         <tr>
-                            <th>번호</th>
-                            <th>제목</th>
-                            <th>작성자</th>
-                            <th>작성일</th>
-                            <th>조회수</th>
+                            <th>
+                                번호
+                                <span className={styles.sortIcon}>▲▼</span>
+                            </th>
+                            <th className={styles.titleCol}>
+                                제목
+                                <span className={styles.sortIcon}>▲▼</span>
+                            </th>
+                            <th>
+                                작성자
+                                <span className={styles.sortIcon}>▲▼</span>
+                            </th>
+                            <th>
+                                작성일
+                                <span className={styles.sortIcon}>▲▼</span>
+                            </th>
+                            <th>
+                                조회수
+                                <span className={styles.sortIcon}>▲▼</span>
+                            </th>
                             <th>관리</th>
                         </tr>
                     </thead>
@@ -116,7 +176,7 @@ const NoticeInfo = () => {
                                 <tr key={notice.noticeNo}>
                                     <td>{notice.noticeNo}</td>
 
-                                    <td>
+                                    <td className={styles.titleCol}>
                                         {/* 필독 */}
                                         {notice.noticeImportant === "Y" && (
                                             <span className={styles.badgeImportant}>필독 !</span>
@@ -145,10 +205,15 @@ const NoticeInfo = () => {
                                     <td>{notice.viewCount}</td>
 
                                     <td>
-                                        <button className={styles.editBtn} onClick={() => openModal(notice)}>
-                                            수정
-                                        </button>
-                                        <button className={styles.deleteBtn}>삭제</button>
+                                        <div className={styles.btnGroup}>
+                                            <button 
+                                                className={styles.editBtn} 
+                                                onClick={() => openModal(notice)}
+                                            >
+                                                수정
+                                            </button>
+                                            <button className={styles.deleteBtn}>삭제</button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -161,6 +226,15 @@ const NoticeInfo = () => {
                         )}
                     </tbody>
                 </table>
+
+                {/* 🔢 정적 페이지네이션 UI */}
+                <div className={styles.pagination}>
+                    <button className={styles.pageBtn}>{`<`}</button>
+                    <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
+                    <button className={styles.pageBtn}>2</button>
+                    <button className={styles.pageBtn}>3</button>
+                    <button className={styles.pageBtn}>{`>`}</button>
+                </div>
             </div>
 
             {/* Modal */}
