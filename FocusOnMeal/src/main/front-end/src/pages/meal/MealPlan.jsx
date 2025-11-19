@@ -12,9 +12,10 @@ const MealPlan = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [showSaveModal, setShowSaveModal] = useState(false);
-    const [servingSize, setServingSize] = useState(1);
     const [showRecipeModal, setShowRecipeModal] = useState(false);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
+    const [mealPlanToSave, setMealPlanToSave] = useState(null);
+    const [editablePlanName, setEditablePlanName] = useState("");
 
     // Refs
     const resultBoxRef = useRef(null);
@@ -172,14 +173,73 @@ const MealPlan = () => {
     };
 
     // 저장 모달
-    const openSaveModal = () => {
-        setServingSize(1);
+    const openSaveModal = (mealPlan) => {
+        if (!mealPlan) {
+            alert("저장할 식단 정보가 없습니다.");
+            return;
+        }
+        setMealPlanToSave(mealPlan);
+        setEditablePlanName(mealPlan.mealName); // 기본값으로 추천된 식단 이름 설정
         setShowSaveModal(true);
     };
 
-    const confirmSave = () => {
-        alert(`${servingSize}인분 기준으로 식단이 저장되었습니다!`);
-        setShowSaveModal(false);
+    const confirmSave = async () => {
+        // 식단명 유효성 검사
+        if (!editablePlanName.trim()) {
+            alert("식단 명칭을 입력해주세요.");
+            return;
+        }
+
+        // 로그인 확인
+        const token = localStorage.getItem("token");
+        // console.log("🔑 Token check:", token ? "토큰 있음" : "토큰 없음");
+        // console.log("🔑 Token value:", token);
+
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            setShowSaveModal(false);
+            return;
+        }
+
+        try {
+            // 레시피를 JSON 문자열로 변환
+            const recipeJson = JSON.stringify(mealPlanToSave.recipe);
+
+            const requestBody = {
+                planName: editablePlanName.trim(),
+                servingSize: 1,
+                mealType: mealPlanToSave.mealType,
+                totalCost: mealPlanToSave.calculatedPrice,
+                nutrition: mealPlanToSave.nutrition,
+                recipe: recipeJson
+            };
+
+            console.log("📤 Sending save request:", requestBody);
+
+            const response = await fetch("http://localhost:8080/api/chat/save-meal", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            // console.log("📥 Response status:", response.status);
+            const data = await response.json();
+            // console.log("📥 Response data:", data);
+
+            if (response.ok && data.status === "SUCCESS") {
+                alert(`"${editablePlanName}" 식단이 저장되었습니다!`);
+                setShowSaveModal(false);
+            } else {
+                alert(data.message || "식단 저장에 실패했습니다.");
+            }
+
+        } catch (error) {
+            console.error("❌ Error saving meal plan:", error);
+            alert("식단 저장 중 오류가 발생했습니다: " + error.message);
+        }
     };
 
     return (
@@ -332,7 +392,7 @@ const MealPlan = () => {
                                             <button className="meal-btn recipe-btn" onClick={() => openRecipeModal(mealPlan)}>
                                                 <span>📖</span> 레시피 보기
                                             </button>
-                                            <button className="meal-btn save-btn-card" onClick={openSaveModal}>
+                                            <button className="meal-btn save-btn-card" onClick={() => openSaveModal(mealPlan)}>
                                                 <span>❤</span> 저장하기
                                             </button>
                                         </div>
@@ -360,25 +420,23 @@ const MealPlan = () => {
                             <span className="modal-close" onClick={() => setShowSaveModal(false)}>&times;</span>
                         </div>
                         <div className="modal-body">
-                            <div className="serving-input-group">
-                                <label htmlFor="servingSize">몇 인분 기준으로 저장하시겠습니까?</label>
-                                <div className="serving-controls">
-                                    <button className="serving-btn" onClick={() => setServingSize(Math.max(1, servingSize - 1))}>-</button>
-                                    <input
-                                        type="number"
-                                        id="servingSize"
-                                        value={servingSize}
-                                        onChange={(e) => setServingSize(parseInt(e.target.value) || 1)}
-                                        min="1"
-                                        max="10"
-                                    />
-                                    <button className="serving-btn" onClick={() => setServingSize(Math.min(10, servingSize + 1))}>+</button>
-                                    <span className="serving-label">인분</span>
+                            <div className="plan-name-section">
+                                <label htmlFor="planName">식단 명칭</label>
+                                <input
+                                    type="text"
+                                    id="planName"
+                                    className="plan-name-input"
+                                    value={editablePlanName}
+                                    onChange={(e) => setEditablePlanName(e.target.value)}
+                                    placeholder="식단 이름을 입력하세요"
+                                    maxLength="50"
+                                />
+                            </div>
+                            {mealPlanToSave && (
+                                <div className="modal-info">
+                                    <p className="info-text">💰 예상 비용: <strong>{mealPlanToSave.calculatedPrice.toLocaleString()}원</strong> (1인분 기준)</p>
                                 </div>
-                            </div>
-                            <div className="modal-info">
-                                <p>선택한 인분수에 맞춰 가격이 계산됩니다.</p>
-                            </div>
+                            )}
                         </div>
                         <div className="modal-footer">
                             <button className="modal-btn cancel-btn" onClick={() => setShowSaveModal(false)}>취소</button>

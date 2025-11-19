@@ -43,6 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
+
+        // /api/chat/save-meal 은 인증 필요하므로 필터링 제외하지 않음
+        if (path.equals("/api/chat/save-meal")) {
+            log.debug("JWT Filter - Path: {}, Should Skip: false (인증 필요)", path);
+            return false;
+        }
+
         boolean shouldSkip = path.startsWith("/api/chat/") ||
                path.startsWith("/api/test/") ||
                path.startsWith("/api/member/login") ||

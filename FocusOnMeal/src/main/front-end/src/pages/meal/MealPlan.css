@@ -594,6 +594,42 @@
     margin-bottom: 15px;
 }
 
+/* 식단 명칭 입력 섹션 */
+.plan-name-section {
+    margin-bottom: 25px;
+}
+
+.plan-name-section label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.plan-name-input {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fafafa;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.plan-name-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.plan-name-input::placeholder {
+    color: #999;
+}
+
 .serving-controls {
     display: flex;
     align-items: center;
@@ -655,15 +691,26 @@
 
 .modal-info {
     background: #f8f9ff;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 15px 20px;
+    border-radius: 10px;
     border-left: 4px solid #667eea;
+    margin-top: 15px;
 }
 
 .modal-info p {
     margin: 0;
     font-size: 14px;
     color: #666;
+}
+
+.modal-info .info-text {
+    font-size: 15px;
+    color: #333;
+}
+
+.modal-info .info-text strong {
+    color: #667eea;
+    font-size: 17px;
 }
 
 .modal-footer {

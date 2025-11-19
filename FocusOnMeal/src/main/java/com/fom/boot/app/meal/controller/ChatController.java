@@ -8,6 +8,7 @@ import com.fom.boot.app.meal.dto.MealNutrition;
 import com.fom.boot.app.meal.dto.MealPlanResponse;
 import com.fom.boot.domain.ingredient.model.service.PriceService;
 import com.fom.boot.domain.meal.model.service.GeminiApiService;
+import com.fom.boot.domain.meal.model.service.MealService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ public class ChatController {
     private final GeminiApiService geminiApiService;
     private final PriceService priceService;
     private final ObjectMapper objectMapper;
+    private final MealService mealService;
 
     /**
      * 채팅 메시지로 식단 추천 요청
@@ -238,6 +240,72 @@ public class ChatController {
             log.error("간단 채팅 실패", e);
             response.put("status", "ERROR");
             response.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    /**
+     * 식단 저장
+     * POST /api/chat/save-meal
+     */
+    @PostMapping("/save-meal")
+    public ResponseEntity<Map<String, Object>> saveMealPlan(
+            @RequestBody com.fom.boot.app.meal.dto.SaveMealPlanRequest request,
+            org.springframework.security.core.Authentication authentication) {
+
+        log.info("식단 저장 요청 - 식단명: {}, 인분: {}", request.getPlanName(), request.getServingSize());
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // 로그인 확인
+            if (authentication == null || !authentication.isAuthenticated()) {
+                response.put("status", "ERROR");
+                response.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.status(401).body(response);
+            }
+
+            String memberId = authentication.getName();
+
+            // MealPlan VO 생성
+            com.fom.boot.domain.meal.model.vo.MealPlan mealPlan = new com.fom.boot.domain.meal.model.vo.MealPlan();
+            mealPlan.setMemberId(memberId);
+            mealPlan.setPlanName(request.getPlanName());
+            mealPlan.setServingSize(request.getServingSize());
+            mealPlan.setTotalCost(request.getTotalCost());
+            mealPlan.setWhenEat(request.getMealType());
+            mealPlan.setAiRecipe(request.getRecipe());
+
+            // 영양 정보 설정
+            if (request.getNutrition() != null) {
+                try {
+                    mealPlan.setCalories(new java.math.BigDecimal(request.getNutrition().getCalories()));
+                    mealPlan.setCarbsG(new java.math.BigDecimal(request.getNutrition().getCarbs()));
+                    mealPlan.setProteinG(new java.math.BigDecimal(request.getNutrition().getProtein()));
+                    mealPlan.setFatG(new java.math.BigDecimal(request.getNutrition().getFat()));
+                } catch (NumberFormatException e) {
+                    log.warn("영양 정보 파싱 실패 - 기본값 사용", e);
+                }
+            }
+
+            // DB 저장
+            boolean success = mealService.saveMealPlan(mealPlan);
+
+            if (success) {
+                response.put("status", "SUCCESS");
+                response.put("message", "식단이 저장되었습니다.");
+                log.info("식단 저장 성공 - 회원ID: {}, 식단명: {}", memberId, request.getPlanName());
+            } else {
+                response.put("status", "ERROR");
+                response.put("message", "식단 저장에 실패했습니다.");
+            }
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("식단 저장 중 오류 발생", e);
+            response.put("status", "ERROR");
+            response.put("message", "식단 저장 중 오류가 발생했습니다: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
     }
