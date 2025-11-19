@@ -192,8 +192,8 @@ const MealPlan = () => {
 
         // 로그인 확인
         const token = localStorage.getItem("token");
-        // console.log("🔑 Token check:", token ? "토큰 있음" : "토큰 없음");
-        // console.log("🔑 Token value:", token);
+        console.log("🔑 Token check:", token ? "토큰 있음" : "토큰 없음");
+        console.log("🔑 Token value:", token);
 
         if (!token) {
             alert("로그인이 필요합니다.");
@@ -225,9 +225,9 @@ const MealPlan = () => {
                 body: JSON.stringify(requestBody)
             });
 
-            // console.log("📥 Response status:", response.status);
+            console.log("📥 Response status:", response.status);
             const data = await response.json();
-            // console.log("📥 Response data:", data);
+            console.log("📥 Response data:", data);
 
             if (response.ok && data.status === "SUCCESS") {
                 alert(`"${editablePlanName}" 식단이 저장되었습니다!`);

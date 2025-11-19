@@ -20,10 +20,10 @@ public class MealServiceImpl implements MealService {
     public boolean saveMealPlan(MealPlan mealPlan) {
         try {
             int result = mealMapper.insertMealPlan(mealPlan);
-//            log.info("식단 저장 완료 - 회원ID: {}, 식단명: {}", mealPlan.getMemberId(), mealPlan.getPlanName());
+            log.info("식단 저장 완료 - 회원ID: {}, 식단명: {}", mealPlan.getMemberId(), mealPlan.getPlanName());
             return result > 0;
         } catch (Exception e) {
-//            log.error("식단 저장 실패 - 회원ID: {}, 식단명: {}", mealPlan.getMemberId(), mealPlan.getPlanName(), e);
+            log.error("식단 저장 실패 - 회원ID: {}, 식단명: {}", mealPlan.getMemberId(), mealPlan.getPlanName(), e);
             return false;
         }
     }
