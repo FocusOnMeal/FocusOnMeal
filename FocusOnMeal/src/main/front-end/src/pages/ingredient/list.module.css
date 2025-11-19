@@ -1,194 +1,412 @@
 /* list.module.css */
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-  font-family: 'Pretendard', sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    font-family: 'Pretendard', sans-serif;
 }
 
 .container h2 {
-  border-bottom: 2px solid #eee;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
+    font-weight: 700;
+    font-size: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 0;
+    border-bottom: none; 
 }
 
-/* 1. 검색 필터 영역 */
+/* 1. 검색 필터 영역 (컨테이너) */
 .filterSection {
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 32px;
+    background-color: white; 
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
 }
 
-/* 필터들을 그리드 레이아웃으로 정렬 */
-.filterGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+/* 🚨 검색창 가운데 정렬을 위한 컨테이너 */
+.centerLayout {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    width: 100%;
 }
 
-.filterGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* 🚨 '식재료명' 레이블 스타일 */
+.searchLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+    width: 100%; 
+    max-width: 600px; 
+    text-align: left; 
 }
 
-.filterGroup label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #555;
+/* 🚨 식재료명 입력창과 버튼들을 담는 컨테이너 */
+.searchInputContainer {
+    display: flex;
+    align-items: flex-end; 
+    gap: 10px;
+    width: 100%;
+    max-width: 600px; 
+    margin-bottom: 15px;
 }
 
-.filterGroup select,
-.filterGroup input {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: white;
+/* 🚨 식재료명 입력창 */
+.searchInput {
+    flex-grow: 1; 
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    height: 40px; 
 }
 
-.filterActions {
-  grid-column: 1 / -1; /* 그리드 전체 영역 차지 */
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
-
-.filterActions button {
-  padding: 10px 20px;
-  font-size: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.resetButton {
-  background-color: #f0f2f5;
-  border: 1px solid #ddd;
-  color: #333;
-}
-.resetButton:hover {
-  background-color: #e4e6e8;
+/* 🚨 검색/초기화 버튼 그룹 */
+.searchButtons {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .submitButton {
-  background-color: #007aff;
-  color: white;
+    background-color: #007aff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    height: 40px;
 }
 .submitButton:hover {
-  background-color: #0056b3;
+    background-color: #0056b3;
 }
 
+.resetButton {
+    background-color: #f0f2f5;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    height: 40px;
+}
+.resetButton:hover {
+    background-color: #e4e6e8;
+}
 
-/* 2. 검색 결과 영역 */
+/* --- 2. 카테고리 버튼 영역 --- */
+.categoryButtons {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 10px; 
+    padding: 15px 0 0 0; 
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    justify-content: center;
+}
+
+.categoryButton {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px; 
+    background-color: #ffffff;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.categoryButton:hover {
+    background-color: #f5f5f5;
+}
+
+.categoryButton.active {
+    background-color: #007aff; 
+    color: white;
+    border-color: #007aff;
+}
+
+/* --- 3. 검색 결과 영역 --- */
+
+/* 검색 결과 총 + 툴팁 섹션 컨테이너 (왼쪽 정렬) */
+.resultsHeaderContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 20px; 
+}
+
 .resultsHeader {
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
 }
 
 .resultsHeader span {
-  font-weight: 700;
-  color: #007aff;
+    font-weight: 700;
+    color: #007aff;
+}
+
+/* 안전 위험도란? + 툴팁 아이콘 그룹 */
+.safetyInfoControl {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
 }
 
 .resultsList {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 리스트 2분할 그리드 레이아웃 */
+.twoColumnList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px; 
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .resultItem {
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
-  background-color: white;
-  transition: box-shadow 0.2s;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 0; 
+    background-color: white;
+    transition: box-shadow 0.2s;
+    position: relative; 
 }
 
 .resultItem:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .itemHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
 }
 
 .itemTitleLink {
-  text-decoration: none;
-  color: black;
+    text-decoration: none;
+    color: black;
 }
 
 .itemTitle {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
 }
 .itemTitleLink:hover .itemTitle {
-  color: #007aff;
+    color: #007aff;
 }
 
 .itemActions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    align-items: center; 
 }
 
 .itemActions button {
-  background-color: #f0f2f5;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
+    background-color: #f0f2f5;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
 }
 .itemActions button:hover {
-  background-color: #e4e6e8;
+    background-color: #e4e6e8;
 }
 
-.itemDetails p {
-  margin: 6px 0;
-  font-size: 15px;
-  color: #555;
+/* 안전 알림 버튼 스타일 */
+.safetyBadge {
+    background-color: #f0f2f5;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    border: 1px solid #ddd;
 }
 
-.itemDetails strong {
-  font-weight: 600;
-  color: #111;
+.itemDetails {
+    line-height: 1.5;
+    font-size: 15px;
+    color: #555;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
 }
 
-.safetyStatus {
-  font-weight: 600;
+/* 🚨 가격 라인 (첫 번째 줄: 현재 가격 + 100g) */
+.priceSummaryLine {
+    font-size: 16px;
+    margin: 5px 0;
+    font-weight: 500; 
+    color: #111; 
+    display: block;
 }
-.safe {
-  color: #28a745; /* Green */
+.priceSummaryLine strong {
+    font-weight: 600;
+    margin-right: 5px;
 }
-.warning {
-  color: #ffc107; /* Orange */
-}
-.danger {
-  color: #dc3545; /* Red */
+.priceSummaryLine span {
+    font-weight: 500;
+    color: #666;
 }
 
-.noResults {
-  text-align: center;
-  padding: 40px;
-  color: #777;
-  font-size: 16px;
-  border: 1px dashed #ddd;
-  border-radius: 12px;
+
+/* 🚨 가격 변동률 라인 (두 번째 줄) */
+.pricePer100gLine {
+    font-size: 0.9em;
+    color: #777;
+    margin: 0 0 10px 0;
 }
+
+/* 🚨 안전 상태 라인 및 아이콘 */
+.safetyStatusLine {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+/* 안전 아이콘 (동그라미) 간격 조정 */
+.safetyIcon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: white; 
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.safe { color: #28a745; }
+.warning { color: #ffc107; }
+.danger { color: #dc3545; }
+.safetyIcon.safe { background-color: #28a745; }
+.safetyIcon.warning { background-color: #ffc107; }
+.safetyIcon.danger { background-color: #dc3545; }
+
+
+/* --- 4. 안전 위험도 툴팁 CSS (위치 조정) --- */
+
+.tooltipContainer {
+    position: relative;
+    display: inline-block;
+    margin-left: 8px;
+    cursor: pointer;
+    flex-shrink: 0; 
+}
+
+.helpIcon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #007aff; 
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* 🚨 툴팁 박스 위치 수정 (left/right 대신 중앙 정렬 기반으로 변경) */
+.tooltipBox {
+    visibility: hidden;
+    opacity: 0;
+    width: 320px; 
+    background-color: #333;
+    color: white;
+    text-align: left;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 10;
+    bottom: 125%; /* 툴팁을 위로 올림 */
+    
+    /* 🚨 툴팁 박스를 아이콘 기준으로 왼쪽에 배치 */
+    left: 50%;
+    transform: translateX(-100%); /* 툴팁 너비의 100%만큼 왼쪽으로 이동 */
+    margin-left: 15px; /* 아이콘과의 간격 조정 */
+    
+    transition: opacity 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    white-space: normal;
+}
+
+/* 툴팁 컨테이너 (호버 시 표시) */
+.tooltipContainer:hover .tooltipBox {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* 🚨 툴팁 꼬리표 (화살표) 위치 수정 */
+.tooltipBox::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    
+    /* 툴팁 박스 내부에서 아이콘 쪽으로 꼬리표 위치 조정 */
+    right: 10px; /* 🚨 툴팁 박스 오른쪽 끝에서 10px 떨어진 곳에 꼬리표 배치 */
+    left: auto;
+    
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.tooltipTitle {
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+/* 툴팁 박스 p 태그 (들여쓰기) */
+.tooltipBox p {
+    font-size: 12px;
+    margin: 5px 0;
+    line-height: 1.4;
+    display: flex; 
+    align-items: flex-start;
+}
+
+/* 툴팁 내 안전 등급 아이콘/제목 (고정 폭) */
+.tooltipBox strong {
+    font-weight: 700;
+    flex-shrink: 0; 
+    width: 65px; 
+    margin-right: 5px; 
+}
+
+/* 툴팁 내 내용 영역 */
+.tooltipTextContent {
+    flex-grow: 1;
+}
+
+.tooltipDanger strong { color: #dc3545; }
+.tooltipWarning strong { color: #ffc107; }
+.tooltipSafe strong { color: #28a745; }
