@@ -3,6 +3,8 @@ package com.fom.boot.domain.member.model.service;
 import java.util.List;
 
 import com.fom.boot.app.member.dto.LoginRequest;
+import com.fom.boot.app.mypage.dto.ProfileResponse;
+import com.fom.boot.app.mypage.dto.ProfileUpdateRequest;
 import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.domain.member.model.vo.Member;
 
@@ -45,5 +47,12 @@ public interface MemberService {
 	
 	// 총 회원 수 + 검색
 	int getTotalMembersBySearch(String type, String keyword);
+	
+	// 회원 정보 수정
+	String generateRandomNickname();
+	
+	ProfileResponse getUserProfile(String memberId);
+	
+	void updateProfile(String memberId, ProfileUpdateRequest request);
 	
 }

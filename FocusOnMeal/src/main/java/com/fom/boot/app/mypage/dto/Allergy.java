@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class Allergy {
-	private int id;
-    private String name;
+	private Integer allergyId;
+    private String allergyName;
+    private String category;
 }

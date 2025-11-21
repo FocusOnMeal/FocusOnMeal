@@ -3,6 +3,7 @@ package com.fom.boot.domain.mypage.model.service;
 import java.util.List;
 import java.util.Map;
 
+import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
 import com.fom.boot.common.pagination.PageInfo;
@@ -22,9 +23,9 @@ public interface MyPageService {
 
 	void saveUserAllergies(String memberId, List<Integer> allergyIds);
 
-	Object getUserAllergyIds(String memberId);
+	List<Integer> getUserAllergyIds(String memberId);
 
-	Object getAllAllergies();
+	List<Allergy> getAllAllergies();
 
 	// 내 식단 페이지
 	Map<String, Object> getMyMealPlans(String memberId, int page);

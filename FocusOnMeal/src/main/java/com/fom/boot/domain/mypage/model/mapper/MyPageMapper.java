@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.app.mypage.dto.MealPlanSummaryDTO;
 import com.fom.boot.domain.meal.model.vo.MealPlan;
@@ -37,9 +38,7 @@ public interface MyPageMapper {
 
 	List<Integer> findMemberAllergies(String memberId);
 
-	Object getUserAllergyIds(String memberId);
-
-	Object getAllAllergies();
+	List<Allergy> getAllAllergies();
 
 	int insertUserAllergy(@Param("memberId") String memberId,
             					@Param("allergyId") int allergyId);
@@ -72,5 +71,7 @@ public interface MyPageMapper {
 
 	// 30일 경과 식단 자동 영구 삭제
 	int permanentDeleteExpiredMeals();
+
+	List<Integer> getUserAllergyIds(String memberId);
 
 }

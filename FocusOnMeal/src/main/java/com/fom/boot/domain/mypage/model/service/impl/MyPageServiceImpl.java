@@ -12,6 +12,7 @@ import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.common.pagination.Pagination;
 import com.fom.boot.domain.meal.model.vo.MealPlan;
 
+import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.app.mypage.dto.MealPlanSummaryDTO;
 import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
@@ -160,13 +161,13 @@ public class MyPageServiceImpl implements MyPageService {
 	}
 
 	@Override
-	public Object getUserAllergyIds(String memberId) {
+	public List<Integer> getUserAllergyIds(String memberId) {
 		return mMapper.getUserAllergyIds(memberId);
 	}
 
 	@Override
-	public Object getAllAllergies() {
-		return mMapper.getAllAllergies();
+	public List<Allergy> getAllAllergies() {
+	    return mMapper.getAllAllergies();  // 그대로 반환
 	}
 
 	// 내 식단 페이지 - 페이지네이션 목록 조회

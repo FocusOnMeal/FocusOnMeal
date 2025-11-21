@@ -86,7 +86,7 @@ const Sidebar = () => {
                 <li className={styles.menuTitle}>내 정보 관리</li>
                 <li>
                     <NavLink
-                        to="/mypage/editProfile"
+                        to="/mypage/profile"
                         className={({ isActive }) =>
                             isActive ? styles.active : styles.subItem
                         }

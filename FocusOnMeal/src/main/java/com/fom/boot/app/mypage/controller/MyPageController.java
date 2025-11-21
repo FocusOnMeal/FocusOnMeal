@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,13 +19,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.service.annotation.PatchExchange;
 
+import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
+import com.fom.boot.app.mypage.dto.ProfileResponse;
+import com.fom.boot.app.mypage.dto.ProfileUpdateRequest;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
+import com.fom.boot.domain.member.model.service.MemberService;
+import com.fom.boot.domain.member.model.vo.Member;
 import com.fom.boot.domain.mypage.model.service.MyPageService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 public class MyPageController {
 	
 	private final MyPageService mService;
+	
+	private final MemberService bService;
 	
 	// 마이페이지 대시보드 이동
 	@GetMapping("/dashboard")
@@ -100,74 +111,90 @@ public class MyPageController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	}
 	
-	// 모든 알레르기 목록 조회 (예: 우유, 계란, 견과류 등)
-	@GetMapping("/allergies/list")
+	/**
+	 * ✅ 수정: 전체 알레르기 목록 조회
+	 * 실제 경로: /api/mypage/allergy/list
+	 */
+	@GetMapping("/allergy/list")
 	public ResponseEntity<?> getAllergyList() {
-	    return ResponseEntity.ok(mService.getAllAllergies());
+	    try {
+	        log.info("=== 알레르기 목록 조회 ===");
+	        List<Allergy> allergies = (List<Allergy>) mService.getAllAllergies();
+	        log.info("조회된 알레르기 개수: {}", allergies.size());
+	        return ResponseEntity.ok(allergies);
+	    } catch (Exception e) {
+	        log.error("알레르기 목록 조회 오류", e);
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	            .body(Map.of("error", "알레르기 목록 조회 실패"));
+	    }
 	}
-	
-	// 특정 회원의 알레르기 조회
-	@GetMapping("/allergies/{memberId}")
-	public ResponseEntity<?> getUserAllergies(@PathVariable String memberId) {
 
-	    // DB에서 회원이 체크한 알레르기 ID 리스트 가져오기
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("allergyIds", mService.getUserAllergyIds(memberId));
+	/**
+	 * ✅ 수정: 사용자 알레르기 조회
+	 * 실제 경로: /api/mypage/allergies
+	 */
+	@GetMapping("/allergies")
+	public ResponseEntity<?> getUserAllergies(Authentication authentication) {
+	    try {
+	        if (authentication == null || !authentication.isAuthenticated()) {
+	            log.warn("인증되지 않은 요청");
+	            return ResponseEntity.ok(Map.of("allergies", List.of()));
+	        }
 
-	    return ResponseEntity.ok(response);
+	        String memberId = authentication.getName();
+	        log.info("사용자 알레르기 조회: memberId={}", memberId);
+
+	        // ✅ 캐스팅 제거 - mService.getUserAllergyIds()가 이미 List<Integer>를 반환
+	        List<Integer> allergyIds = mService.getUserAllergyIds(memberId);
+	        log.info("조회된 알레르기 ID: {}", allergyIds);
+
+	        return ResponseEntity.ok(Map.of("allergies", allergyIds));
+	    } catch (Exception e) {
+	        log.error("사용자 알레르기 조회 오류", e);
+	        return ResponseEntity.ok(Map.of("allergies", List.of()));
+	    }
 	}
-	
-	// 알레르기 정보 저장
-	@PostMapping("/allergies")
+
+	/**
+	 * ✅ 수정: 알레르기 저장
+	 * 실제 경로: /api/mypage/allergies
+	 */
+	@PostMapping("/allergies")  // ← /mypage 제거!
 	public ResponseEntity<?> saveAllergies(
 	        @RequestBody Map<String, Object> body,
 	        Authentication authentication) {
-
-	    if (authentication == null || !authentication.isAuthenticated()) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                .body(Map.of("message", "로그인이 필요합니다."));
-	    }
-
-	    String memberId = authentication.getName();
-
-	    // { "allergyIds": [1, 3, 5] }
-	    Object allergyObj = body.get("allergyIds");
-
-	    if (!(allergyObj instanceof java.util.List<?> allergyIds)) {
-	        return ResponseEntity.badRequest()
-	                .body(Map.of("message", "알레르기 정보가 올바르지 않습니다."));
-	    }
-
-	    boolean result = mService.updateMemberAllergies(memberId, allergyIds);
-
-	    if (result) {
+	    
+	    try {
+	        if (authentication == null || !authentication.isAuthenticated()) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body(Map.of("error", "로그인이 필요합니다."));
+	        }
+	        
+	        String memberId = authentication.getName();
+	        Object allergyObj = body.get("allergyIds");
+	        
+	        log.info("알레르기 저장 요청: memberId={}, allergyIds={}", memberId, allergyObj);
+	        
+	        if (!(allergyObj instanceof List<?>)) {
+	            return ResponseEntity.badRequest()
+	                .body(Map.of("error", "알레르기 정보가 올바르지 않습니다."));
+	        }
+	        
+	        @SuppressWarnings("unchecked")
+	        List<Integer> allergyIds = (List<Integer>) allergyObj;
+	        
+	        mService.saveUserAllergies(memberId, allergyIds);
+	        log.info("알레르기 저장 성공");
+	        
 	        return ResponseEntity.ok(Map.of(
-	                "success", true,
-	                "message", "알레르기 정보가 저장되었습니다."
+	            "success", true,
+	            "message", "알레르기 정보가 저장되었습니다."
 	        ));
+	    } catch (Exception e) {
+	        log.error("알레르기 저장 오류", e);
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	            .body(Map.of("error", "저장 실패: " + e.getMessage()));
 	    }
-
-	    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	            .body(Map.of("message", "저장 실패"));
-	}
-	
-	// 회원의 알레르기 저장·업데이트
-	@PostMapping("/allergies/update")
-	public ResponseEntity<?> saveUserAllergies(
-	        @RequestBody Map<String, Object> data,
-	        Authentication authentication) {
-
-	    if (authentication == null || !authentication.isAuthenticated()) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	            .body(Map.of("message", "로그인이 필요합니다."));
-	    }
-
-	    String memberId = (String) data.get("memberId");
-	    var allergyIds = (List<Integer>) data.get("allergyIds");
-
-	    mService.saveUserAllergies(memberId, allergyIds);
-
-	    return ResponseEntity.ok(Map.of("success", true, "message", "알레르기 정보가 저장되었습니다."));
 	}
 
 	// 내 식단 목록 조회 (페이지네이션)
@@ -295,4 +322,58 @@ public class MyPageController {
 		));
 	}
 
+	/*
+	 * 개인정보 수정 부분
+	 */
+
+	// 프로필 조회
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponse> getUserProfile(Authentication authentication) {
+        try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                log.warn("인증되지 않은 요청");
+                return ResponseEntity.status(401).build();
+            }
+
+            String memberId = authentication.getName();
+            log.info("프로필 조회: memberId={}", memberId);
+
+            ProfileResponse profile = bService.getUserProfile(memberId);
+            return ResponseEntity.ok(profile);
+            
+        } catch (Exception e) {
+            log.error("프로필 조회 오류", e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    // 프로필 수정
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(
+            @RequestBody ProfileUpdateRequest request,
+            Authentication authentication) {
+        try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                log.warn("인증되지 않은 요청");
+                return ResponseEntity.status(401)
+                        .body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            String memberId = authentication.getName();
+            log.info("프로필 수정 요청: memberId={}, request={}", memberId, request);
+
+            bService.updateProfile(memberId, request);
+            
+            return ResponseEntity.ok(Map.of("message", "회원정보가 수정되었습니다."));
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("프로필 수정 실패: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("프로필 수정 오류", e);
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "서버 오류가 발생했습니다."));
+        }
+    }
 }

@@ -28,6 +28,8 @@ public interface MemberMapper {
 
     String searchMemberId(@Param("memberName") String memberName,
     		@Param("email") String email);
+    
+    int updateProfile(Member member);
 
     /* ========== 관리자 영역 시작 : 여기 아래에 일반 회원 메퍼 작성하지 마세요 ========== */
     /* ===================================================================== */
@@ -54,6 +56,7 @@ public interface MemberMapper {
 	        @Param("type") String type,
 	        @Param("keyword") String keyword
 	);
+
 	
     /* ===================================================================== */
     /* ===================================================================== */

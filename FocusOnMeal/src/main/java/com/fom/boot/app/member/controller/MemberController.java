@@ -8,6 +8,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.fom.boot.app.jwt.JwtTokenProvider;
 import com.fom.boot.app.member.dto.*;
+import com.fom.boot.app.mypage.dto.RandomNicknameResponse;
 import com.fom.boot.domain.member.model.service.MemberService;
 import com.fom.boot.domain.member.model.service.EmailService;
 import com.fom.boot.domain.member.model.service.PasswordResetService;
@@ -436,4 +437,17 @@ public class MemberController {
         boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*");
         return hasDigit && hasSpecial;
     }
+    
+    // 랜덤 닉네임 생성
+    @GetMapping("/random-nickname")
+    public ResponseEntity<RandomNicknameResponse> getRandomNickname() {
+        try {
+            String nickname = mService.generateRandomNickname();
+            return ResponseEntity.ok(new RandomNicknameResponse(nickname));
+        } catch (Exception e) {
+            log.error("랜덤 닉네임 생성 오류", e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+    
 }

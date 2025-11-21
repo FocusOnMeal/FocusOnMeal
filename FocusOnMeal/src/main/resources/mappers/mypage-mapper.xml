@@ -91,13 +91,16 @@
 
     <!-- ====== 알레르기 기능 ====== -->
 
-    <!-- 전체 알레르기 목록 -->
-    <select id="getAllAllergies" resultType="com.fom.boot.app.mypage.dto.Allergy">
-        SELECT ALLERGY_ID AS id,
-               ALLERGY_NAME AS name
-        FROM ALLERGY
-        ORDER BY ALLERGY_ID
-    </select>
+
+    <!-- ✅ resultType을 Allergy로 지정 (리스트는 자동 처리) -->
+	<select id="getAllAllergies" resultType="com.fom.boot.app.mypage.dto.Allergy">
+	    SELECT 
+	        ALLERGY_ID AS allergyId,
+	        ALLERGY_NAME AS allergyName,
+	        CATEGORY AS category
+	    FROM ALLERGY_MASTER
+	    ORDER BY ALLERGY_ID
+	</select>
 
     <!-- 특정 회원의 알레르기 ID 조회 -->
     <select id="getUserAllergyIds" parameterType="string" resultType="int">
