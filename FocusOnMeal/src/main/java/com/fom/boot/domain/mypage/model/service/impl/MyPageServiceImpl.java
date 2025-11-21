@@ -155,7 +155,7 @@ public class MyPageServiceImpl implements MyPageService {
 	}
 
 	@Override
-	public Object getUserAllergyIds(String memberId) {
+	public List<Integer> getUserAllergyIds(String memberId) {
 		return mMapper.getUserAllergyIds(memberId);
 	}
 

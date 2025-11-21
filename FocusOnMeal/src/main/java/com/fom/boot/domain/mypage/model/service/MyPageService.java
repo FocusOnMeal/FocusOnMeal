@@ -20,7 +20,7 @@ public interface MyPageService {
 
 	void saveUserAllergies(String memberId, List<Integer> allergyIds);
 
-	Object getUserAllergyIds(String memberId);
+	List<Integer> getUserAllergyIds(String memberId);
 
 	List<Allergy> getAllAllergies();
 

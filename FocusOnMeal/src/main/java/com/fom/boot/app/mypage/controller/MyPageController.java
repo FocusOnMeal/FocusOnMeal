@@ -124,20 +124,21 @@ public class MyPageController {
 	 * ✅ 수정: 사용자 알레르기 조회
 	 * 실제 경로: /api/mypage/allergies
 	 */
-	@GetMapping("/allergies")  // ← /mypage 제거!
+	@GetMapping("/allergies")
 	public ResponseEntity<?> getUserAllergies(Authentication authentication) {
 	    try {
 	        if (authentication == null || !authentication.isAuthenticated()) {
 	            log.warn("인증되지 않은 요청");
-	            return ResponseEntity.ok(Map.of("allergies", List.of()));  // 빈 배열 반환
+	            return ResponseEntity.ok(Map.of("allergies", List.of()));
 	        }
-	        
+
 	        String memberId = authentication.getName();
 	        log.info("사용자 알레르기 조회: memberId={}", memberId);
-	        
-	        List<Integer> allergyIds = (List<Integer>) mService.getUserAllergyIds(memberId);
+
+	        // ✅ 캐스팅 제거 - mService.getUserAllergyIds()가 이미 List<Integer>를 반환
+	        List<Integer> allergyIds = mService.getUserAllergyIds(memberId);
 	        log.info("조회된 알레르기 ID: {}", allergyIds);
-	        
+
 	        return ResponseEntity.ok(Map.of("allergies", allergyIds));
 	    } catch (Exception e) {
 	        log.error("사용자 알레르기 조회 오류", e);

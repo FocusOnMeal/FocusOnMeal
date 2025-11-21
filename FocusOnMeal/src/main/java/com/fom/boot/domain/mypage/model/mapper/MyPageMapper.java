@@ -38,13 +38,13 @@ public interface MyPageMapper {
 
 	List<Integer> findMemberAllergies(String memberId);
 
-	Object getUserAllergyIds(String memberId);
-
 	List<Allergy> getAllAllergies();
 
 	int insertUserAllergy(@Param("memberId") String memberId,
             					@Param("allergyId") int allergyId);
 
 	void deleteUserAllergies(String memberId);
+
+	List<Integer> getUserAllergyIds(String memberId);
 
 }

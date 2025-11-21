@@ -56,14 +56,32 @@ const Allergies = () => {
             });
             
             console.log("📥 사용자 알레르기 응답:", res.data);
+            console.log("📥 응답 타입:", typeof res.data, Array.isArray(res.data));
             
-            const allergyIds = Array.isArray(res.data) 
-                ? res.data 
-                : (res.data.allergies || []);
+            // 다양한 응답 형식 처리
+            let allergyIds = [];
+            if (Array.isArray(res.data)) {
+                allergyIds = res.data;
+            } else if (res.data && Array.isArray(res.data.allergies)) {
+                allergyIds = res.data.allergies;
+            } else if (res.data && Array.isArray(res.data.allergyIds)) {
+                allergyIds = res.data.allergyIds;
+            }
             
+            // 숫자 배열로 변환 (문자열로 올 수도 있음)
+            allergyIds = allergyIds.map(id => typeof id === 'number' ? id : parseInt(id)).filter(id => !isNaN(id));
+            
+            console.log("✅ 최종 체크될 알레르기 ID:", allergyIds);
             setChecked(allergyIds);
         } catch (error) {
             console.error("❌ 사용자 알레르기 조회 오류:", error);
+            console.error("상태:", error.response?.status);
+            console.error("응답:", error.response?.data);
+            
+            // 500 에러가 발생해도 빈 배열로 초기화 (백엔드 오류 대응)
+            if (error.response?.status === 500) {
+                console.warn("⚠️ 서버 오류로 인해 빈 배열로 초기화합니다.");
+            }
             setChecked([]);
         }
     };
