@@ -22,34 +22,37 @@
     margin-top: 0;
 }
 
-/* 검색 영역 (선택사항) */
+/* 검색 영역 */
 .searchBox {
     display: flex;
-    gap: 10px;
+    justify-content: flex-end;
+    gap: 8px;
     margin-bottom: 20px;
 }
 
 .selectBox{
-    border-radius: 15px;
+    border-radius: 6px;
     border: 1px solid #ccc;
+    text-align: center;
     font-size: 14px;
-    padding: 4px;
+    padding: 6px 3px;
     margin: 0;
 }
 
 .searchInput {
     width: 220px;
-    padding: 10px;
-    border-radius: 15px;
+    padding: 6px 10px;
+    border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 14px;
 }
 
 .searchBtn {
     background: #67932A;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
     color: #fff;
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 6px 15px;
+    border-radius: 6px;
     border: none;
     font-size: 14px;
     cursor: pointer;
