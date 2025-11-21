@@ -316,6 +316,52 @@
     color: #67932A;
 }
 
+/* 재료 섹션 */
+.ingredientsSection {
+    margin-bottom: 24px;
+}
+
+.ingredientsSection h3 {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #67932A;
+}
+
+.ingredientsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ingredientItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.ingredientItem:last-child {
+    border-bottom: none;
+}
+
+.ingredientName {
+    color: #333;
+}
+
+.ingredientPrice {
+    color: #67932A;
+    font-weight: 600;
+}
+
+.ingredientPriceNa {
+    color: #999;
+    font-size: 12px;
+}
+
 /* 레시피 섹션 */
 .recipeSection {
     margin-bottom: 16px;

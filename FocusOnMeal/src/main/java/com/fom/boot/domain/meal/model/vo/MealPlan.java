@@ -29,4 +29,5 @@ public class MealPlan {
     private BigDecimal fatG; // 해당 식자재의 지방
     private String aiRecipe; // 해당 식단 AI 레시피
     private String whenEat; // 언제 먹는 식단인지 (아침, 점심, 저녁)
+    private String ingredientsJson; // 재료 및 가격 정보 (JSON)
 }

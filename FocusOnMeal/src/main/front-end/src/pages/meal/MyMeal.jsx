@@ -110,6 +110,16 @@ const MyMeal = () => {
         }
     };
 
+    // 재료 파싱 (JSON 문자열 -> 배열)
+    const parseIngredients = (ingredientsJson) => {
+        if (!ingredientsJson) return [];
+        try {
+            return JSON.parse(ingredientsJson);
+        } catch {
+            return [];
+        }
+    };
+
     if (loading) return <div className={styles.loading}>Loading...</div>;
 
     return (
@@ -238,6 +248,29 @@ const MyMeal = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* 재료 정보 */}
+                            {parseIngredients(selectedMeal.ingredientsJson).length > 0 && (
+                                <div className={styles.ingredientsSection}>
+                                    <h3>재료</h3>
+                                    <ul className={styles.ingredientsList}>
+                                        {parseIngredients(selectedMeal.ingredientsJson).map((ing, i) => (
+                                            <li key={i} className={styles.ingredientItem}>
+                                                <span className={styles.ingredientName}>
+                                                    {ing.name} {ing.amount}{ing.unit}
+                                                </span>
+                                                {ing.calculatedPrice !== null && ing.calculatedPrice !== undefined ? (
+                                                    <span className={styles.ingredientPrice}>
+                                                        {ing.calculatedPrice.toLocaleString()}원
+                                                    </span>
+                                                ) : (
+                                                    <span className={styles.ingredientPriceNa}>가격 정보 없음</span>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
 
                             {/* 레시피 */}
                             <div className={styles.recipeSection}>

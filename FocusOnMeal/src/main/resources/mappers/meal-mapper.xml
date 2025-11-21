@@ -17,7 +17,8 @@
             PROTEIN_G,
             FAT_G,
             AI_RECIPE,
-            WHEN_EAT
+            WHEN_EAT,
+            INGREDIENTS_JSON
         ) VALUES (
             SEQ_MEAL_PLAN.NEXTVAL,
             #{memberId},
@@ -29,7 +30,8 @@
             #{proteinG},
             #{fatG},
             #{aiRecipe},
-            #{whenEat}
+            #{whenEat},
+            #{ingredientsJson}
         )
     </insert>
 

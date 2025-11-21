@@ -204,6 +204,8 @@ const MealPlan = () => {
         try {
             // 레시피를 JSON 문자열로 변환
             const recipeJson = JSON.stringify(mealPlanToSave.recipe);
+            // 재료 정보를 JSON 문자열로 변환
+            const ingredientsJson = JSON.stringify(mealPlanToSave.ingredients);
 
             const requestBody = {
                 planName: editablePlanName.trim(),
@@ -211,7 +213,8 @@ const MealPlan = () => {
                 mealType: mealPlanToSave.mealType,
                 totalCost: mealPlanToSave.calculatedPrice,
                 nutrition: mealPlanToSave.nutrition,
-                recipe: recipeJson
+                recipe: recipeJson,
+                ingredients: ingredientsJson
             };
 
             console.log("📤 Sending save request:", requestBody);

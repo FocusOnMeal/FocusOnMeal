@@ -25,4 +25,5 @@ public class SaveMealPlanRequest {
     private int totalCost;             // 총 비용
     private MealNutrition nutrition;   // 영양 정보
     private String recipe;             // AI 레시피 (JSON 문자열)
+    private String ingredients;        // 재료 정보 (JSON 문자열)
 }

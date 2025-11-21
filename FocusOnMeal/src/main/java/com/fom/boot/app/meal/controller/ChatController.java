@@ -275,6 +275,7 @@ public class ChatController {
             mealPlan.setTotalCost(request.getTotalCost());
             mealPlan.setWhenEat(request.getMealType());
             mealPlan.setAiRecipe(request.getRecipe());
+            mealPlan.setIngredientsJson(request.getIngredients());
 
             // 영양 정보 설정
             if (request.getNutrition() != null) {

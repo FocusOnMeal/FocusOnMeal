@@ -139,6 +139,7 @@
                 CREATED_AT as createdAt,
                 IS_DELETED as isDelete,
                 DELETED_AT as deleteAt,
+                INGREDIENTS_JSON as ingredientsJson,
                 ROW_NUMBER() OVER (ORDER BY CREATED_AT DESC) AS rnum
             FROM MEAL_PLAN
             WHERE MEMBER_ID = #{memberId}
@@ -163,7 +164,8 @@
             WHEN_EAT as whenEat,
             CREATED_AT as createdAt,
             IS_DELETED as isDelete,
-            DELETED_AT as deleteAt
+            DELETED_AT as deleteAt,
+            INGREDIENTS_JSON as ingredientsJson
         FROM MEAL_PLAN
         WHERE PLAN_ID = #{planId}
           AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
