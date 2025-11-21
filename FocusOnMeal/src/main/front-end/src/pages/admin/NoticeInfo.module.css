@@ -9,7 +9,8 @@
 /* 공통 메인 영역 */
 .main {
     flex: 1;
-    padding: 40px;
+    --padding: 10px 30px 40px 30px;
+    padding: 30px;
     background: #fafafa;
 }
 
@@ -22,34 +23,44 @@
     margin-top: 0;
 }
 
-/* 검색 영역 (선택사항) */
-.searchBox {
+/* 필터와 검색 영역을 감싸는 컨테이너 (수평 정렬) */
+.controlsContainer {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    justify-content: space-between; /* 양 끝 정렬 */
+    align-items: flex-end; /* 수직 하단 정렬 (버튼 기준선 맞추기) */
+    margin-bottom: 15px; /* 테이블 위 마진 */
+    margin-top: 40px; /* 제목과의 간격 */
 }
 
+/* 검색 영역 (select + input + button) */
+.searchBox {
+    display: flex;
+    gap: 8px;
+    border-radius: 12px;
+}
 .selectBox{
-    border-radius: 15px;
+    border-radius: 6px;
     border: 1px solid #ccc;
+    text-align: center;
     font-size: 14px;
-    padding: 4px;
+    padding: 6px 3px;
     margin: 0;
 }
 
 .searchInput {
     width: 220px;
-    padding: 10px;
-    border-radius: 15px;
+    padding: 6px 10px;
+    border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 14px;
 }
 
 .searchBtn {
     background: #67932A;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
     color: #fff;
-    padding: 10px 22px;
-    border-radius: 8px;
+    padding: 6px 15px;
+    border-radius: 6px;
     border: none;
     font-size: 14px;
     cursor: pointer;
@@ -59,13 +70,26 @@
     background: #587b24;
 }
 
-/* 테이블 박스 (화이트 카드 느낌) */
-.tableBox {
-    background: #fff;
-    padding: 25px;
-    border-radius: 14px;
-    border: 1px solid #e1e1e1;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+/* 필터 버튼 영역 */
+.filterButtons {
+    display: flex; /* 버튼들 수평 정렬 */
+    gap: 8px;
+}
+
+.filterBtn {
+    background: #e4e4e4;
+    padding: 6px 9px;
+    border-radius: 20px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.activeFilter {
+    background: #67932A;
+    color: #fff;
+    font-weight: 600;
 }
 
 /* 테이블 */
@@ -73,6 +97,11 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 15px;
+    table-layout: fixed; 
+}
+
+.noticeTable th:nth-child(2) {
+    width: 35%;
 }
 
 /* 테이블 헤더 */
@@ -81,7 +110,7 @@
     padding: 14px 12px;
     border-bottom: 2px solid #dcdcdc;
     font-weight: 600;
-    text-align: left;
+    text-align: center;
     color: #333;
 }
 
@@ -90,10 +119,22 @@
     transition: 0.2s;
 }
 
+.noticeTable td:first-child,
+.noticeTable th:first-child {
+    text-align: center;
+}
+
 /* 테이블 셀 */
 .noticeTable td {
     padding: 14px 12px;
     border-bottom: 1px solid #eaeaea;
+    text-align: center;
+}
+
+/* 제목(th, td)만 왼쪽 정렬 */
+.noticeTable th.titleCol,
+.noticeTable td.titleCol {
+    text-align: left;
 }
 
 /* hover 효과 */
@@ -101,19 +142,51 @@
     background: #f0f4e8;
 }
 
-/* 버튼 영역 */
-.actionBtn {
-    background: #67932A;
-    color: #fff;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    border: none;
-    cursor: pointer;
+.sortIcon {
+    font-size: 12px;
+    margin-left: 6px;
+    color: #888;
 }
 
-.actionBtn:hover {
-    background: #587b24;
+/* 테이블 셀 내 버튼 그룹 */
+.btnGroup {
+    display: flex;
+    gap: 5px; /* 버튼 간 간격 */
+    justify-content: center; /* 셀 가운데 정렬 */
+}
+
+/* 수정 버튼 */
+.editBtn {
+    background: white;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    color: black;
+    padding: 6px 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.editBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 삭제 버튼 */
+.deleteBtn {
+    background: white; 
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    color: black;
+    padding: 6px 10px;
+    border-radius: 20px;
+    border: 1px solid red;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.deleteBtn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
 }
 
 /* 필독 뱃지 */
@@ -137,6 +210,56 @@
     margin-right: 6px;
     display: inline-block;
 } 
+.addBtnContainer{
+    display: flex;
+    justify-content: flex-end;
+    margin-right:8px;
+}
+.addBtn{
+    background: none; 
+    color: blue;
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 10px;
+}
+
+.addBtn:hover{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 8px;
+}
+
+.pageBtn {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pageBtn:hover {
+    background: #f1f4ec;
+    border-color: #cdd5c5;
+}
+
+
+.active {
+    background-color: #67932A;
+    color: white;
+}
+
+/* Modal 관련 CSS (이하 동일) */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -149,7 +272,6 @@
     justify-content: center;
     z-index: 999;
 }
-
 .modalContent {
     background: white;
     padding: 20px;
@@ -159,13 +281,11 @@
     flex-direction: column;
     gap: 10px;
 }
-
 .modalButtons {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
-
 .saveBtn {
     background: #0796E5;
     color: white;
@@ -173,24 +293,20 @@
     border-radius: 6px;
     border: none;
 }
-
 .closeBtn {
     background: #ccc;
     padding: 8px 14px;
     border-radius: 6px;
     border: none;
 }
-
 .linkTitle {
     cursor: pointer;
     color: #0796E5;
     font-weight: 500;
 }
-
 .linkTitle:hover {
     text-decoration: underline;
 }
-
 .toggleOn {
     background-color: #4CAF50;
     color: white;
@@ -199,7 +315,6 @@
     border: none;
     cursor: pointer;
 }
-
 .toggleOff {
     background-color: #ccc;
     color: #333;
@@ -207,36 +322,4 @@
     border-radius: 20px;
     border: none;
     cursor: pointer;
-}
-
-.editBtn {
-    background: #5da6f5; /* 파란색 계열 */
-    color: white;
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: none;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-}
-.editBtn:hover {
-    background: #0056b3;
-    transform: translateY(-1px);
-}
-
-/* 삭제 버튼 (빨간색, 경고 디자인) */
-.deleteBtn {
-    background: #ff1f35cd; /* 빨간색 계열 */
-    color: white;
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: none;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    margin: 3px;;
-}
-.deleteBtn:hover {
-    background: #c82333;
-    transform: translateY(-1px);
 }

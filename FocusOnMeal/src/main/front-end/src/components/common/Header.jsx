@@ -146,10 +146,10 @@ const fetchNotifications = async () => {
                 <nav className="nav">
                     <ul className="nav-menu">
                         <li className="dropdown">
-                            <Link to="/ingredient/list">식자재</Link>
+                            <Link to="/ingredient/list">식재료</Link>
                             <ul className="dropdown-menu">
-                                <li><Link to="/ingredient/list">식자재 목록</Link></li>
-                                <li><Link to="/mypage/customIngredients">커스텀 식자재</Link></li>
+                                <li><Link to="/ingredient/list">식재료 목록</Link></li>
+                                <li><Link to="/mypage/customIngredients">커스텀 식재료</Link></li>
                             </ul>
                         </li>
                         <li><Link to="/meal/mealAI">식단</Link></li>

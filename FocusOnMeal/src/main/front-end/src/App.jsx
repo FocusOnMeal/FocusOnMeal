@@ -21,6 +21,7 @@ import MyMeal from './pages/mypage/MyMeal';
 import Allergies from './pages/mypage/Allergies';
 // 개인 정보 수정
 import EditProfile from "./pages/mypage/EditProfile";
+import SafetyAlert from './pages/mypage/SafetyAlert';
 
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
@@ -70,6 +71,12 @@ function App() {
         } />
         <Route path="/mypage/allergies" element={<Allergies />} />
         <Route path="/mypage/profile" element={<EditProfile />} />
+
+        <Route path="/mypage/setting/safetyAlert" element={
+          <ProtectedRoute>
+            <SafetyAlert />
+          </ProtectedRoute>} 
+        />
 
         {/* 식재료 관련 */}
         <Route path="/ingredient/list" element={<IngredientSearch />} />

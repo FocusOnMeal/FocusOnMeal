@@ -1,0 +1,247 @@
+.container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f6f8;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.main {
+    flex: 1;
+    padding: 30px 40px;
+    margin: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* --- 🟢 설정 카드 영역 --- */
+.settingsCard {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 40px;
+}
+
+.settingHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settingTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #343a40;
+    margin: 0 0 5px 0;
+}
+
+.settingDesc {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* 토글 스위치 디자인 */
+.toggleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggleLabel {
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+}
+
+.toggleSwitch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggleSwitch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px; width: 20px;
+    left: 3px; bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider { background-color: #67932A; } /* 녹색 */
+input:checked + .slider:before { transform: translateX(24px); }
+
+/* --- 🟠 구독 식재료 박스 --- */
+.subscriptionBox {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.subTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-right: 5px;
+}
+
+.tagContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ingredientTag {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    color: #495057;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.ingredientTag:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    color: #212529;
+}
+
+.addTagBtn {
+    background-color: #f1f3f5;
+    color: #868e96;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-decoration: none;
+    border: 1px dashed #adb5bd;
+}
+
+.emptyText {
+    font-size: 13px;
+    color: #999;
+}
+
+/* --- 🔍 리스트 영역 --- */
+.contentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.listTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.searchBox {
+    display: flex;
+    gap: 8px;
+}
+
+.selectBox, .searchInput {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.searchInput { width: 220px; }
+
+.searchBtn {
+    padding: 8px 16px;
+    background-color: #67932A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.searchBtn:hover { background-color: #587b24; }
+
+/* --- 📋 테이블 스타일 (기존 유지) --- */
+.alertTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    table-layout: fixed;
+}
+
+.alertTable th {
+    background-color: #f1f3f5;
+    padding: 12px;
+    color: #333;
+    border-bottom: 1px solid #dcdcdc;
+    cursor: pointer;
+}
+
+.alertTable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    color: #555;
+}
+
+.emptyRow { padding: 40px; color: #999; }
+
+.sortArrow { font-size: 10px; margin-left: 4px; color: #adb5bd; }
+
+/* 컬럼 너비 */
+.idCol { width: 60px; }
+.nationCol { width: 100px; }
+.hazardCol { width: 120px; }
+.titleCol { width: auto; }
+.dateCol { width: 110px; }
+.linkCol { width: 70px; }
+
+/* 뱃지 및 버튼 */
+.badgeHazard {
+    background-color: #fff5f5;
+    color: #e03131;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.alignLeft {
+    text-align: left !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.linkBtn {
+    padding: 4px 8px;
+    border: 1px solid #67932A;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #666;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.linkBtn:hover { background-color: #f8f9fa; color: #333; }

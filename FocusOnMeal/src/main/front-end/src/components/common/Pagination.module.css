@@ -1,26 +1,25 @@
 .paginationWrap {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     margin-top: 20px;
 }
 
-/* 기본 리스트 스타일 제거 */
 .pagination {
     list-style: none;
     display: flex;
-    gap: 6px;
+    gap: 8px;
     padding: 0;
     margin: 0;
 }
 
 /* 기본 버튼 스타일 */
 .pageItem button {
-    padding: 6px 12px;
+    padding: 6px 10px;
     border: 1px solid #ddd;
     background-color: #fff;
     color: #333;
     font-size: 14px;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -32,9 +31,9 @@
 
 /* active page */
 .active button {
-    background-color: #006104;
+    background-color: #67932A;
     color: #fff;
-    border-color: #006104;
+    border-color: #67932A;
     font-weight: bold;
 }
 
