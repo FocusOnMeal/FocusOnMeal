@@ -16,7 +16,10 @@ import ResetPassword from './pages/member/ResetPassword';
 // 마이페이지
 import Dashboard from './pages/mypage/Dashboard';
 import ProtectedRoute from './components/mypage/ProtectedRoute';
+// 알레르기 정보 관리 및 수정
 import Allergies from './pages/mypage/Allergies';
+// 개인 정보 수정
+import EditProfile from "./pages/mypage/EditProfile";
 
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
@@ -54,12 +57,13 @@ function App() {
         <Route path="/member/resetPassword" element={<ResetPassword />} />
 
         {/* 마이페이지 관련 */}
-        <Route path="/mypage/allergies" element={<Allergies />} />
         <Route path="/mypage" element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>} 
         />
+        <Route path="/mypage/allergies" element={<Allergies />} />
+        <Route path="/mypage/profile" element={<EditProfile />} />
 
         {/* 식재료 관련 */}
         <Route path="/ingredient/list" element={<IngredientSearch />} />

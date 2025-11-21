@@ -119,6 +119,15 @@
           AND STATUS_YN = 'Y'
     </select>
     
+    <!-- 프로필 수정 -->
+	<update id="updateProfile" parameterType="Member">
+	    UPDATE member
+	    SET nickname = #{nickname},
+	        phone = #{phone},
+	        password = #{password}
+	    WHERE member_id = #{memberId}
+	</update>
+    
     <!-- 관리자 영역 시작 -->
 	<!-- ************************************************************************ -->
 	

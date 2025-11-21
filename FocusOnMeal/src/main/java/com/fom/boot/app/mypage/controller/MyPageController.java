@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,10 +18,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.service.annotation.PatchExchange;
 
 import com.fom.boot.app.mypage.dto.Allergy;
 import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
+import com.fom.boot.app.mypage.dto.ProfileResponse;
+import com.fom.boot.app.mypage.dto.ProfileUpdateRequest;
+import com.fom.boot.app.mypage.dto.ProfileUpdateRequest;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
+import com.fom.boot.domain.member.model.service.MemberService;
+import com.fom.boot.domain.member.model.vo.Member;
 import com.fom.boot.domain.mypage.model.service.MyPageService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MyPageController {
 	
 	private final MyPageService mService;
+	
+	private final MemberService bService;
 	
 	// 마이페이지 대시보드 이동
 	@GetMapping("/dashboard")
@@ -188,6 +197,58 @@ public class MyPageController {
 	    }
 	}
 
-	
-	
+	/*
+	 * 개인정보 수정 부분
+	 */
+
+	// 프로필 조회
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponse> getUserProfile(Authentication authentication) {
+        try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                log.warn("인증되지 않은 요청");
+                return ResponseEntity.status(401).build();
+            }
+
+            String memberId = authentication.getName();
+            log.info("프로필 조회: memberId={}", memberId);
+
+            ProfileResponse profile = bService.getUserProfile(memberId);
+            return ResponseEntity.ok(profile);
+            
+        } catch (Exception e) {
+            log.error("프로필 조회 오류", e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    // 프로필 수정
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(
+            @RequestBody ProfileUpdateRequest request,
+            Authentication authentication) {
+        try {
+            if (authentication == null || !authentication.isAuthenticated()) {
+                log.warn("인증되지 않은 요청");
+                return ResponseEntity.status(401)
+                        .body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            String memberId = authentication.getName();
+            log.info("프로필 수정 요청: memberId={}, request={}", memberId, request);
+
+            bService.updateProfile(memberId, request);
+            
+            return ResponseEntity.ok(Map.of("message", "회원정보가 수정되었습니다."));
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("프로필 수정 실패: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("프로필 수정 오류", e);
+            return ResponseEntity.status(500)
+                    .body(Map.of("message", "서버 오류가 발생했습니다."));
+        }
+    }
 }
