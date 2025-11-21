@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
+import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 
@@ -43,5 +44,7 @@ public interface IngredientMapper {
 	 * @return List<IngredientDTO>
 	 */
 	List<IngredientDTO> selectListWithLatestPrice();
+	
+	List<FavoriteIngredientSummaryDTO> selectFavoritesByMemberId(String memberId);
 	
 }

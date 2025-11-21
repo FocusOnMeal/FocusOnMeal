@@ -72,5 +72,21 @@
         WHERE INGREDIENT_ID = #{ingredientId}
         AND TRUNC(COLLECTED_DATE) = TRUNC(SYSDATE)
     </select>
+    
+        <!-- 특정 날짜 범위에서 가장 최근 가격 조회 -->
+    <select id="findLatestPriceByIngredientAndDateRange" resultMap="PriceHistory">
+        SELECT *
+        FROM (
+            SELECT *
+            FROM PRICE_HISTORY
+            WHERE INGREDIENT_ID = #{ingredientId}
+              AND COLLECTED_DATE &gt;= #{startDate}
+              AND COLLECTED_DATE &lt; #{endDate}
+              AND REGION = '서울'
+              AND PRICE_TYPE = '소매'
+            ORDER BY COLLECTED_DATE DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
 
 </mapper>

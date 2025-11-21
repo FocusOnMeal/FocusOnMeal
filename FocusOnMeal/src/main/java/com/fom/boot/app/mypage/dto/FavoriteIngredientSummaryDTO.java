@@ -13,9 +13,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FavoriteIngredientSummaryDTO {
 	private Long favoriteId;
+	private String memberId;
     private Long ingredientId;
-    private String name;
     private String isCustom; 		// 'Y' or 'N'
+    
+    private String ingredientName;
+    private String category;
     private BigDecimal currentPrice; 	// 최신 가격 (int로 변경)
     private String standardUnit;
 }

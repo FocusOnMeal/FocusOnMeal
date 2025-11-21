@@ -12,6 +12,35 @@
   		<result		property="isCustom"		column="IS_CUSTOM"		/>
   	</resultMap>
   	
+  	<!-- 찜한 식재료 목록 조회 (마이페이지용) -->
+	<select id="selectFavoritesByMemberId" resultType="com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO">
+	    SELECT 
+	        F.FAVORITE_ID as favoriteId,
+	        F.MEMBER_ID as memberId,
+	        F.INGREDIENT_ID as ingredientId,
+	        F.IS_CUSTOM as isCustom,
+	        I.NAME as ingredientName,
+	        I.CATEGORY as category,
+	        I.STANDARD_UNIT as standardUnit,
+	        P.PRICE_VALUE as currentPrice
+	    FROM FAVORITE F
+	    INNER JOIN INGREDIENT_MASTER I ON F.INGREDIENT_ID = I.INGREDIENT_ID
+	    LEFT JOIN (
+	        SELECT INGREDIENT_ID, PRICE_VALUE
+	        FROM (
+	            SELECT 
+	                INGREDIENT_ID, 
+	                PRICE_VALUE,
+	                ROW_NUMBER() OVER(PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) as RN
+	            FROM PRICE_HISTORY
+	            WHERE REGION = '서울' AND PRICE_TYPE = '소매'
+	        )
+	        WHERE RN = 1
+	    ) P ON I.INGREDIENT_ID = P.INGREDIENT_ID
+	    WHERE F.MEMBER_ID = #{memberId}
+	    ORDER BY F.FAVORITE_ID DESC
+	</select>
+  	
   	<!-- 찜 등록 -->
     <insert id="insertFavorite" parameterType="com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient">
         <!-- 오라클 시퀀스를 사용한 자동 번호 생성 -->
@@ -107,34 +136,47 @@
         <result property="collectedDate" column="COLLECTED_DATE" />
     </resultMap>
 
-    <!-- 리스트 페이지용: 전체 목록 + 최신 가격 조회 (서울/소매 기준) -->
-    <select id="selectListWithLatestPrice" resultMap="IngredientWithPriceMap">
-        SELECT 
-            M.INGREDIENT_ID,
-            M.NAME,
-            M.CATEGORY,
-            M.STANDARD_UNIT,
-            M.KAMIS_ITEM_CODE,
-            M.KAMIS_KIND_CODE,
-            M.KAMIS_ITEM_CATEGORY_CODE,
-            P.PRICE_VALUE,
-            P.COLLECTED_DATE
-        FROM INGREDIENT_MASTER M
-        LEFT JOIN (
-            SELECT INGREDIENT_ID, PRICE_VALUE, COLLECTED_DATE
-            FROM (
-                SELECT 
-                    INGREDIENT_ID, 
-                    PRICE_VALUE, 
-                    COLLECTED_DATE,
-                    ROW_NUMBER() OVER(PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) as RN
-                FROM PRICE_HISTORY
-                WHERE REGION = '서울' 
-                  AND PRICE_TYPE = '소매'
-            )
-            WHERE RN = 1
-        ) P ON M.INGREDIENT_ID = P.INGREDIENT_ID
-        ORDER BY M.NAME ASC
-    </select>
+	<!-- 리스트 페이지용: 전체 목록 + 최신 가격 조회 (서울/소매 기준) -->
+	<select id="selectListWithLatestPrice" resultMap="IngredientWithPriceMap">
+	    SELECT 
+	        M.INGREDIENT_ID,
+	        M.NAME,
+	        M.CATEGORY,
+	        M.STANDARD_UNIT,
+	        M.KAMIS_ITEM_CODE,
+	        M.KAMIS_KIND_CODE,
+	        M.KAMIS_ITEM_CATEGORY_CODE,
+	        P.PRICE_VALUE,
+	        P.COLLECTED_DATE
+	    FROM (
+	        <!-- 같은 이름의 식재료 중 KAMIS_KIND_CODE가 가장 작은 것만 선택 -->
+	        SELECT 
+	            INGREDIENT_ID,
+	            NAME,
+	            CATEGORY,
+	            STANDARD_UNIT,
+	            KAMIS_ITEM_CODE,
+	            KAMIS_KIND_CODE,
+	            KAMIS_ITEM_CATEGORY_CODE,
+	            ROW_NUMBER() OVER(PARTITION BY NAME ORDER BY KAMIS_KIND_CODE ASC) as RN
+	        FROM INGREDIENT_MASTER
+	    ) M
+	    LEFT JOIN (
+	        SELECT INGREDIENT_ID, PRICE_VALUE, COLLECTED_DATE
+	        FROM (
+	            SELECT 
+	                INGREDIENT_ID, 
+	                PRICE_VALUE, 
+	                COLLECTED_DATE,
+	                ROW_NUMBER() OVER(PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) as RN
+	            FROM PRICE_HISTORY
+	            WHERE REGION = '서울' 
+	              AND PRICE_TYPE = '소매'
+	        )
+	        WHERE RN = 1
+	    ) P ON M.INGREDIENT_ID = P.INGREDIENT_ID
+	    WHERE M.RN = 1  <!-- 각 이름별로 KAMIS_KIND_CODE가 가장 작은 것만 --> 
+	    ORDER BY M.NAME ASC
+	</select>
 
   </mapper>

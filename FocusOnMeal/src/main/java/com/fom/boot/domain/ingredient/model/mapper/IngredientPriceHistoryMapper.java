@@ -1,5 +1,6 @@
 package com.fom.boot.domain.ingredient.model.mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -46,4 +47,9 @@ public interface IngredientPriceHistoryMapper {
 	 * @return 존재하면 1 이상, 없으면 0
 	 */
 	int checkTodayPriceExists(@Param("ingredientId") int ingredientId);
+
+	PriceHistory findLatestPriceByIngredientAndDateRange(
+			@Param("ingredientId") int ingredientId, 
+			@Param("startDate") LocalDateTime todayStart, 
+			@Param("endDate") LocalDateTime todayEnd);
 }

@@ -56,7 +56,7 @@
 .categoryInTitle {
     font-size: 0.7em; /* H1 크기보다 작게 설정하여 부제목 느낌 */
     font-weight: 500; /* 굵기를 낮춤 */
-    color: #666; /* 회색으로 색상 조정 */
+    color: #999; /* 회색으로 색상 조정 */
     margin-left: 10px;
 }
 
@@ -153,6 +153,25 @@
     font-weight: normal; 
 }
 
+.itemActions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    align-items: center; 
+}
+
+.itemActions button {
+    background-color: #f0f2f5;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+}
+.itemActions button:hover {
+    background-color: #e4e6e8;
+}
 
 .topActions {
     display: flex;
@@ -166,9 +185,8 @@
     border-radius: 4px;
     cursor: pointer;
     font-weight: 600;
-    border: 1px solid #dc3545;
-    background-color: white;
-    color: #dc3545;
+    border: 1px solid #ddd;
+    background-color: #f0f2f5;
     transition: all 0.2s;
 }
 
@@ -358,6 +376,6 @@
 .specRow span {
     font-weight: 600;
     color: #333;
-    width: 100px; 
+    width: 140px; 
     flex-shrink: 0;
 }

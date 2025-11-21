@@ -44,11 +44,10 @@ function IngredientSearch() {
         if (Array.isArray(response.data)) {
             const processedData = response.data.map(item => ({
               ...item,
-              pricePer100g: item.currentPrice ? Math.floor(item.currentPrice / 10) : 0, 
-              // 🚨 UI 테스트용 임의 데이터
-              priceChangePercent: Math.random() > 0.5 ? 10 : -5, 
-              safetyStatus: ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)],
-              unit: item.unit || '1kg' // 단위 추가
+              pricePer100g: item.currentPrice ? Math.floor(item.currentPrice / 10) : 0,
+              // 실제 백엔드에서 받은 priceChangePercent 사용
+              safetyStatus: ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)], // TODO: 실제 안전도 로직
+              unit: item.unit || '1kg'
             }));
             setOriginalResults(processedData);
         } else {
@@ -100,7 +99,6 @@ function IngredientSearch() {
     setCurrentPage(1);
   }, [selectedCategoryKey, searchText]);
 
-
   const handleReset = () => {
     setSelectedCategoryKey(null); 
     setSearchText('');
@@ -115,7 +113,6 @@ function IngredientSearch() {
       {/* 1. 검색/필터 영역 */}
       <form onSubmit={(e) => e.preventDefault()} className={styles.filterSection}>
         
-        {/* 🚨 가운데 정렬 컨테이너 적용 */}
         <div className={styles.centerLayout}> 
             <label htmlFor="food-search" className={styles.searchLabel}>식재료명</label>
             
@@ -148,10 +145,8 @@ function IngredientSearch() {
             </div>
         </div>
         
-        {/* 2. 카테고리 버튼 UI (filterSection 내부) */}
+        {/* 2. 카테고리 버튼 UI */}
         <div className={styles.categoryButtons}>
-          
-          {/* '전체' 버튼 */}
           <button
             className={`${styles.categoryButton} ${!selectedCategoryKey ? styles.active : ''}`}
             onClick={() => setSelectedCategoryKey(null)}
@@ -171,13 +166,12 @@ function IngredientSearch() {
         </div>
       </form>
 
-      {/* 🚨 검색 결과 총 + 안전 위험도 툴팁 섹션 */}
+      {/* 검색 결과 총 + 안전 위험도 툴팁 */}
       <div className={styles.resultsHeaderContainer}>
           <p className={styles.resultsHeader}>
             검색 결과 총 : <span>{filteredResults.length}</span>건
           </p>
           
-          {/* 🚨 안전 위험도 툴팁 아이콘 */}
           <div className={styles.safetyInfoControl}>
             <span style={{fontWeight: 600, color: '#333'}}>안전 위험도란?</span>
             <span className={styles.tooltipContainer}>
@@ -197,12 +191,9 @@ function IngredientSearch() {
             </span>
           </div>
       </div>
-      {/* 🚨 /검색 결과 총 + 안전 위험도 툴팁 섹션 */}
-
 
       {/* 3. 결과 리스트 렌더링 */}
       <section>
-        {/* 🚨 2분할 그리드 레이아웃 적용 */}
         <ul className={`${styles.resultsList} ${styles.twoColumnList}`}>
           {currentItems.length === 0 && ( 
             <li className={styles.noResults}>
@@ -216,15 +207,17 @@ function IngredientSearch() {
                               : item.safetyStatus === 'warning' ? styles.warning 
                               : styles.danger;
             
-            const changeIndicator = item.priceChangePercent >= 0 ? '▲' : '▼';
+            // 실제 가격 변동률 사용
+            const hasPriceChange = item.priceChangePercent !== null && item.priceChangePercent !== undefined;
+            const changeIndicator = hasPriceChange && item.priceChangePercent >= 0 ? '▲' : '▼';
             const changeStyle = {
-                color: item.priceChangePercent >= 0 ? '#dc3545' : '#007aff', 
+                color: hasPriceChange && item.priceChangePercent >= 0 ? '#dc3545' : '#007aff', 
                 fontWeight: 'bold',
-                // 🚨 가격 변동률은 .priceChangeLine에서 스타일링
             };
+            
             const safetyText = item.safetyStatus === 'safe' ? '안전'
-                             : item.safetyStatus === 'warning' ? '주의'
-                             : '위험';
+                            : item.safetyStatus === 'warning' ? '주의'
+                            : '위험';
 
             return (
               <li key={item.ingredientId} className={styles.resultItem}>
@@ -233,6 +226,14 @@ function IngredientSearch() {
                     <Link to={`/ingredient/detail/${item.ingredientId}`} className={styles.itemTitleLink}>
                       <h3 className={styles.itemTitle}>
                         {item.name} 
+                        <span style={{
+                          fontSize: '0.7em', 
+                          fontWeight: 'normal', 
+                          color: '#999', 
+                          marginLeft: '5px'
+                        }}>
+                          ({item.category})
+                        </span>
                       </h3>
                     </Link>
                     
@@ -243,30 +244,64 @@ function IngredientSearch() {
                         >
                           {isWished ? '❤️ 찜하기' : '🤍 찜하기'}
                         </button>
-                        {/* 🚨 찜하기 옆 안전 알림 버튼 추가 */}
-                        <span className={styles.safetyBadge}>안전 알림</span>
                     </div>
                 </div>
 
-                                <div className={styles.itemDetails}>
+                <div className={styles.itemDetails}>
                     <p className={styles.priceSummaryLine}>
-                        <strong>[가격]:</strong> 
+                        <strong>[ 가격 (1kg) ] :</strong> 
                         {item.currentPrice ? `${item.currentPrice.toLocaleString()}원` : '정보 없음'}
                         {item.pricePer100g > 0 && 
                             <span style={{marginLeft: '10px', color: '#666', fontSize: '0.9em', fontWeight: 'normal'}}>
                                 (100g당 {item.pricePer100g.toLocaleString()}원)
                             </span>
                         }
-                        {/* 가격 변동률을 같은 줄에 표시 */}
-                        {item.priceChangePercent !== undefined && (
-                            <span style={{...changeStyle, marginLeft: '10px', fontSize: '0.9em'}}>
-                                (어제 대비 {changeIndicator}{Math.abs(item.priceChangePercent)}%)
-                            </span>
-                        )}
                     </p>
                     
+                    {/* 🚨 가격 변동 정보를 별도 줄로 표시 */}
+                    {hasPriceChange && (
+                        <p style={{fontSize: '0.85em', color: '#666', marginTop: '4px', marginBottom: '4px'}}>
+                            {item.priceChangePercent === 0 ? (
+                                <>
+                                    <span>전일 대비 변동 없음</span>
+                                    {item.yesterdayPrice && item.yesterdayCollectedDate && (
+                                        <span style={{marginLeft: '8px', color: '#999'}}>
+                                            (전일: {item.yesterdayPrice.toLocaleString()}원, {new Date(item.yesterdayCollectedDate).toLocaleDateString('ko-KR', {
+                                                month: 'numeric',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })})
+                                        </span>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <span style={changeStyle}>
+                                        전일 대비 {changeIndicator}{Math.abs(item.priceChangePercent).toFixed(1)}%
+                                    </span>
+                                    {item.yesterdayPrice && item.yesterdayCollectedDate && (
+                                        <span style={{marginLeft: '8px', color: '#999'}}>
+                                            (전일 : {item.yesterdayPrice.toLocaleString()}원, {new Date(item.yesterdayCollectedDate).toLocaleDateString('ko-KR', {
+                                                month: 'numeric',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })})
+                                        </span>
+                                    )}
+                                </>
+                            )}
+                        </p>
+                    )}
+                    {!hasPriceChange && item.currentPrice && (
+                        <p style={{fontSize: '0.85em', color: '#999', marginTop: '4px', marginBottom: '4px'}}>
+                            전일 가격 정보 없음
+                        </p>
+                    )}
+                    
                     <p className={styles.safetyStatusLine}>
-                        <strong>[안전]:&nbsp;</strong> 
+                        <strong>[ 안전 ] : &nbsp;</strong> 
                         
                         <span className={`${styles.safetyIcon} ${safetyClass}`}>
                             {safetyText.charAt(0)}
@@ -275,9 +310,7 @@ function IngredientSearch() {
                         <span className={safetyClass} style={{marginLeft: '5px', fontWeight: 600}}>
                             {safetyText}
                         </span>
-                        
                     </p>
-
                 </div>
               </li>
             );

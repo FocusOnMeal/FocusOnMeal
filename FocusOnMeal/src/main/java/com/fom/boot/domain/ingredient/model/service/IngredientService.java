@@ -3,6 +3,7 @@ package com.fom.boot.domain.ingredient.model.service;
 import java.util.List;
 
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
+import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
@@ -20,5 +21,6 @@ public interface IngredientService {
 	Ingredient getIngredientById(int id);
 	// 상세 페이지 : 특정 식재료 가격 이력 조회
 	List<PriceHistory> getPriceHistory(int id);
+	List<FavoriteIngredientSummaryDTO> getFavoritesByMemberId(String memberId);
 
 }

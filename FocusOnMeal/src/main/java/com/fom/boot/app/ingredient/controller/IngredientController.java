@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
+import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
@@ -55,8 +56,26 @@ public class IngredientController {
         return ResponseEntity.ok(response);
     }
 	
+    // [API 3] 찜한 식재료 목록 조회 (마이페이지용)
+    @GetMapping("/api/favorites")
+    @ResponseBody
+    public ResponseEntity<?> getFavoriteIngredients(Authentication authentication) {
+        
+        // 로그인 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        String memberId = authentication.getName();
+        List<FavoriteIngredientSummaryDTO> favorites = iService.getFavoritesByMemberId(memberId);
+        
+        return ResponseEntity.ok(favorites);
+    }
+    
+    
     // 찜 등록 및 해제
     @PostMapping("detail/{ingredientId}/favorite")
+    @ResponseBody
     public ResponseEntity<?> toggleFavoriteIngredient(@PathVariable("ingredientId") int ingredientId,
                                                         Authentication authentication) { // 변경: HttpSession → Authentication
         

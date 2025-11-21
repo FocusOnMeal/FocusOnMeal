@@ -168,6 +168,7 @@
     list-style-type: none;
     padding: 0;
     margin: 0;
+    min-height: 950px;
 }
 
 /* 리스트 2분할 그리드 레이아웃 */
@@ -177,6 +178,7 @@
     gap: 20px; 
     margin-top: 0;
     margin-bottom: 0;
+    align-content: start;
 }
 
 .resultItem {
@@ -410,3 +412,19 @@
 .tooltipDanger strong { color: #dc3545; }
 .tooltipWarning strong { color: #ffc107; }
 .tooltipSafe strong { color: #28a745; }
+
+/* 검색 결과가 없을 때 li 스타일 */
+.noResults {
+    grid-column: 1 / -1; /* 그리드 2칸을 모두 차지하게 설정 */
+    
+    /* 박스 정중앙 정렬 */
+    display: flex;
+    justify-content: center; /* 가로 중앙 */
+    align-items: top;     /* 세로 중앙 */
+    padding-top: 150px;
+    
+    height: 100%;            /* 부모의 min-height(950px)를 가득 채움 */
+    font-size: 1.2rem;
+    color: #888;
+    font-weight: 500;
+}
