@@ -16,6 +16,7 @@ import ResetPassword from './pages/member/ResetPassword';
 // 마이페이지
 import Dashboard from './pages/mypage/Dashboard';
 import ProtectedRoute from './components/mypage/ProtectedRoute';
+import SafetyAlert from './pages/mypage/SafetyAlert';
 
 // 식재료
 import IngredientSearch from './pages/ingredient/list';
@@ -56,6 +57,12 @@ function App() {
         <Route path="/mypage" element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>} 
+        />
+
+        <Route path="/mypage/setting/safetyAlert" element={
+          <ProtectedRoute>
+            <SafetyAlert />
           </ProtectedRoute>} 
         />
 
