@@ -226,7 +226,11 @@ const NoticeInfo = () => {
                         )}
                     </tbody>
                 </table>
-
+                <div className={styles.addBtnContainer}>
+                    <button className={styles.addBtn}>
+                        공지사항 추가 +
+                    </button>
+                </div>
                 {/* 🔢 정적 페이지네이션 UI */}
                 <div className={styles.pagination}>
                     <button className={styles.pageBtn}>{`<`}</button>

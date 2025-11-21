@@ -35,17 +35,18 @@
 /* 검색 영역 (select + input + button) */
 .searchBox {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     --margin: 25px 0;   
     border-radius: 12px;
 }
 .selectBox{
     border-radius: 6px;
     border: 1px solid #ccc;
+    text-align: center;;
     font-size: 14px;
-    padding: 6px 10px;
+    padding: 6px 3px;
     margin: 0;
-    min-width: 80px;
+    --min-width: 20px;
 }
 
 .searchInput {
@@ -58,8 +59,9 @@
 
 .searchBtn {
     background: #67932A;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2)    ;
     color: #fff;
-    padding: 6px 22px;
+    padding: 6px 15px;
     border-radius: 6px;
     border: none;
     font-size: 14px;
@@ -78,8 +80,8 @@
 
 .filterBtn {
     background: #e4e4e4;
-    padding: 6px 14px;
-    border-radius: 6px;
+    padding: 6px 9px;
+    border-radius: 20px;
     border: none;
     font-size: 14px;
     cursor: pointer;
@@ -157,33 +159,35 @@
 
 /* 수정 버튼 */
 .editBtn {
-    background: #5da6f5; /* 파란색 계열 */
-    color: white;
+    background: white;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    color: black;
     padding: 6px 10px;
-    border-radius: 5px;
-    border: none;
+    border-radius: 20px;
+    border: 1px solid #ccc;
     font-size: 12px;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
 }
 .editBtn:hover {
-    background: #0056b3;
     transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* 삭제 버튼 */
 .deleteBtn {
-    background: #ff1f35cd; /* 빨간색 계열 */
-    color: white;
+    background: white; 
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    color: black;
     padding: 6px 10px;
-    border-radius: 5px;
-    border: none;
+    border-radius: 20px;
+    border: 1px solid red;
     font-size: 12px;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
 }
 .deleteBtn:hover {
-    background: #c82333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transform: translateY(-1px);
 }
 
@@ -208,6 +212,27 @@
     margin-right: 6px;
     display: inline-block;
 } 
+.addBtnContainer{
+    display: flex;
+    justify-content: flex-end;
+    margin-right:8px;
+}
+.addBtn{
+    background: none; 
+    color: blue;
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 10px;
+}
+
+.addBtn:hover{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
 
 /* 페이지네이션 */
 .pagination {
