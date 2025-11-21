@@ -21,4 +21,5 @@ public class SafetyAlert {
     private String title;           	// TITLE(상세 공표 제목)
     private String description;     	// DESCRIPTION(상세 공표 내용)
     private Timestamp publicationDate; 	// PUBLICATION_DATE(공표된 날짜)
+    private String originalUrl;			// ORIGINAL_URL(오리지널 링크)
 }

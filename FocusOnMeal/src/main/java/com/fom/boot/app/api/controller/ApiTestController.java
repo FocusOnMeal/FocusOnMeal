@@ -1,6 +1,8 @@
 package com.fom.boot.app.api.controller;
 
 
+import com.fom.boot.domain.alert.model.service.FoodSafetyApiService;
+import com.fom.boot.domain.alert.model.service.FoodSafetyDataSyncService;
 import com.fom.boot.domain.ingredient.model.service.KamisDataSyncService;
 import com.fom.boot.domain.ingredient.model.service.PriceService;
 import com.fom.boot.domain.meal.model.service.ChamgaApiService;
@@ -31,6 +33,8 @@ public class ApiTestController {
     private final SeoulPriceApiService seoulPriceApiService;
     private final PriceService priceService;
     private final KamisDataSyncService kamisDataSyncService;
+    private final FoodSafetyApiService foodSafetyApiService;
+    private final FoodSafetyDataSyncService foodSafetyDataSyncService;
 
     /**
      * 전체 API 연결 테스트
@@ -537,6 +541,191 @@ public class ApiTestController {
             log.error("KAMIS dailyPriceByCategoryList 조회 실패", e);
             return ResponseEntity.ok("ERROR: " + e.getMessage());
         }
+    }
+    
+    /**
+     * 식품안전정보원 API 테스트
+     * GET /api/test/food-safety
+     */
+    @GetMapping("/food-safety")
+    public ResponseEntity<Map<String, Object>> testFoodSafety() {
+        log.info("식품안전정보원 API 단독 테스트");
+
+        try {
+            String result = foodSafetyApiService.testConnection();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", result.contains("성공") || result.contains("연결 성공") ? "SUCCESS" : "FAIL",
+                    "message", result
+            ));
+        } catch (Exception e) {
+            log.error("식품안전정보원 API 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 식품안전정보원 API 원본 응답 조회
+     * GET /api/test/food-safety/raw?start=1&end=10
+     */
+    @GetMapping("/food-safety/raw")
+    public ResponseEntity<String> testFoodSafetyRaw(
+            @RequestParam(defaultValue = "1") int start,
+            @RequestParam(defaultValue = "10") int end
+    ) {
+        log.info("식품안전정보원 API 원본 응답 조회 - start: {}, end: {}", start, end);
+
+        try {
+            String rawResponse = foodSafetyApiService.getRawResponse(start, end);
+            return ResponseEntity.ok(rawResponse);
+        } catch (Exception e) {
+            log.error("식품안전정보원 API 원본 응답 조회 실패", e);
+            return ResponseEntity.ok("ERROR: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 식품안전정보 동기화 테스트
+     * GET /api/test/food-safety/sync
+     */
+    @GetMapping("/food-safety/sync")
+    public ResponseEntity<Map<String, Object>> testFoodSafetySync() {
+        log.info("식품안전정보 동기화 테스트");
+
+        try {
+            String result = foodSafetyDataSyncService.syncAndGetResult();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", result.contains("완료") ? "SUCCESS" : "FAIL",
+                    "result", result
+            ));
+
+        } catch (Exception e) {
+            log.error("식품안전정보 동기화 테스트 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 식품안전정보 최근 데이터 동기화
+     * GET /api/test/food-safety/sync/recent
+     */
+    @GetMapping("/food-safety/sync/recent")
+    public ResponseEntity<Map<String, Object>> testFoodSafetySyncRecent() {
+        log.info("식품안전정보 최근 데이터 동기화 테스트");
+
+        try {
+            int savedCount = foodSafetyDataSyncService.syncRecentAlerts();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "savedCount", savedCount,
+                    "message", savedCount + "건의 위험 공표 정보가 저장되었습니다."
+            ));
+
+        } catch (Exception e) {
+            log.error("식품안전정보 최근 동기화 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * 식품안전정보 전체 동기화
+     * GET /api/test/food-safety/sync/all
+     */
+    @GetMapping("/food-safety/sync/all")
+    public ResponseEntity<Map<String, Object>> testFoodSafetySyncAll() {
+        log.info("식품안전정보 전체 동기화 테스트");
+
+        try {
+            int savedCount = foodSafetyDataSyncService.syncAllAlerts();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "savedCount", savedCount,
+                    "message", savedCount + "건의 위험 공표 정보가 저장되었습니다."
+            ));
+
+        } catch (Exception e) {
+            log.error("식품안전정보 전체 동기화 실패", e);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ERROR",
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    
+    /**
+     * 최근 7일치 위험 공표 정보를 수동으로 동기화하고 결과를 반환합니다.
+     * 엔드포인트: GET /api/sync/recent
+     * @return 동기화 결과 메시지
+     */
+    @GetMapping("/sync/recent")
+    public ResponseEntity<String> syncRecentAlertsManually() {
+        log.info("Manual synchronization of recent alerts triggered.");
+        
+        try {
+            // FoodSafetyDataSyncServiceImpl의 테스트용 메서드 호출
+            // 이 메서드는 최근 7일치 데이터를 가져오고 상세 결과를 문자열로 반환합니다.
+            String result = foodSafetyDataSyncService.syncAndGetResult();
+            
+            return ResponseEntity.ok("데이터 동기화 요청 성공: " + result);
+            
+        } catch (Exception e) {
+            log.error("Manual synchronization failed", e);
+            return ResponseEntity.internalServerError().body("데이터 동기화 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 특정 범위의 위험 공표 정보를 수동으로 동기화합니다. (대량 데이터 동기화용)
+     * 엔드포인트: GET /api/sync/range?start=1&end=100
+     * @param startIdx 시작 인덱스 (API 기준)
+     * @param endIdx 종료 인덱스 (API 기준)
+     * @return 동기화된 건수
+     */
+    @GetMapping("/sync/range")
+    public ResponseEntity<String> syncAlertsByRange(
+            @RequestParam(required = true) Integer start,
+            @RequestParam(required = true) Integer end
+    ) {
+        log.info("Manual synchronization by range triggered: start={}, end={}", start, end);
+
+        if (start <= 0 || end <= 0 || start > end) {
+            return ResponseEntity.badRequest().body("시작 및 종료 인덱스가 유효하지 않습니다.");
+        }
+
+        try {
+            int savedCount = foodSafetyDataSyncService.syncAlertsByRange(start, end);
+            return ResponseEntity.ok(String.format("범위 동기화 요청 성공: %d 건 저장 완료", savedCount));
+        } catch (Exception e) {
+            log.error("Range synchronization failed", e);
+            return ResponseEntity.internalServerError().body("범위 동기화 중 오류 발생: " + e.getMessage());
+        }
+    }
+    
+    // [추가] Raw Response 확인용 임시 엔드포인트
+    @GetMapping("/raw")
+    public String getRawApi(int start, int end) {
+        log.info("Raw API response requested: start={}, end={}", start, end);
+        
+        // **중요: 기간을 1년으로 넓힌 버전으로 호출해야 정확한 테스트가 됩니다.**
+        // getRawResponse의 내부 로직이 7일로 고정되어 있다면, 그 코드를 수정해야 합니다.
+        // 현재 FoodSafetyApiServiceImpl의 getRawResponse는 7일로 되어 있습니다.
+        
+        // 임시로 getRawResponse 내부 코드를 1년으로 변경하거나,
+        // 아래처럼 Service에 별도의 1년 조회 메서드를 임시로 만들어 사용해야 합니다.
+        
+        return foodSafetyApiService.getRawResponse(start, end);
     }
 }
 

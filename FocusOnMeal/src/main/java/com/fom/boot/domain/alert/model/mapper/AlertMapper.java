@@ -12,7 +12,7 @@ import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 @Mapper
 public interface AlertMapper {
 
-	/**
+    /**
      * 회원의 알림 목록 조회 (제목 포함)
      * @param memberId 회원 ID
      * @return 알림 목록
@@ -82,6 +82,13 @@ public interface AlertMapper {
     List<String> selectMembersWithIngredientAlertEnabled(@Param("ingredientId") int ingredientId);
     
     /**
+     * 키워드로 식재료 ID 찾기
+     * @param keyword 검색 키워드
+     * @return 식재료 ID (없으면 null)
+     */
+    Integer findIngredientIdByKeyword(@Param("keyword") String keyword);
+    
+    /**
      * 알림 로그 생성
      * @param memberId 회원 ID
      * @param type 알림 유형
@@ -93,4 +100,32 @@ public interface AlertMapper {
                              @Param("type") String type, 
                              @Param("message") String message,
                              @Param("alertId") Integer alertId);
+    
+    /**
+     * 안전 위험 공표 정보 등록
+     * @param safetyAlert 공표 정보
+     * @return 생성된 행 수
+     */
+    int insertSafetyAlert(SafetyAlert safetyAlert);
+    
+    /**
+     * 제목으로 중복 체크
+     * @param title 제목
+     * @return 중복 건수
+     */
+    int countByTitle(@Param("title") String title);
+  
+    /**
+     * 안전 위험 공표 정보 배치 등록
+     * @param safetyAlerts 공표 정보 리스트
+     * @return 생성된 행 수
+     */
+    int insertBatchSafetyAlert(List<SafetyAlert> safetyAlerts);
+    
+    /**
+     * 제목, 국가, 공표일 복합 키로 중복 체크
+     * @param safetyAlert 공표 정보 (title, nation, publicationDate 사용)
+     * @return 중복 건수
+     */
+    int countByComplexKey(SafetyAlert safetyAlert);
 }

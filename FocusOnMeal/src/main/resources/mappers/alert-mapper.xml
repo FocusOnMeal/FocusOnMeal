@@ -124,5 +124,50 @@
             SYSTIMESTAMP
         )
     </insert>
+    
+    <!-- 키워드로 식재료 ID 찾기 (E. 미구현 문제 해결) -->
+    <select id="findIngredientIdByKeyword" resultType="int">
+        SELECT INGREDIENT_ID
+        FROM INGREDIENT_MASTER
+        WHERE NAME LIKE '%' || #{keyword} || '%' 
+        AND ROWNUM = 1
+    </select>
+    
+    <!-- 안전 위험 공표 정보 배치 등록 (D. 배치 삽입 문제 해결) -->
+    <insert id="insertBatchSafetyAlert" 
+            parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="alert" separator=" ">
+        INTO SAFETY_ALERT_MASTER (
+            ALERT_ID,
+            INGREDIENT_ID,
+            NATION,
+            HAZARD_TYPE,
+            TITLE,
+            DESCRIPTION,
+            PUBLICATION_DATE,
+            ORIGINAL_URL
+        ) VALUES (
+            SEQ_SAFETY_ALERT_MASTER.NEXTVAL,
+            #{alert.ingredientId},
+            #{alert.nation},
+            #{alert.hazardType},
+            #{alert.title},
+            #{alert.description},
+            #{alert.publicationDate, jdbcType=TIMESTAMP},
+            #{alert.originalUrl}
+        )
+        </foreach>
+        SELECT * FROM DUAL
+    </insert>
+    
+    <!-- 복합 키로 중복 체크 (C. 중복 체크 취약 문제 해결) -->
+    <select id="countByComplexKey" resultType="int">
+        SELECT COUNT(*)
+        FROM SAFETY_ALERT_MASTER
+        WHERE TITLE = #{title}
+          AND NATION = #{nation}
+          AND PUBLICATION_DATE = #{publicationDate, jdbcType=TIMESTAMP}
+    </select>
   
   </mapper>
