@@ -64,7 +64,7 @@ function App() {
             <Dashboard />
           </ProtectedRoute>
         } />
-        <Route path="/meal/myMeal" element={
+        <Route path="mypage/myMeal" element={
           <ProtectedRoute>
             <MyMeal />
           </ProtectedRoute>
