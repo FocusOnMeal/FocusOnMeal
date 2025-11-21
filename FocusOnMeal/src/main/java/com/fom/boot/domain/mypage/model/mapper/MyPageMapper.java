@@ -54,4 +54,23 @@ public interface MyPageMapper {
 	// 식단 상세 조회
 	MealPlan selectMealPlanById(@Param("planId") int planId);
 
+	// ====== 휴지통 기능 ======
+	// 삭제된 식단 목록 조회
+	List<MealPlan> selectDeletedMealPlans(@Param("memberId") String memberId);
+
+	// 삭제된 식단 개수
+	int countDeletedMealPlans(@Param("memberId") String memberId);
+
+	// 식단 복원 (IS_DELETED = 'N')
+	int restoreMealPlan(@Param("planId") int planId);
+
+	// 식단 영구 삭제
+	int permanentDeleteMealPlan(@Param("planId") int planId);
+
+	// 휴지통 비우기 (일괄 영구 삭제)
+	int permanentDeleteAllDeletedMeals(@Param("memberId") String memberId);
+
+	// 30일 경과 식단 자동 영구 삭제
+	int permanentDeleteExpiredMeals();
+
 }

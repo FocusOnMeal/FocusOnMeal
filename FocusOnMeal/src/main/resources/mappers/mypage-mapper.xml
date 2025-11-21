@@ -171,4 +171,60 @@
           AND (IS_DELETED IS NULL OR IS_DELETED = 'N')
     </select>
 
+    <!-- ====== 휴지통 기능 ====== -->
+
+    <!-- 삭제된 식단 목록 조회 -->
+    <select id="selectDeletedMealPlans" resultType="com.fom.boot.domain.meal.model.vo.MealPlan">
+        SELECT
+            PLAN_ID as planId,
+            MEMBER_ID as memberId,
+            PLAN_NAME as planName,
+            SERVING_SIZE as servingSize,
+            TOTAL_COST as totalCost,
+            CALORIES as calories,
+            WHEN_EAT as whenEat,
+            CREATED_AT as createdAt,
+            DELETED_AT as deleteAt
+        FROM MEAL_PLAN
+        WHERE MEMBER_ID = #{memberId}
+          AND IS_DELETED = 'Y'
+        ORDER BY DELETED_AT DESC
+    </select>
+
+    <!-- 삭제된 식단 개수 -->
+    <select id="countDeletedMealPlans" resultType="int">
+        SELECT COUNT(*)
+        FROM MEAL_PLAN
+        WHERE MEMBER_ID = #{memberId}
+          AND IS_DELETED = 'Y'
+    </select>
+
+    <!-- 식단 복원 -->
+    <update id="restoreMealPlan">
+        UPDATE MEAL_PLAN
+        SET IS_DELETED = 'N',
+            DELETED_AT = NULL
+        WHERE PLAN_ID = #{planId}
+    </update>
+
+    <!-- 식단 영구 삭제 -->
+    <delete id="permanentDeleteMealPlan">
+        DELETE FROM MEAL_PLAN
+        WHERE PLAN_ID = #{planId}
+    </delete>
+
+    <!-- 휴지통 비우기 (일괄 영구 삭제) -->
+    <delete id="permanentDeleteAllDeletedMeals">
+        DELETE FROM MEAL_PLAN
+        WHERE MEMBER_ID = #{memberId}
+          AND IS_DELETED = 'Y'
+    </delete>
+
+    <!-- 30일 경과 식단 자동 영구 삭제 -->
+    <delete id="permanentDeleteExpiredMeals">
+        DELETE FROM MEAL_PLAN
+        WHERE IS_DELETED = 'Y'
+          AND DELETED_AT &lt; SYSTIMESTAMP - INTERVAL '30' DAY
+    </delete>
+
 </mapper>

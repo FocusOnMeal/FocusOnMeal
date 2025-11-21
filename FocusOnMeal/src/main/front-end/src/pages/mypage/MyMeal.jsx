@@ -14,6 +14,12 @@ const MyMeal = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedMeal, setSelectedMeal] = useState(null);
 
+    // 휴지통 모달
+    const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
+    const [deletedMeals, setDeletedMeals] = useState([]);
+    const [trashCount, setTrashCount] = useState(0);
+    const [trashLoading, setTrashLoading] = useState(false);
+
     // 식단 목록 조회
     useEffect(() => {
         const fetchMealPlans = async () => {
@@ -35,6 +41,12 @@ const MyMeal = () => {
                 console.log("[API 성공] 받은 데이터:", response.data);
                 setMealList(response.data.mealList);
                 setPageInfo(response.data.pageInfo);
+
+                // 휴지통 개수 조회
+                const trashResponse = await axios.get("/api/mypage/trash", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setTrashCount(trashResponse.data.count || 0);
             } catch (err) {
                 console.error("[API 실패] 에러 발생:", err);
             } finally {
@@ -59,7 +71,7 @@ const MyMeal = () => {
 
     // 식단 삭제
     const handleDelete = async (planId) => {
-        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+        if (!window.confirm("휴지통으로 이동하시겠습니까?\n(30일 이내 복원 가능)")) return;
 
         const token = localStorage.getItem("token");
 
@@ -70,7 +82,7 @@ const MyMeal = () => {
                 }
             });
 
-            alert("식단이 삭제되었습니다.");
+            alert("식단이 휴지통으로 이동되었습니다.");
             // 목록 새로고침 - API 다시 호출
             const response = await axios.get("/api/mypage/myMeals", {
                 params: { page: currentPage },
@@ -80,6 +92,8 @@ const MyMeal = () => {
             });
             setMealList(response.data.mealList);
             setPageInfo(response.data.pageInfo);
+            // 휴지통 카운트 업데이트
+            setTrashCount(prev => prev + 1);
         } catch (err) {
             console.error("삭제 실패:", err);
             alert("삭제에 실패했습니다.");
@@ -120,13 +134,118 @@ const MyMeal = () => {
         }
     };
 
+    // 휴지통 열기
+    const openTrashModal = async () => {
+        const token = localStorage.getItem("token");
+        setTrashLoading(true);
+        try {
+            const response = await axios.get("/api/mypage/trash", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setDeletedMeals(response.data.deletedMeals || []);
+            setTrashCount(response.data.count || 0);
+            setIsTrashModalOpen(true);
+        } catch (err) {
+            console.error("휴지통 조회 실패:", err);
+            alert("휴지통을 불러오는데 실패했습니다.");
+        } finally {
+            setTrashLoading(false);
+        }
+    };
+
+    // 휴지통 닫기
+    const closeTrashModal = () => {
+        setIsTrashModalOpen(false);
+    };
+
+    // 식단 복원
+    const handleRestore = async (planId) => {
+        const token = localStorage.getItem("token");
+        try {
+            await axios.put(`/api/mypage/trash/restore/${planId}`, null, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert("식단이 복원되었습니다.");
+            // 휴지통 목록 새로고침
+            const trashResponse = await axios.get("/api/mypage/trash", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setDeletedMeals(trashResponse.data.deletedMeals || []);
+            setTrashCount(trashResponse.data.count || 0);
+            // 식단 목록도 새로고침
+            const mealResponse = await axios.get("/api/mypage/myMeals", {
+                params: { page: currentPage },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setMealList(mealResponse.data.mealList);
+            setPageInfo(mealResponse.data.pageInfo);
+        } catch (err) {
+            console.error("복원 실패:", err);
+            alert("복원에 실패했습니다.");
+        }
+    };
+
+    // 영구 삭제
+    const handlePermanentDelete = async (planId) => {
+        if (!window.confirm("영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+        const token = localStorage.getItem("token");
+        try {
+            await axios.delete(`/api/mypage/trash/${planId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert("식단이 영구 삭제되었습니다.");
+            // 휴지통 목록 새로고침
+            const response = await axios.get("/api/mypage/trash", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setDeletedMeals(response.data.deletedMeals || []);
+            setTrashCount(response.data.count || 0);
+        } catch (err) {
+            console.error("영구 삭제 실패:", err);
+            alert("삭제에 실패했습니다.");
+        }
+    };
+
+    // 휴지통 비우기
+    const handleEmptyTrash = async () => {
+        if (!window.confirm("휴지통을 비우시겠습니까? 모든 식단이 영구 삭제됩니다.")) return;
+        const token = localStorage.getItem("token");
+        try {
+            const response = await axios.delete("/api/mypage/trash/empty", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert(response.data.message);
+            setDeletedMeals([]);
+            setTrashCount(0);
+        } catch (err) {
+            console.error("휴지통 비우기 실패:", err);
+            alert("휴지통 비우기에 실패했습니다.");
+        }
+    };
+
+    // 남은 일수 계산 (30일 - 경과일)
+    const getDaysRemaining = (deleteAt) => {
+        if (!deleteAt) return 30;
+        const deletedDate = new Date(deleteAt);
+        const now = new Date();
+        const diffTime = now - deletedDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return Math.max(0, 30 - diffDays);
+    };
+
     if (loading) return <div className={styles.loading}>Loading...</div>;
 
     return (
         <div className={styles.container}>
             <Sidebar />
             <main className={styles.main}>
-                <h2 className={styles.title}>내 식단</h2>
+                <div className={styles.titleRow}>
+                    <h2 className={styles.title}>내 식단</h2>
+                    <button className={styles.trashBtn} onClick={openTrashModal} disabled={trashLoading}>
+                        🗑️ 휴지통
+                        {trashCount > 0 && <span className={styles.trashBadge}></span>}
+                    </button>
+                </div>
 
                 <table className={styles.mealTable}>
                     <thead>
@@ -284,6 +403,66 @@ const MyMeal = () => {
                         </div>
                         <div className={styles.modalFooter}>
                             <button className={styles.closeBtn} onClick={closeModal}>닫기</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 휴지통 모달 */}
+            {isTrashModalOpen && (
+                <div className={styles.modalOverlay} onClick={closeTrashModal}>
+                    <div className={styles.trashModalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2>🗑️ 휴지통 ({trashCount})</h2>
+                            <span className={styles.modalClose} onClick={closeTrashModal}>&times;</span>
+                        </div>
+                        <div className={styles.trashNotice}>
+                            삭제된 식단은 30일 후 자동으로 영구 삭제됩니다.
+                        </div>
+                        <div className={styles.trashBody}>
+                            {deletedMeals.length === 0 ? (
+                                <div className={styles.trashEmpty}>
+                                    휴지통이 비어있습니다.
+                                </div>
+                            ) : (
+                                <ul className={styles.trashList}>
+                                    {deletedMeals.map((meal) => (
+                                        <li key={meal.planId} className={styles.trashItem}>
+                                            <div className={styles.trashItemInfo}>
+                                                <span className={styles.trashItemName}>{meal.planName}</span>
+                                                <span className={styles.trashItemMeta}>
+                                                    {meal.whenEat} · {meal.totalCost?.toLocaleString()}원
+                                                </span>
+                                                <span className={styles.trashItemDays}>
+                                                    {getDaysRemaining(meal.deleteAt)}일 후 영구 삭제
+                                                </span>
+                                            </div>
+                                            <div className={styles.trashItemBtns}>
+                                                <button
+                                                    className={styles.restoreBtn}
+                                                    onClick={() => handleRestore(meal.planId)}
+                                                >
+                                                    복원
+                                                </button>
+                                                <button
+                                                    className={styles.permanentDeleteBtn}
+                                                    onClick={() => handlePermanentDelete(meal.planId)}
+                                                >
+                                                    삭제
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                        <div className={styles.modalFooter}>
+                            {deletedMeals.length > 0 && (
+                                <button className={styles.emptyTrashBtn} onClick={handleEmptyTrash}>
+                                    휴지통 비우기
+                                </button>
+                            )}
+                            <button className={styles.closeBtn} onClick={closeTrashModal}>닫기</button>
                         </div>
                     </div>
                 </div>

@@ -195,4 +195,52 @@ public class MyPageServiceImpl implements MyPageService {
 	public MealPlan getMealPlanDetail(int planId) {
 		return mMapper.selectMealPlanById(planId);
 	}
+
+	// ====== 휴지통 기능 ======
+
+	// 삭제된 식단 목록 조회
+	@Override
+	@Transactional(readOnly = true)
+	public List<MealPlan> getDeletedMealPlans(String memberId) {
+		return mMapper.selectDeletedMealPlans(memberId);
+	}
+
+	// 삭제된 식단 개수
+	@Override
+	@Transactional(readOnly = true)
+	public int getDeletedMealCount(String memberId) {
+		return mMapper.countDeletedMealPlans(memberId);
+	}
+
+	// 식단 복원
+	@Override
+	@Transactional
+	public int restoreMealPlan(int planId) {
+		return mMapper.restoreMealPlan(planId);
+	}
+
+	// 식단 영구 삭제
+	@Override
+	@Transactional
+	public int permanentDeleteMealPlan(int planId) {
+		return mMapper.permanentDeleteMealPlan(planId);
+	}
+
+	// 휴지통 비우기 (일괄 영구 삭제)
+	@Override
+	@Transactional
+	public int emptyTrash(String memberId) {
+		return mMapper.permanentDeleteAllDeletedMeals(memberId);
+	}
+
+	// 30일 경과 식단 자동 영구 삭제
+	@Override
+	@Transactional
+	public int deleteExpiredMeals() {
+		int deletedCount = mMapper.permanentDeleteExpiredMeals();
+		if (deletedCount > 0) {
+			log.info("30일 경과 식단 {} 건 자동 삭제 완료", deletedCount);
+		}
+		return deletedCount;
+	}
 }

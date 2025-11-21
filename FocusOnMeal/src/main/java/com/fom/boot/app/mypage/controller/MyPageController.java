@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -205,6 +206,93 @@ public class MyPageController {
 		}
 
 		return ResponseEntity.ok(mealPlan);
+	}
+
+	// ====== 휴지통 기능 ======
+
+	// 삭제된 식단 목록 조회 (휴지통)
+	@GetMapping("/trash")
+	public ResponseEntity<?> getDeletedMealPlans(Authentication authentication) {
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "로그인이 필요합니다."));
+		}
+
+		String memberId = authentication.getName();
+		var deletedMeals = mService.getDeletedMealPlans(memberId);
+		int count = mService.getDeletedMealCount(memberId);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("deletedMeals", deletedMeals);
+		result.put("count", count);
+
+		return ResponseEntity.ok(result);
+	}
+
+	// 식단 복원
+	@PutMapping("/trash/restore/{planId}")
+	public ResponseEntity<?> restoreMealPlan(
+			@PathVariable int planId,
+			Authentication authentication) {
+
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "로그인이 필요합니다."));
+		}
+
+		int result = mService.restoreMealPlan(planId);
+
+		if (result > 0) {
+			return ResponseEntity.ok(Map.of(
+					"success", true,
+					"message", "식단이 복원되었습니다."
+			));
+		}
+
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(Map.of("message", "복원에 실패했습니다."));
+	}
+
+	// 식단 영구 삭제
+	@DeleteMapping("/trash/{planId}")
+	public ResponseEntity<?> permanentDeleteMealPlan(
+			@PathVariable int planId,
+			Authentication authentication) {
+
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "로그인이 필요합니다."));
+		}
+
+		int result = mService.permanentDeleteMealPlan(planId);
+
+		if (result > 0) {
+			return ResponseEntity.ok(Map.of(
+					"success", true,
+					"message", "식단이 영구 삭제되었습니다."
+			));
+		}
+
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(Map.of("message", "삭제에 실패했습니다."));
+	}
+
+	// 휴지통 비우기 (일괄 영구 삭제)
+	@DeleteMapping("/trash/empty")
+	public ResponseEntity<?> emptyTrash(Authentication authentication) {
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "로그인이 필요합니다."));
+		}
+
+		String memberId = authentication.getName();
+		int deletedCount = mService.emptyTrash(memberId);
+
+		return ResponseEntity.ok(Map.of(
+				"success", true,
+				"deletedCount", deletedCount,
+				"message", deletedCount + "개의 식단이 영구 삭제되었습니다."
+		));
 	}
 
 }

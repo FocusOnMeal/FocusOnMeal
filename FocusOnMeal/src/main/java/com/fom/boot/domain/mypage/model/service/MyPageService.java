@@ -31,4 +31,23 @@ public interface MyPageService {
 
 	MealPlan getMealPlanDetail(int planId);
 
+	// ====== 휴지통 기능 ======
+	// 삭제된 식단 목록 조회
+	List<MealPlan> getDeletedMealPlans(String memberId);
+
+	// 삭제된 식단 개수
+	int getDeletedMealCount(String memberId);
+
+	// 식단 복원
+	int restoreMealPlan(int planId);
+
+	// 식단 영구 삭제
+	int permanentDeleteMealPlan(int planId);
+
+	// 휴지통 비우기 (일괄 영구 삭제)
+	int emptyTrash(String memberId);
+
+	// 30일 경과 식단 자동 영구 삭제
+	int deleteExpiredMeals();
+
 }
