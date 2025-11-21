@@ -3,32 +3,58 @@
 	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-	<root level="INFO">
-		<appender-ref ref="CONSOLE"/>
-	</root>
-	
+	<appender name="SYSTEM_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>./logs/system/app.log</file>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36} - %msg%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>./logs/system/app.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="API_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>./logs/system/api-data.log</file>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] %logger{36} - %msg%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>./logs/system/api-data.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="MEMBER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>./logs/member/join-test.log</file>
+		<encoder>
+			<pattern>%d{yy-MM-dd HH:mm:ss} [%p] %c{1}.%M>%L - %m%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>./logs/member/join-test.log.%d{yyyyMMdd}</fileNamePattern>
+		</rollingPolicy>
+	</appender>
+
 	<appender name="myConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [TEST] %-5p %c.%M - %m%n</pattern>
 		</layout>
 	</appender>
+
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="SYSTEM_FILE"/> 
+	</root>
 	
-	<appender name="myFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>./logs/member/join-test.log</file>
-		
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<pattern>%d{yy-MM-dd HH:mm:ss} [%p] %c{1}.%M>%L - %m%n</pattern>
-		</encoder>
-		
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>./logs/member/join-test.log.%d{yyyyMMdd}</fileNamePattern>
-		</rollingPolicy>
-	</appender>
-	
+	<logger name="com.fom.boot.domain.ingredient" level="INFO" additivity="false">
+		<appender-ref ref="API_FILE"/>
+		<appender-ref ref="SYSTEM_FILE"/> </logger>
 	
 	<logger name="com.fom.boot.app.member.controller.MemberController" level="debug" additivity="false">
 		<appender-ref ref="myConsoleAppender"/>
-		<appender-ref ref="myFileAppender"/>
+		<appender-ref ref="MEMBER_FILE"/>
+		<appender-ref ref="SYSTEM_FILE"/>
 	</logger>
 	
 </configuration>
