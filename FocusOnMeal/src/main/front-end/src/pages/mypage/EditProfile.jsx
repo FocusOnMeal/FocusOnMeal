@@ -63,16 +63,40 @@ const EditProfile = () => {
     const generateRandomNickname = async () => {
         setNicknameSpinning(true);
         
-        // 애니메이션 효과를 위한 여러 번 변경
+        // ✅ 수정: 백엔드와 동일한 풍부한 닉네임 조합 (Join.jsx와 동일한 배열 사용)
+        const adjectives = [
+            '따뜻한', '포근한', '신비한', '강한', '귀여운', '용감한', '슬기로운', 
+            '활발한', '조용한', '차분한', '빛나는', '달콤한', '상냥한', '깜찍한', 
+            '발랄한', '몽환적인', '환상적인', '강렬한', '냉정한', '우아한', '화려한', 
+            '영롱한', '전설적인', '매혹적인', '냉혹한', '영원한', '불멸의'
+        ];
+        
+        const animals = [
+            '고양이', '강아지', '토끼', '햄스터', '판다', '호랑이', '사자', '늑대', 
+            '여우', '용', '유니콘', '펭귄', '코알라', '돌고래', '독수리', '불사조', 
+            '드래곤', '피닉스', '사슴', '곰', '수달', '너구리', '그리핀', '페가수스'
+        ];
+        
+        const suffixes = [
+            '왕', '여왕', '공주', '요정', '천사', '기사', '마법사', '전사', '영웅', 
+            '용사', '별', '달', '꽃', '구름', '바람', '하늘', '전설', '신화', 
+            '마스터', '선생', '박사', '소울', '빛', '어둠', '정령', '수호자'
+        ];
+        
         const spinCount = 10;
         const spinInterval = 100;
         
+        // ✅ 슬롯머신 애니메이션: 백엔드와 비슷한 닉네임 조합 보여주기
         for (let i = 0; i < spinCount; i++) {
             await new Promise(resolve => setTimeout(resolve, spinInterval));
-            const tempNickname = `임시닉네임${Math.floor(Math.random() * 1000)}`;
+            const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+            const randomSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+            const tempNickname = `${randomAdj}${randomAnimal}${randomSuffix}`;
             setFormData(prev => ({ ...prev, nickname: tempNickname }));
         }
         
+        // ✅ 최종 닉네임 API 호출
         try {
             const res = await axios.get(`${API_BASE_URL}/api/member/random-nickname`);
             setFormData(prev => ({ ...prev, nickname: res.data.nickname }));

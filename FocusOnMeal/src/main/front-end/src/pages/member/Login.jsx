@@ -13,7 +13,7 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await fetch('/member/login', {
+            const response = await fetch('/api/member/login', {  // ✅ /api 추가
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,19 +26,17 @@ const Login = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                const data = result.data; // ApiResponse 구조에서 실제 데이터 추출
+                const data = result.data;
 
-                // JWT 토큰 및 사용자 정보 저장 (localStorage)
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('memberId', data.memberId);
-                localStorage.setItem('memberName', data.memberName);
-                localStorage.setItem('memberNickname', data.memberNickname);
-                localStorage.setItem('adminYn', data.adminYn);
+                // ✅ 수정: localStorage → sessionStorage (브라우저 닫으면 자동 로그아웃)
+                sessionStorage.setItem('token', data.token);
+                sessionStorage.setItem('memberId', data.memberId);
+                sessionStorage.setItem('memberName', data.memberName);
+                sessionStorage.setItem('memberNickname', data.memberNickname);
+                sessionStorage.setItem('adminYn', data.adminYn);
 
-                // 로그인 상태 변경 이벤트 발생 (로그인 시 바로 변경된 상태를 확인해 헤더 상태를 변경할 수 있게 함)
                 window.dispatchEvent(new Event("loginStateChange"));
 
-                // 관리자 여부에 따라 페이지 이동
                 if (data.adminYn === 'Y') {
                     navigate('/admin');
                 } else {

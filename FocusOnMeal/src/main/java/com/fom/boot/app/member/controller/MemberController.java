@@ -28,7 +28,7 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/member")
+@RequestMapping("/api/member")  // ✅ 수정: /member → /api/member
 public class MemberController {
 
     private final BCryptPasswordEncoder bcrypt;
@@ -438,14 +438,16 @@ public class MemberController {
         return hasDigit && hasSpecial;
     }
     
-    // 랜덤 닉네임 생성
+    // ✅ 수정: 랜덤 닉네임 생성 API - 로그 추가
     @GetMapping("/random-nickname")
     public ResponseEntity<RandomNicknameResponse> getRandomNickname() {
         try {
+            log.info("🎲 랜덤 닉네임 생성 요청");
             String nickname = mService.generateRandomNickname();
+            log.info("🎲 생성된 닉네임: {}", nickname);
             return ResponseEntity.ok(new RandomNicknameResponse(nickname));
         } catch (Exception e) {
-            log.error("랜덤 닉네임 생성 오류", e);
+            log.error("❌ 랜덤 닉네임 생성 오류", e);
             return ResponseEntity.status(500).build();
         }
     }

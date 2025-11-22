@@ -122,9 +122,9 @@
     <!-- 프로필 수정 -->
 	<update id="updateProfile" parameterType="Member">
 	    UPDATE member
-	    SET nickname = #{nickname},
+	    SET member_nickname = #{memberNickname},
 	        phone = #{phone},
-	        password = #{password}
+	        member_pw = #{memberPw}
 	    WHERE member_id = #{memberId}
 	</update>
     
