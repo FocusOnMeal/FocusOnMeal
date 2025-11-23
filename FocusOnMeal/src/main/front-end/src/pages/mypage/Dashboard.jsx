@@ -20,7 +20,15 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem('token');
+        console.log('🔍 토큰 확인:', token ? '있음' : '없음');
+        console.log('🔍 토큰 값:', token);
+
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            navigate('/member/login');
+            return;
+        }
 
         if (!token) {
             console.error("JWT 토큰 없음 → 로그인 필요");
@@ -47,9 +55,9 @@ const Dashboard = () => {
         });
     }, []);
 
-    // 식자재 클릭시 해당 식자재의 물가 추이 그래프 로드
+    // ✅ 수정: 61줄 - localStorage → sessionStorage
     const handleIngredientClick = async (ingredientId) => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         
         try {
             const response = await axios.get(
@@ -98,7 +106,7 @@ const Dashboard = () => {
                             styles.stable
                         }`}>
                             {changeRate.weeklyChange > 0 ? '↑' : 
-                             changeRate.weeklyChange < 0 ? '↓' : '→'} 
+                            changeRate.weeklyChange < 0 ? '↓' : '→'} 
                             {Math.abs(changeRate.weeklyChange).toFixed(2)}%
                         </span>
                     </div>
@@ -112,7 +120,7 @@ const Dashboard = () => {
                             styles.stable
                         }`}>
                             {changeRate.monthlyChange > 0 ? '↑' : 
-                             changeRate.monthlyChange < 0 ? '↓' : '→'} 
+                            changeRate.monthlyChange < 0 ? '↓' : '→'} 
                             {Math.abs(changeRate.monthlyChange).toFixed(2)}%
                         </span>
                     </div>
