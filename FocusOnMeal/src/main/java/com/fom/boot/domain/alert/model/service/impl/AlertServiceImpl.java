@@ -134,4 +134,39 @@ public class AlertServiceImpl implements AlertService {
             throw new RuntimeException("안전 알림 생성에 실패했습니다.", e);
         }
     }
+
+    @Override
+    public boolean checkIngredientAlertEnabled(String memberId, int ingredientId) {
+        try {
+            int count = alertMapper.countIngredientAlert(memberId, ingredientId);
+            return count > 0;
+        } catch (Exception e) {
+            log.error("식재료 알림 설정 확인 실패: memberId={}, ingredientId={}", memberId, ingredientId, e);
+            return false;
+        }
+    }
+
+    @Override
+    public int insertIngredientAlert(String memberId, int ingredientId) {
+        try {
+            int result = alertMapper.insertIngredientAlert(memberId, ingredientId);
+            log.info("식재료 알림 등록 성공: memberId={}, ingredientId={}", memberId, ingredientId);
+            return result;
+        } catch (Exception e) {
+            log.error("식재료 알림 등록 실패: memberId={}, ingredientId={}", memberId, ingredientId, e);
+            throw new RuntimeException("식재료 알림 등록에 실패했습니다.", e);
+        }
+    }
+
+    @Override
+    public int deleteIngredientAlert(String memberId, int ingredientId) {
+        try {
+            int result = alertMapper.deleteIngredientAlert(memberId, ingredientId);
+            log.info("식재료 알림 해제 성공: memberId={}, ingredientId={}", memberId, ingredientId);
+            return result;
+        } catch (Exception e) {
+            log.error("식재료 알림 해제 실패: memberId={}, ingredientId={}", memberId, ingredientId, e);
+            throw new RuntimeException("식재료 알림 해제에 실패했습니다.", e);
+        }
+    }
 }

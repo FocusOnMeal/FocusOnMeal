@@ -7,10 +7,11 @@ function IngredientDetail() {
     const { id } = useParams();
     const navigate = useNavigate(); 
     
-    const [itemInfo, setItemInfo] = useState(null); 
-    const [priceHistory, setPriceHistory] = useState([]); 
+    const [itemInfo, setItemInfo] = useState(null);
+    const [priceHistory, setPriceHistory] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isWished, setIsWished] = useState(false); 
+    const [isWished, setIsWished] = useState(false);
+    const [isAlertEnabled, setIsAlertEnabled] = useState(false); // 안전 알림 상태 
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -67,7 +68,7 @@ function IngredientDetail() {
                     try {
                         // 기존: '/ingredient/api/favorites' -> 변경: '/api/mypage/favorites'
                         const favoriteResponse = await axios.get('/api/mypage/favorites');
-                        
+
                         if (favoriteResponse.data && Array.isArray(favoriteResponse.data)) {
                             // 현재 보고 있는 상세 페이지의 ID가 찜 목록에 있는지 확인
                             const isFavorited = favoriteResponse.data.some(fav => fav.ingredientId === parseInt(id));
@@ -76,6 +77,17 @@ function IngredientDetail() {
                     } catch{
                         // 비로그인 상태 등 에러 발생 시 찜 안 된 상태로 유지
                         // console.log("찜 상태 확인 실패 (로그인 필요):", favError);
+                    }
+
+                    // 안전 알림 상태 확인
+                    try {
+                        const alertResponse = await axios.get(`/ingredient/api/${id}/alert`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        setIsAlertEnabled(alertResponse.data.isEnabled || false);
+                    } catch {
+                        // 비로그인 또는 오류 시 알림 OFF 상태
+                        setIsAlertEnabled(false);
                     }
                 }
 
@@ -95,6 +107,31 @@ function IngredientDetail() {
             if (response.data.success) {
                 setIsWished(response.data.isFavorite);
                 // alert(response.data.message); // 너무 자주 뜨면 주석 처리 추천
+            }
+        } catch (error) {
+            if (error.response?.status === 401) {
+                alert("로그인이 필요합니다.");
+            } else {
+                alert("오류가 발생했습니다.");
+            }
+        }
+    };
+
+    const handleAlertClick = async () => {
+        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`/ingredient/api/${id}/alert`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data.success) {
+                setIsAlertEnabled(response.data.isEnabled);
             }
         } catch (error) {
             if (error.response?.status === 401) {
@@ -277,7 +314,12 @@ function IngredientDetail() {
                                 {isWished ? '❤️ 찜하기' : '🤍 찜하기'}
                             </button>
                             <span className={styles.safetyBadge}>가격 알림</span>
-                            <span className={styles.safetyBadge}>안전 알림</span>
+                            <button
+                                onClick={handleAlertClick}
+                                className={`${styles.safetyBadge} ${isAlertEnabled ? styles.alertEnabled : ''}`}
+                            >
+                                {isAlertEnabled ? '🔔 안전 알림' : '🔕 안전 알림'}
+                            </button>
                         </div>
                     </div>
                     

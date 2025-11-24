@@ -47,4 +47,28 @@ public interface AlertService {
      * @param alertId 공표 정보 ID
      */
     void createSafetyAlertNotifications(int alertId);
+
+    /**
+     * 회원의 특정 식재료 알림 설정 확인
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 알림 설정 여부
+     */
+    boolean checkIngredientAlertEnabled(String memberId, int ingredientId);
+
+    /**
+     * 특정 식재료 알림 등록
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 생성된 행 수
+     */
+    int insertIngredientAlert(String memberId, int ingredientId);
+
+    /**
+     * 특정 식재료 알림 해제
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 삭제된 행 수
+     */
+    int deleteIngredientAlert(String memberId, int ingredientId);
 }

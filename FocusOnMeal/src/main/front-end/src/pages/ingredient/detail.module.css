@@ -203,8 +203,21 @@
     font-weight: 500;
     color: #666;
     border: 1px solid #ddd;
-    display: flex; 
+    display: flex;
     align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.safetyBadge:hover {
+    background-color: #e0e0e0;
+}
+
+.safetyBadge.alertEnabled {
+    background-color: #ff9800;
+    color: white;
+    border-color: #ff9800;
+    font-weight: 600;
 }
 
 /* 🚨 안전 위험도 아이콘 (list.jsx 스타일 반영) */

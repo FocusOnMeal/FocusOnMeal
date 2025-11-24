@@ -135,4 +135,31 @@ public interface AlertMapper {
      * @return Alert ID (없으면 null)
      */
     Integer findAlertIdByComplexKey(SafetyAlert safetyAlert);
+
+    /**
+     * 회원의 특정 식재료 알림 설정 확인
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 설정 건수 (0 또는 1)
+     */
+    int countIngredientAlert(@Param("memberId") String memberId,
+                            @Param("ingredientId") int ingredientId);
+
+    /**
+     * 특정 식재료 알림 등록
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 생성된 행 수
+     */
+    int insertIngredientAlert(@Param("memberId") String memberId,
+                             @Param("ingredientId") int ingredientId);
+
+    /**
+     * 특정 식재료 알림 해제
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 삭제된 행 수
+     */
+    int deleteIngredientAlert(@Param("memberId") String memberId,
+                             @Param("ingredientId") int ingredientId);
 }
