@@ -11,7 +11,8 @@ function IngredientDetail() {
     const [priceHistory, setPriceHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isWished, setIsWished] = useState(false);
-    const [isAlertEnabled, setIsAlertEnabled] = useState(false); // 안전 알림 상태 
+    const [isAlertEnabled, setIsAlertEnabled] = useState(false); // 안전 알림 상태
+    const [isPriceAlertEnabled, setIsPriceAlertEnabled] = useState(false); // 가격 알림 상태 
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -84,10 +85,23 @@ function IngredientDetail() {
                         const alertResponse = await axios.get(`/ingredient/api/${id}/alert`, {
                             headers: { Authorization: `Bearer ${token}` }
                         });
-                        setIsAlertEnabled(alertResponse.data.isEnabled || false);
+                        const enabled = alertResponse.data.isEnabled || false;
+                        setIsAlertEnabled(enabled);
                     } catch {
                         // 비로그인 또는 오류 시 알림 OFF 상태
                         setIsAlertEnabled(false);
+                    }
+
+                    // 가격 알림 상태 확인 (별도)
+                    try {
+                        const priceAlertResponse = await axios.get(`/ingredient/api/${id}/price-alert`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        const priceEnabled = priceAlertResponse.data.isEnabled || false;
+                        setIsPriceAlertEnabled(priceEnabled);
+                    } catch {
+                        // 비로그인 또는 오류 시 알림 OFF 상태
+                        setIsPriceAlertEnabled(false);
                     }
                 }
 
@@ -131,7 +145,34 @@ function IngredientDetail() {
             });
 
             if (response.data.success) {
-                setIsAlertEnabled(response.data.isEnabled);
+                const newState = response.data.isEnabled;
+                setIsAlertEnabled(newState);
+            }
+        } catch (error) {
+            if (error.response?.status === 401) {
+                alert("로그인이 필요합니다.");
+            } else {
+                alert("오류가 발생했습니다.");
+            }
+        }
+    };
+
+    const handlePriceAlertClick = async () => {
+        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`/ingredient/api/${id}/price-alert`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data.success) {
+                const newState = response.data.isEnabled;
+                setIsPriceAlertEnabled(newState);
             }
         } catch (error) {
             if (error.response?.status === 401) {
@@ -313,7 +354,12 @@ function IngredientDetail() {
                             <button onClick={handleWishClick} className={`${styles.wishButton} ${isWished ? styles.wished : ''}`}>
                                 {isWished ? '❤️ 찜하기' : '🤍 찜하기'}
                             </button>
-                            <span className={styles.safetyBadge}>가격 알림</span>
+                            <button
+                                onClick={handlePriceAlertClick}
+                                className={`${styles.priceAlertBadge} ${isPriceAlertEnabled ? styles.priceAlertEnabled : ''}`}
+                            >
+                                {isPriceAlertEnabled ? '💰 가격 알림' : '💸 가격 알림'}
+                            </button>
                             <button
                                 onClick={handleAlertClick}
                                 className={`${styles.safetyBadge} ${isAlertEnabled ? styles.alertEnabled : ''}`}

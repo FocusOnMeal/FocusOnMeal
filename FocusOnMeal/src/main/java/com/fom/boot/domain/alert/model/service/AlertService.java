@@ -71,4 +71,35 @@ public interface AlertService {
      * @return 삭제된 행 수
      */
     int deleteIngredientAlert(String memberId, int ingredientId);
+
+    /**
+     * 가격 변동 알림 생성 (전날 대비 가격 변동 체크)
+     * PRICE_ALERT_SETTING에 등록된 식재료의 가격 변동을 확인하고
+     * 전날 대비 변동이 있을 경우 알림 생성
+     */
+    void createPriceChangeNotifications();
+
+    /**
+     * 회원의 특정 식재료 가격 알림 설정 확인
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 가격 알림 설정 여부
+     */
+    boolean checkPriceAlertEnabled(String memberId, int ingredientId);
+
+    /**
+     * 특정 식재료 가격 알림 등록
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 생성된 행 수
+     */
+    int insertPriceAlert(String memberId, int ingredientId);
+
+    /**
+     * 특정 식재료 가격 알림 해제
+     * @param memberId 회원 ID
+     * @param ingredientId 식재료 ID
+     * @return 삭제된 행 수
+     */
+    int deletePriceAlert(String memberId, int ingredientId);
 }

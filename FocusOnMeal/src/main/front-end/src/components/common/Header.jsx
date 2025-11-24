@@ -11,6 +11,7 @@ const Header = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [hasUnread, setHasUnread] = useState(false);
+    const [activeTab, setActiveTab] = useState("위험공표"); // 탭 상태 추가
 
     // ✅ 수정: localStorage → sessionStorage
     useEffect(() => {
@@ -170,35 +171,58 @@ const Header = () => {
                                                 <p>로그인이 필요합니다.</p>
                                                 <Link to="/member/login" className="login-link">로그인하기</Link>
                                             </div>
-                                        ) : notifications.length === 0 ? (
-                                            <div className="notification-empty">알림이 없습니다.</div>
                                         ) : (
-                                            <div>
-                                                {notifications.map((notif) => (
-                                                    <div
-                                                        key={notif.notificationId}
-                                                        className={`notification-item ${notif.isRead === 'N' ? 'unread' : ''}`}
-                                                        onClick={() => handleNotificationClick(notif)}
-                                                        onMouseEnter={(e) => e.currentTarget.classList.add('hover')}
-                                                        onMouseLeave={(e) => e.currentTarget.classList.remove('hover')}
+                                            <>
+                                                {/* 탭 헤더 */}
+                                                <div className="notification-tabs">
+                                                    <button
+                                                        className={`notification-tab ${activeTab === '위험공표' ? 'active' : ''}`}
+                                                        onClick={() => setActiveTab('위험공표')}
                                                     >
-                                                        <div className="notification-item-header">
-                                                            <span className={`notification-type ${notif.type === '위험공표' ? 'danger' : 'normal'}`}>
-                                                                {getTypeLabel(notif.type)}
-                                                            </span>
-                                                            <span className="notification-time">{formatTime(notif.sentAt)}</span>
-                                                        </div>
+                                                        위험공표
+                                                    </button>
+                                                    <button
+                                                        className={`notification-tab ${activeTab === '가격정보' ? 'active' : ''}`}
+                                                        onClick={() => setActiveTab('가격정보')}
+                                                    >
+                                                        가격정보
+                                                    </button>
+                                                </div>
 
-                                                        <div className={`notification-title ${notif.isRead === 'N' ? 'bold' : ''}`}>
-                                                            {notif.title}
-                                                        </div>
+                                                {/* 탭 콘텐츠 */}
+                                                <div className="notification-content">
+                                                    {notifications.filter(n => n.type === activeTab).length === 0 ? (
+                                                        <div className="notification-empty">알림이 없습니다.</div>
+                                                    ) : (
+                                                        notifications
+                                                            .filter(n => n.type === activeTab)
+                                                            .map((notif) => (
+                                                                <div
+                                                                    key={notif.notificationId}
+                                                                    className={`notification-item ${notif.isRead === 'N' ? 'unread' : ''}`}
+                                                                    onClick={() => handleNotificationClick(notif)}
+                                                                    onMouseEnter={(e) => e.currentTarget.classList.add('hover')}
+                                                                    onMouseLeave={(e) => e.currentTarget.classList.remove('hover')}
+                                                                >
+                                                                    <div className="notification-item-header">
+                                                                        <span className={`notification-type ${notif.type === '위험공표' ? 'danger' : 'normal'}`}>
+                                                                            {getTypeLabel(notif.type)}
+                                                                        </span>
+                                                                        <span className="notification-time">{formatTime(notif.sentAt)}</span>
+                                                                    </div>
 
-                                                        <div className="notification-message">
-                                                            {notif.message}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                                                    <div className={`notification-title ${notif.isRead === 'N' ? 'bold' : ''}`}>
+                                                                        {notif.title}
+                                                                    </div>
+
+                                                                    <div className="notification-message">
+                                                                        {notif.message}
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                    )}
+                                                </div>
+                                            </>
                                         )}
                                     </div>
                                 )}

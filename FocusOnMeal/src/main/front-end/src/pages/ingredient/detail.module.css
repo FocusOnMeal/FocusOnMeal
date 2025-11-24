@@ -220,6 +220,32 @@
     font-weight: 600;
 }
 
+/* 가격 알림 버튼 스타일 (초록색 계열) */
+.priceAlertBadge {
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.priceAlertBadge:hover {
+    background-color: #e0e0e0;
+}
+
+.priceAlertBadge.priceAlertEnabled {
+    background-color: #10b981;
+    color: white;
+    border-color: #10b981;
+    font-weight: 600;
+}
+
 /* 🚨 안전 위험도 아이콘 (list.jsx 스타일 반영) */
 .safetyIcon {
     display: inline-flex;

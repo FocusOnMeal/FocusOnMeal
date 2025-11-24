@@ -14,11 +14,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PriceChangeRate {
     private int currentPrice;           // 현재 가격
-    
+
+    // 1일 전 대비
+    private Double dailyChange;         // 1일 전 대비 등락률 (%)
+    private Integer dailyPriceDiff;     // 1일 전 대비 가격 차이
+
     // 1주일 전 대비
     private Double weeklyChange;        // 1주일 전 대비 등락률 (%)
     private Integer weeklyPriceDiff;    // 1주일 전 대비 가격 차이
-    
+
     // 1개월 전 대비
     private Double monthlyChange;       // 1개월 전 대비 등락률 (%)
     private Integer monthlyPriceDiff;   // 1개월 전 대비 가격 차이

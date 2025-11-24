@@ -162,4 +162,10 @@ public interface AlertMapper {
      */
     int deleteIngredientAlert(@Param("memberId") String memberId,
                              @Param("ingredientId") int ingredientId);
+
+    /**
+     * 알림이 설정된 모든 고유 식재료 ID 조회
+     * @return 식재료 ID 목록
+     */
+    List<Integer> selectAllAlertIngredientIds();
 }

@@ -211,4 +211,82 @@ public class IngredientController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
+
+    // 가격 알림 상태 확인
+    @GetMapping("/api/{ingredientId}/price-alert")
+    @ResponseBody
+    public ResponseEntity<?> checkPriceAlert(@PathVariable("ingredientId") int ingredientId,
+                                             Authentication authentication) {
+        // 로그인 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String memberId = authentication.getName();
+
+        try {
+            boolean isEnabled = alertService.checkPriceAlertEnabled(memberId, ingredientId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("isEnabled", isEnabled);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
+    // 가격 알림 ON/OFF 토글
+    @PostMapping("/api/{ingredientId}/price-alert")
+    @ResponseBody
+    public ResponseEntity<?> togglePriceAlert(@PathVariable("ingredientId") int ingredientId,
+                                              Authentication authentication) {
+        // 로그인 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        String memberId = authentication.getName();
+
+        try {
+            // 현재 상태 확인
+            boolean isCurrentlyEnabled = alertService.checkPriceAlertEnabled(memberId, ingredientId);
+
+            if (isCurrentlyEnabled) {
+                // 가격 알림 해제
+                int result = alertService.deletePriceAlert(memberId, ingredientId);
+                if (result > 0) {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("isEnabled", false);
+                    response.put("message", "가격 알림이 해제되었습니다.");
+                    return ResponseEntity.ok(response);
+                }
+            } else {
+                // 가격 알림 등록
+                int result = alertService.insertPriceAlert(memberId, ingredientId);
+                if (result > 0) {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("isEnabled", true);
+                    response.put("message", "가격 알림이 설정되었습니다.");
+                    return ResponseEntity.ok(response);
+                }
+            }
+
+            // 실패한 경우
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "처리에 실패했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
 }

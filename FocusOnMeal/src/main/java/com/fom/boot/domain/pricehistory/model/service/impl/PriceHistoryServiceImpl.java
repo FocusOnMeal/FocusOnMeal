@@ -115,31 +115,44 @@ public class PriceHistoryServiceImpl implements PriceHistoryService {
             throw new RuntimeException("가격 정보가 없습니다. 식자재 ID: " + ingredientId);
         }
         
+        // 1일 전 가격 조회
+        LocalDateTime oneDayAgo = latestPrice.getCollectedDate().minusDays(1);
+        params.put("targetDate", oneDayAgo);
+        PriceHistory dayAgoPrice = priceHistoryMapper.selectClosestPrice(params);
+
         // 1주일 전 가격 조회
         LocalDateTime oneWeekAgo = latestPrice.getCollectedDate().minusWeeks(1);
         params.put("targetDate", oneWeekAgo);
         PriceHistory weekAgoPrice = priceHistoryMapper.selectClosestPrice(params);
-        
+
         // 1개월 전 가격 조회
         LocalDateTime oneMonthAgo = latestPrice.getCollectedDate().minusMonths(1);
         params.put("targetDate", oneMonthAgo);
         PriceHistory monthAgoPrice = priceHistoryMapper.selectClosestPrice(params);
-        
+
         // 등락률 계산
         PriceChangeRate changeRate = new PriceChangeRate();
         changeRate.setCurrentPrice(latestPrice.getPriceValue());
-        
+
+        if (dayAgoPrice != null) {
+            changeRate.setDailyChange(calculatePercentChange(
+                    dayAgoPrice.getPriceValue(),
+                    latestPrice.getPriceValue()
+            ));
+            changeRate.setDailyPriceDiff(latestPrice.getPriceValue() - dayAgoPrice.getPriceValue());
+        }
+
         if (weekAgoPrice != null) {
             changeRate.setWeeklyChange(calculatePercentChange(
-                    weekAgoPrice.getPriceValue(), 
+                    weekAgoPrice.getPriceValue(),
                     latestPrice.getPriceValue()
             ));
             changeRate.setWeeklyPriceDiff(latestPrice.getPriceValue() - weekAgoPrice.getPriceValue());
         }
-        
+
         if (monthAgoPrice != null) {
             changeRate.setMonthlyChange(calculatePercentChange(
-                    monthAgoPrice.getPriceValue(), 
+                    monthAgoPrice.getPriceValue(),
                     latestPrice.getPriceValue()
             ));
             changeRate.setMonthlyPriceDiff(latestPrice.getPriceValue() - monthAgoPrice.getPriceValue());

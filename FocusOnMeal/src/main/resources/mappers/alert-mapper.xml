@@ -220,4 +220,11 @@
           AND INGREDIENT_ID = #{ingredientId}
     </delete>
 
+    <!-- 알림이 설정된 모든 고유 식재료 ID 조회 -->
+    <select id="selectAllAlertIngredientIds" resultType="int">
+        SELECT DISTINCT INGREDIENT_ID
+        FROM MEMBER_INGREDIENT_ALERT
+        ORDER BY INGREDIENT_ID
+    </select>
+
   </mapper>
