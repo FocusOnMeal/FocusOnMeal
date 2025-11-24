@@ -115,11 +115,11 @@ public class AlertServiceImpl implements AlertService {
             
             // 각 회원에게 알림 생성
             for (String memberId : memberIds) {
-                String message = String.format("[%s] %s - %s", 
-                    alert.getNation(), 
-                    alert.getHazardType(), 
-                    alert.getDescription());
-                
+                String message = String.format("[%s] %s - %s",
+                    alert.getNation(),
+                    alert.getHazardType(),
+                    alert.getTitle());
+
                 alertMapper.insertNotificationLog(memberId, "위험공표", message, alertId);
                 
                 log.info("안전 알림 생성: memberId={}, alertId={}, ingredientId={}", 

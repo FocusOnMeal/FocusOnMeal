@@ -129,7 +129,7 @@
     <select id="findIngredientIdByKeyword" resultType="int">
         SELECT INGREDIENT_ID
         FROM INGREDIENT_MASTER
-        WHERE NAME LIKE '%' || #{keyword} || '%' 
+        WHERE #{keyword} LIKE '%' || NAME || '%'
         AND ROWNUM = 1
     </select>
     
