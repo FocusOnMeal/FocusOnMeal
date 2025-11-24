@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class IngredientDTO extends Ingredient {
     
-	// 가격 변동 관련 필드 추가
-    // DB에서 JOIN해서 가져올 추가 필드
-    private Integer currentPrice;       // 최신 가격 (PRICE_VALUE)
-    private LocalDateTime collectedDate; // 수집 날짜 (COLLECTED_DATE)
-    private Integer yesterdayPrice;        // 어제 가격
-    private LocalDateTime yesterdayCollectedDate;  // 어제 가격 수집 날짜 추가
-    private Double priceChangePercent;     // 가격 변동률 (%)
+	// 현재 가격 정보
+    private Integer currentPrice;        // 최신 가격
+    private LocalDateTime collectedDate; // 최신 수집일
+
+    private Integer previousPrice;          // 직전 가격 (날짜 무관, 바로 이전 데이터)
+    private LocalDateTime previousCollectedDate; // 직전 가격 수집일
     
+    private Double priceChangePercent;      // 가격 변동률 (%)
 }

@@ -120,6 +120,9 @@ public class PriceHistoryServiceImpl implements PriceHistoryService {
         params.put("targetDate", oneDayAgo);
         PriceHistory dayAgoPrice = priceHistoryMapper.selectClosestPrice(params);
 
+        params.put("priceType", latestPrice.getPriceType());
+        params.put("region", latestPrice.getRegion());
+        
         // 1주일 전 가격 조회
         LocalDateTime oneWeekAgo = latestPrice.getCollectedDate().minusWeeks(1);
         params.put("targetDate", oneWeekAgo);
