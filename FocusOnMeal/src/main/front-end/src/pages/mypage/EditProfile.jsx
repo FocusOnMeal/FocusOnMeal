@@ -253,9 +253,17 @@ const EditProfile = () => {
                 updateData.newPassword = formData.newPassword;
             }
 
-            await axios.put(`${API_BASE_URL}/api/mypage/profile`, updateData, {
+            const response = await axios.put(`${API_BASE_URL}/api/mypage/profile`, updateData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            // ✅ sessionStorage에 닉네임 업데이트
+            // 백엔드 응답에 닉네임이 있으면 그것을 사용, 없으면 formData의 닉네임 사용
+            const updatedNickname = response.data.nickname || formData.nickname;
+            sessionStorage.setItem('memberNickname', updatedNickname);
+            
+            // ✅ 헤더 업데이트를 위한 이벤트 발생
+            window.dispatchEvent(new Event("loginStateChange"));
 
             alert('회원정보가 수정되었습니다!');
             
