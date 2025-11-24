@@ -43,6 +43,20 @@ const Dashboard = () => {
         .then(res => {
             console.log(res.data);
             setDashboard(res.data);
+            console.log('📊 전체 Dashboard 데이터:', res.data);
+            console.log('🥕 찜한 식자재 배열:', res.data.favoriteIngredients);
+
+            // 첫 번째 식자재 상세 확인
+            if (res.data.favoriteIngredients && res.data.favoriteIngredients.length > 0) {
+                console.log('🔍 첫 번째 식자재 상세:', res.data.favoriteIngredients[0]);
+            }
+            
+            setDashboard(res.data);
+            if (res.data.defaultPriceChart) {
+                setSelectedChart(res.data.defaultPriceChart);
+            }
+            setLoading(false);
+
             // 기본 차트 설정 (PriceTrendResponse 형태)
             if (res.data.defaultPriceChart) {
                 setSelectedChart(res.data.defaultPriceChart);
@@ -248,38 +262,43 @@ const Dashboard = () => {
                             <h3>찜한 식자재</h3>
                             <span className={styles.count}>{dashboard.favoriteIngredientCount}개</span>
                         </div>
+                        {/* 찜한 식자재 리스트 렌더링 부분 */} 
                         <div className={styles.listContent}>
                             {dashboard.favoriteIngredients && dashboard.favoriteIngredients.length > 0 ? (
-                                dashboard.favoriteIngredients.map(ingredient => (
-                                    <div 
-                                        key={ingredient.favoriteId} 
-                                        className={styles.listItem}
-                                        onClick={() => handleIngredientClick(ingredient.ingredientId)}
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <div className={styles.itemInfo}>
-                                            <h4>
-                                                {ingredient.name}
-                                                {ingredient.isCustom === 'Y' && (
-                                                    <span className={styles.customBadge}>커스텀</span>
-                                                )}
-                                            </h4>
-                                            <p className={styles.price}>
-                                                {ingredient.currentPrice 
-                                                    ? `${ingredient.currentPrice.toLocaleString()}원/${ingredient.standardUnit}`
-                                                    : '가격 정보 없음'
-                                                }
-                                            </p>
-                                        </div>
-                                        <Link 
-                                            to="/mypage/favoriteIngredients" 
-                                            className={styles.detailBtn}
-                                            onClick={(e) => e.stopPropagation()}
+                                dashboard.favoriteIngredients.map(ingredient => {
+                                    console.log('🎨 렌더링 중인 식자재:', ingredient); // 디버깅 로그 추가
+                                    
+                                    return (
+                                        <div 
+                                            key={ingredient.favoriteId} 
+                                            className={styles.listItem}
+                                            onClick={() => handleIngredientClick(ingredient.ingredientId)}
+                                            style={{ cursor: 'pointer' }}
                                         >
-                                            상세보기
-                                        </Link>
-                                    </div>
-                                ))
+                                            <div className={styles.itemInfo}>
+                                                <h4>
+                                                    {ingredient.ingredientName || '이름 없음'}
+                                                    {ingredient.isCustom === 'Y' && (
+                                                        <span className={styles.customBadge}>커스텀</span>
+                                                    )}
+                                                </h4>
+                                                <p className={styles.price}>
+                                                    {ingredient.currentPrice 
+                                                        ? `${Number(ingredient.currentPrice).toLocaleString()}원/${ingredient.standardUnit}`
+                                                        : '가격 정보 없음'
+                                                    }
+                                                </p>
+                                            </div>
+                                            <Link 
+                                                to="/mypage/favoriteIngredients" 
+                                                className={styles.detailBtn}
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                상세보기
+                                            </Link>
+                                        </div>
+                                    );
+                                })
                             ) : (
                                 <p className={styles.emptyMessage}>찜한 식자재가 없습니다.</p>
                             )}

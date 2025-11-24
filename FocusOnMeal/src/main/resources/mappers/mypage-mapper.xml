@@ -44,23 +44,24 @@
    <!-- 찜한 식자재 요약 목록 조회 (최신 가격 포함) -->
     <select id="findFavoriteIngredientSummary" resultType="FavoriteIngredientSummaryDTO">
         SELECT 
-            f.FAVORITE_ID AS favoriteId,
-            f.INGREDIENT_ID AS ingredientId,
-            im.NAME AS ingredientName,
-            f.IS_CUSTOM AS isCustom,
-            im.STANDARD_UNIT AS standardUnit,
-            (
-                SELECT ph.PRICE_VALUE
-                FROM PRICE_HISTORY ph
-                WHERE ph.INGREDIENT_ID = f.INGREDIENT_ID
-                ORDER BY ph.COLLECTED_DATE DESC
-                FETCH FIRST 1 ROW ONLY
-            ) AS currentPrice
-        FROM FAVORITE f
-        JOIN INGREDIENT_MASTER im ON f.INGREDIENT_ID = im.INGREDIENT_ID
-        WHERE f.MEMBER_ID = #{memberId}
-        ORDER BY f.FAVORITE_ID DESC
-        FETCH FIRST #{limit} ROWS ONLY
+        f.FAVORITE_ID AS favoriteId,
+        f.INGREDIENT_ID AS ingredientId,
+        im.NAME AS ingredientName,
+        im.CATEGORY AS category,
+        f.IS_CUSTOM AS isCustom,
+        im.STANDARD_UNIT AS standardUnit,
+        (
+            SELECT ph.PRICE_VALUE
+            FROM PRICE_HISTORY ph
+            WHERE ph.INGREDIENT_ID = f.INGREDIENT_ID
+            ORDER BY ph.COLLECTED_DATE DESC
+            FETCH FIRST 1 ROW ONLY
+        ) AS currentPrice  <!-- ✅ currentPrice로 수정 -->
+    FROM FAVORITE f
+    JOIN INGREDIENT_MASTER im ON f.INGREDIENT_ID = im.INGREDIENT_ID
+    WHERE f.MEMBER_ID = #{memberId}
+    ORDER BY f.FAVORITE_ID DESC
+    FETCH FIRST #{limit} ROWS ONLY
     </select>
     <!-- 찜한 식자재 총 개수 -->
     <select id="countFavoriteIngredients" resultType="int">

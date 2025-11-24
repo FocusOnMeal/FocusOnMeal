@@ -106,28 +106,26 @@ public class MyPageServiceImpl implements MyPageService {
 
 	@Transactional(readOnly = true)
 	public PriceTrendResponse getPriceChartData(int ingredientId, int days) {
-		LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(days);
-        
-        // period를 일수에 따라 자동 결정
-        String period;
-        if (days <= 7) {
-            period = "DAILY";
-        } else if (days <= 60) {
-            period = "DAILY";  // 2개월까지는 일별
-        } else {
-            period = "WEEKLY"; // 그 이상은 주별
-        }
-        
-        return priceHistoryService.getPriceTrend(
-            ingredientId,
-            period,
-            startDate,
-            endDate,
-            null,  // 모든 가격 유형
-            null   // 모든 지역
-        );
-    }
+	    try {
+	        LocalDate endDate = LocalDate.now();
+	        LocalDate startDate = endDate.minusDays(days);
+	        
+	        // period를 일수에 따라 자동 결정
+	        String period = days <= 60 ? "DAILY" : "WEEKLY";
+	        
+	        return priceHistoryService.getPriceTrend(
+	            ingredientId,
+	            period,
+	            startDate,
+	            endDate,
+	            null,  // 모든 가격 유형
+	            null   // 모든 지역
+	        );
+	    } catch (Exception e) {
+	        log.error("가격 차트 조회 실패 - ingredientId: {}, days: {}", ingredientId, days, e);
+	        throw new RuntimeException("해당 식자재의 가격 정보를 찾을 수 없습니다.");
+	    }
+	}
 
 	@Override
 	public boolean updateMemberAllergies(String memberId, List<?> allergyIds) {
