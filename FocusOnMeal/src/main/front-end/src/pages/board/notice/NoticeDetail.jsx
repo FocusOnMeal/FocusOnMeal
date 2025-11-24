@@ -79,7 +79,7 @@ const NoticeDetail = () => {
 
                     <div className={styles.infoBar}>
                         <span className={styles.infoItem}>
-                            작성자: {notice.memberId || "관리자"}
+                            작성자: 관리자
                         </span>
                         <span className={styles.separator}>|</span>
                         <span className={styles.infoItem}>
