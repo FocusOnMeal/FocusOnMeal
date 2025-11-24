@@ -55,4 +55,35 @@
           AND sas.NOTIFICATION_ENABLED = 'Y'
     </select>
 
+    <!-- 내 가격 알림 설정 조회 -->
+    <select id="selectMySetting" resultType="com.fom.boot.domain.alert.model.vo.PriceAlert">
+        SELECT
+            ALERT_ID             AS alertId,
+            MEMBER_ID            AS memberId,
+            INGREDIENT_ID        AS ingredientId,
+            THRESHOLD_PRICE      AS thresholdPrice,
+            NOTIFICATION_ENABLED AS notificationEnabled
+        FROM PRICE_ALERT_SETTING
+        WHERE MEMBER_ID = #{memberId}
+          AND INGREDIENT_ID = #{ingredientId}
+    </select>
+
+    <!-- 가격 알림 설정 업데이트 -->
+    <update id="updatePriceAlert" parameterType="com.fom.boot.domain.alert.model.vo.PriceAlert">
+        UPDATE PRICE_ALERT_SETTING
+        SET THRESHOLD_PRICE = #{thresholdPrice},
+            NOTIFICATION_ENABLED = 'Y'
+        WHERE MEMBER_ID = #{memberId}
+          AND INGREDIENT_ID = #{ingredientId}
+    </update>
+
+    <!-- 가격 임계값을 초과한 회원 목록 조회 -->
+    <select id="selectTargetMemberIds" resultType="string">
+        SELECT MEMBER_ID
+        FROM PRICE_ALERT_SETTING
+        WHERE INGREDIENT_ID = #{ingredientId}
+          AND NOTIFICATION_ENABLED = 'Y'
+          AND THRESHOLD_PRICE >= #{currentPrice}
+    </select>
+
   </mapper>
