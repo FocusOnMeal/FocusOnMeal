@@ -23,4 +23,113 @@
 	        IS_DELETED = #{isDeleted}
 	    WHERE NOTICE_NO = #{noticeNo}
 	</update>	
+	
+	<!-- 일반회원 : 필독공지 조희 -->
+	<select id="selectImportantNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
+        SELECT 
+            NOTICE_NO, NOTICE_SUBJECT, NOTICE_CONTENT, NOTICE_CREATEAT, 
+            NOTICE_ISNEW, NOTICE_IMPORTANT, VIEW_COUNT, MEMBER_ID
+        FROM NOTICE
+        WHERE NOTICE_IMPORTANT = 'Y' 
+          AND IS_DELETED = 'N'
+        ORDER BY NOTICE_CREATEAT DESC
+    </select>
+	
+	<!-- 일반회원 : 공지사항 조회 -->
+	<select id="selectPublicNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
+        SELECT *
+        FROM (
+            SELECT ROWNUM AS RNUM, N.*
+            FROM (
+                SELECT
+                    NOTICE_NO,
+                    MEMBER_ID,
+                    NOTICE_SUBJECT,
+                    NOTICE_CONTENT,
+                    NOTICE_CREATEAT,
+                    NOTICE_ISNEW,
+                    NOTICE_IMPORTANT,
+                    VIEW_COUNT
+                FROM NOTICE
+                WHERE IS_DELETED = 'N'
+                  AND NOTICE_IMPORTANT = 'N'  <if test="type == 'all' and keyword != null and keyword != ''">
+                    AND (NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                         OR NOTICE_CONTENT LIKE '%' || #{keyword} || '%')
+                </if>
+                <if test="type == 'title' and keyword != null and keyword != ''">
+                    AND NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test="type == 'content' and keyword != null and keyword != ''">
+                    AND NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+                </if>
+
+                <choose>
+                    <when test="sortColumn == 'noticeSubject'">
+                        ORDER BY NOTICE_SUBJECT 
+                        <if test="sortOrder == 'asc'">ASC</if>
+                        <if test="sortOrder == 'desc'">DESC</if>
+                    </when>
+                    
+                    <when test="sortColumn == 'noticeCreateAt'">
+                        ORDER BY NOTICE_CREATEAT 
+                        <if test="sortOrder == 'asc'">ASC</if>
+                        <if test="sortOrder == 'desc'">DESC</if>
+                    </when>
+                    
+                    <when test="sortColumn == 'viewCount'">
+                        ORDER BY VIEW_COUNT 
+                        <if test="sortOrder == 'asc'">ASC</if>
+                        <if test="sortOrder == 'desc'">DESC</if>
+                    </when>
+                    
+                    <otherwise>
+                        ORDER BY NOTICE_CREATEAT DESC
+                    </otherwise>
+                </choose>
+                
+            ) N
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE RNUM &gt;= #{startRow}
+    </select>
+
+	
+	<!-- 일반회원 : 공지사항 상세 조회 -->
+	<select id="selectNoticeDetail" parameterType="int"
+        resultType="com.fom.boot.domain.notice.model.vo.Notice">
+	    SELECT
+	        NOTICE_NO,
+	        MEMBER_ID,
+	        NOTICE_SUBJECT,
+	        NOTICE_CONTENT,
+	        NOTICE_CREATEAT,
+	        NOTICE_ISNEW,
+	        NOTICE_IMPORTANT
+	    FROM NOTICE
+	    WHERE NOTICE_NO = #{noticeNo}
+	      AND IS_DELETED = 'N'
+	</select>
+	
+	<!-- 일반회원 : 총 공지사항 수 -->
+	<select id="getTotalNoticesBySearch" resultType="int">
+    SELECT COUNT(*)
+        FROM NOTICE
+        WHERE IS_DELETED = 'N'
+          AND NOTICE_IMPORTANT = 'N' <if test="type == 'all' and keyword != null and keyword != ''">
+               AND ( NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                  OR NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+                )
+            </if>
+    
+            <if test="type != 'all' and keyword != null and keyword != ''">
+                <choose>
+                    <when test="type == 'title'">
+                       AND NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'content'">
+                       AND NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+                    </when>
+                </choose>
+            </if>
+    </select>
   </mapper>
