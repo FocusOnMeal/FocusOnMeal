@@ -6,6 +6,7 @@ const MealPlan = () => {
     const [height, setHeight] = useState(170);
     const [weight, setWeight] = useState(70);
     const [allergies, setAllergies] = useState([]);
+    const [allergyList, setAllergyList] = useState([]); // DB에서 가져올 알레르기 목록
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
     const [mealPlans, setMealPlans] = useState([]);
@@ -34,27 +35,79 @@ const MealPlan = () => {
         }
     }, [mealPlans]);
 
-    // 알러지 목록
-    const allergyList = [
-        { id: 1, value: "메밀", label: "메밀 없음" },
-        { id: 2, value: "밀", label: "밀" },
-        { id: 3, value: "대두", label: "대두(콩)" },
-        { id: 4, value: "땅콩", label: "땅콩" },
-        { id: 5, value: "호두", label: "호두" },
-        { id: 6, value: "잣", label: "잣" },
-        { id: 7, value: "고등어", label: "고등어" },
-        { id: 8, value: "게", label: "게" },
-        { id: 9, value: "새우", label: "새우" },
-        { id: 10, value: "돼지고기", label: "돼지고기" },
-        { id: 11, value: "복숭아", label: "복숭아" },
-        { id: 12, value: "토마토", label: "토마토" },
-        { id: 13, value: "아황산류", label: "아황산류" },
-        { id: 14, value: "호두", label: "호두" },
-        { id: 15, value: "닭고기", label: "닭고기" },
-        { id: 16, value: "쇠고기", label: "쇠고기" },
-        { id: 17, value: "오징어", label: "오징어" },
-        { id: 18, value: "조개류", label: "조개류(전복, 홍합 포함)" }
-    ];
+    // DB에서 알레르기 목록 가져오기
+    useEffect(() => {
+        const fetchAllergyList = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/mypage/allergy/list");
+                if (response.ok) {
+                    const data = await response.json();
+                    // API 응답을 화면에 맞게 변환 (allergyId, allergyName, category)
+                    const formattedList = data.map(allergy => ({
+                        id: allergy.allergyId,
+                        value: allergy.allergyName,
+                        label: allergy.allergyName
+                    }));
+                    setAllergyList(formattedList);
+                } else {
+                    console.error("알레르기 목록 조회 실패");
+                }
+            } catch (error) {
+                console.error("알레르기 목록 조회 오류:", error);
+            }
+        };
+
+        fetchAllergyList();
+    }, []);
+
+    // 사용자가 저장한 알레르기 정보 가져오기 (로그인 시)
+    useEffect(() => {
+        const fetchUserAllergies = async () => {
+            const token = sessionStorage.getItem("token"); // ✅ localStorage → sessionStorage
+            console.log("🔑 Token:", token ? "있음" : "없음");
+            if (!token) return; // 로그인 안 했으면 skip
+
+            try {
+                const response = await fetch("http://localhost:8080/api/mypage/allergies", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                console.log("📥 사용자 알레르기 조회 응답 상태:", response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("📥 사용자 알레르기 데이터:", data);
+                    const allergyIds = data.allergies || [];
+                    console.log("✅ 사용자 알레르기 ID 목록:", allergyIds);
+                    console.log("📋 전체 알레르기 목록:", allergyList);
+
+                    // allergyIds를 allergyName으로 변환
+                    if (allergyList.length > 0 && allergyIds.length > 0) {
+                        const selectedAllergies = allergyList
+                            .filter(allergy => {
+                                console.log(`체크: allergy.id=${allergy.id}, 포함여부=${allergyIds.includes(allergy.id)}`);
+                                return allergyIds.includes(allergy.id);
+                            })
+                            .map(allergy => allergy.value);
+                        console.log("✅ 선택된 알레르기:", selectedAllergies);
+                        setAllergies(selectedAllergies);
+                    }
+                } else {
+                    console.error("❌ 사용자 알레르기 조회 실패:", response.status);
+                }
+            } catch (error) {
+                console.error("❌ 사용자 알레르기 조회 오류:", error);
+            }
+        };
+
+        // allergyList가 로드된 후에만 실행
+        console.log("📋 allergyList 길이:", allergyList.length);
+        if (allergyList.length > 0) {
+            fetchUserAllergies();
+        }
+    }, [allergyList]); // allergyList가 변경될 때마다 실행
 
     // 알러지 체크박스 핸들러
     const handleAllergyChange = (value) => {
@@ -191,7 +244,7 @@ const MealPlan = () => {
         }
 
         // 로그인 확인
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token"); // ✅ localStorage → sessionStorage
         console.log("🔑 Token check:", token ? "토큰 있음" : "토큰 없음");
         console.log("🔑 Token value:", token);
 

@@ -26,7 +26,7 @@ const Allergies = () => {
         try {
             console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergy/list`);
             
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             const res = await axios.get(`${API_BASE_URL}/api/mypage/allergy/list`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {}
             });
@@ -44,7 +44,7 @@ const Allergies = () => {
         try {
             console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergies`);
             
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 console.warn("⚠️ 토큰 없음");
                 setChecked([]);
@@ -104,7 +104,7 @@ const Allergies = () => {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 alert("로그인이 필요합니다.");
                 return;

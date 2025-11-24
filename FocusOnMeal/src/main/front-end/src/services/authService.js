@@ -15,7 +15,7 @@ const apiClient = axios.create({
 // 요청 인터셉터 (토큰이 있으면 자동으로 헤더에 추가)
 apiClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -39,8 +39,8 @@ apiClient.interceptors.response.use(
         
         // 401 에러 (인증 실패) 시 로그아웃 처리
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
             window.location.href = '/login';
         }
         
@@ -59,8 +59,8 @@ const authService = {
             });
             
             if (response.data.data?.token) {
-                localStorage.setItem('token', response.data.data.token);
-                localStorage.setItem('user', JSON.stringify({
+                sessionStorage.setItem('token', response.data.data.token);
+                sessionStorage.setItem('user', JSON.stringify({
                     memberId: response.data.data.memberId,
                     memberName: response.data.data.memberName,
                     memberNickname: response.data.data.memberNickname,
@@ -77,11 +77,11 @@ const authService = {
     logout: async () => {
         try {
             await apiClient.post('/logout');
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
         } catch (error) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
             throw error;
         }
     },
@@ -204,16 +204,16 @@ const authService = {
     // ========== 유틸리티 ==========
 
     getCurrentUser: () => {
-        const userStr = localStorage.getItem('user');
+        const userStr = sessionStorage.getItem('user');
         return userStr ? JSON.parse(userStr) : null;
     },
 
     isLoggedIn: () => {
-        return !!localStorage.getItem('token');
+        return !!sessionStorage.getItem('token');
     },
 
     getToken: () => {
-        return localStorage.getItem('token');
+        return sessionStorage.getItem('token');
     }
 };
 

@@ -30,7 +30,7 @@ const NoticeInfo = () => {
 
     // save modify
     const handleSave = () => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         const payload = { ...selectedNotice };
 
@@ -53,7 +53,7 @@ const NoticeInfo = () => {
 
     useEffect(() => {
         const fetchNoticeInfo = () => {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             if (!token) {
                 console.error("JWT 토큰이 없습니다.");
                 return;
