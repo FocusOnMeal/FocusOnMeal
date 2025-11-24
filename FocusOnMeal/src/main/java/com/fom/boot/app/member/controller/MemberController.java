@@ -1,29 +1,42 @@
 package com.fom.boot.app.member.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fom.boot.app.jwt.JwtTokenProvider;
-import com.fom.boot.app.member.dto.*;
+import com.fom.boot.app.member.dto.ApiResponse;
+import com.fom.boot.app.member.dto.EmailCodeVerificationRequest;
+import com.fom.boot.app.member.dto.EmailVerificationRequest;
+import com.fom.boot.app.member.dto.IdSearchRequest;
+import com.fom.boot.app.member.dto.JoinRequest;
+import com.fom.boot.app.member.dto.LoginRequest;
+import com.fom.boot.app.member.dto.LoginResponse;
+import com.fom.boot.app.member.dto.PasswordResetLinkRequest;
 import com.fom.boot.app.mypage.dto.RandomNicknameResponse;
-import com.fom.boot.domain.member.model.service.MemberService;
 import com.fom.boot.domain.member.model.service.EmailService;
+import com.fom.boot.domain.member.model.service.MemberService;
 import com.fom.boot.domain.member.model.service.PasswordResetService;
 import com.fom.boot.domain.member.model.vo.Member;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
-import jakarta.validation.Valid;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @CrossOrigin(origins = "http://localhost:5173")
