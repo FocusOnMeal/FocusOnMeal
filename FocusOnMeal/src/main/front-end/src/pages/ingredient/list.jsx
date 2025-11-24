@@ -66,7 +66,13 @@ const toggleWishlist = async (ingredientId) => {
             const processedData = response.data.map(item => ({
               ...item,
               pricePer100g: item.currentPrice ? Math.floor(item.currentPrice / 10) : 0,
-              // 실제 백엔드에서 받은 priceChangePercent 사용
+              
+              // [수정] 백엔드 데이터 매핑
+              priceChangePercent: item.priceChangePercent ?? 0, 
+              previousPrice: item.previousPrice || 0, 
+              // ✅ 직전 데이터 수집일 추가 (문자열로 올 수 있으니 확인 필요)
+              previousCollectedDate: item.previousCollectedDate || null,
+
               safetyStatus: ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)], // TODO: 실제 안전도 로직
               unit: item.unit || '1kg'
             }));
@@ -318,45 +324,45 @@ const toggleWishlist = async (ingredientId) => {
                         }
                     </p>
                     
-                    {/* 가격 변동 정보를 별도 줄로 표시 */}
-                    {hasPriceChange && (
-                        <p style={{fontSize: '0.85em', color: '#666', marginTop: '4px', marginBottom: '4px'}}>
-                            {item.priceChangePercent === 0 ? (
-                                <>
-                                    <span>전일 대비 변동 없음</span>
-                                    {item.yesterdayPrice && item.yesterdayCollectedDate && (
-                                        <span style={{marginLeft: '8px', color: '#999'}}>
-                                            (전일: {item.yesterdayPrice.toLocaleString()}원, {new Date(item.yesterdayCollectedDate).toLocaleDateString('ko-KR', {
-                                                month: 'numeric',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })})
-                                        </span>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <span style={changeStyle}>
-                                        전일 대비 {changeIndicator}{Math.abs(item.priceChangePercent).toFixed(1)}%
-                                    </span>
-                                    {item.yesterdayPrice && item.yesterdayCollectedDate && (
-                                        <span style={{marginLeft: '8px', color: '#999'}}>
-                                            (전일 : {item.yesterdayPrice.toLocaleString()}원, {new Date(item.yesterdayCollectedDate).toLocaleDateString('ko-KR', {
-                                                month: 'numeric',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })})
-                                        </span>
-                                    )}
-                                </>
+                    {/* ✅ [수정] 가격 변동 정보 + 날짜 상세 표시 */}
+                    {item.currentPrice && item.previousPrice ? (
+                        <p style={{fontSize: '0.85em', marginTop: '4px', marginBottom: '4px'}}>
+                            
+                            {/* 1. 변동 없음 */}
+                            {item.priceChangePercent === 0 && (
+                                <span style={{color: '#666'}}>
+                                    - 전일 대비 변동 없음
+                                </span>
+                            )}
+
+                            {/* 2. 상승/하락 표시 (글자 + 화살표 + 수치 통일) */}
+                            {item.priceChangePercent !== 0 && (
+                                <span style={{
+                                    // 여기서 색상을 한 번에 지정합니다
+                                    color: item.priceChangePercent > 0 ? '#dc3545' : '#007aff', 
+                                    fontWeight: 'bold'
+                                }}>
+                                    전일 대비 {item.priceChangePercent > 0 ? '▲' : '▼'} {Math.abs(item.priceChangePercent).toFixed(1)}%
+                                </span>
+                            )}
+
+                            {/* ✅ [날짜/시간 추가] (전일 : 000원, 11.24 09:30) */}
+                            {item.previousCollectedDate && (
+                                <span style={{color: '#999', marginLeft: '6px'}}>
+                                    (전일 : {item.previousPrice.toLocaleString()}원, 
+                                    {' ' + new Date(item.previousCollectedDate).toLocaleDateString('ko-KR', {
+                                        month: 'numeric', 
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })})
+                                </span>
                             )}
                         </p>
-                    )}
-                    {!hasPriceChange && item.currentPrice && (
+                    ) : (
                         <p style={{fontSize: '0.85em', color: '#999', marginTop: '4px', marginBottom: '4px'}}>
-                            전일 가격 정보 없음
+                            <span style={{background:'#ffc107', color:'#fff', padding:'2px 6px', borderRadius:'4px', marginRight:'5px', fontSize:'0.9em'}}>NEW</span>
+                            최근 데이터 기준
                         </p>
                     )}
                     

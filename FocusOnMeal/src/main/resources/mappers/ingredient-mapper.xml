@@ -131,13 +131,18 @@
                type="com.fom.boot.app.ingredient.dto.IngredientDTO" 
                extends="IngredientResultMap">
         
-        <!-- DTO에 추가된 필드만 매핑 -->
-        <result property="currentPrice" column="PRICE_VALUE" />
+        <!-- column 이름을 쿼리의 AS 별칭과 정확히 일치시킴 -->
+        <result property="currentPrice" column="CURRENT_PRICE" />
         <result property="collectedDate" column="COLLECTED_DATE" />
+        
+        <!-- 추가된 필드 매핑 -->
+        <result property="previousPrice" column="PREVIOUS_PRICE" />
+        <result property="previousCollectedDate" column="PREVIOUS_COLLECTED_DATE" />
+        <result property="priceChangePercent" column="PRICE_CHANGE_PERCENT" />
     </resultMap>
 
 	<!-- 리스트 페이지용: 전체 목록 + 최신 가격 조회 (서울/소매 기준) -->
-	<select id="selectListWithLatestPrice" resultMap="IngredientWithPriceMap">
+	<select id="getIngredientList" resultMap="IngredientWithPriceMap">
 	    SELECT 
 	        M.INGREDIENT_ID,
 	        M.NAME,
@@ -146,10 +151,20 @@
 	        M.KAMIS_ITEM_CODE,
 	        M.KAMIS_KIND_CODE,
 	        M.KAMIS_ITEM_CATEGORY_CODE,
-	        P.PRICE_VALUE,
-	        P.COLLECTED_DATE
+	        
+	        P.PRICE_VALUE AS CURRENT_PRICE,
+	        P.COLLECTED_DATE AS COLLECTED_DATE,
+	        
+	        NVL(P.PREVIOUS_PRICE, 0) AS PREVIOUS_PRICE,
+	        P.PREVIOUS_COLLECTED_DATE,
+	        
+	        CASE 
+	            WHEN P.PREVIOUS_PRICE > 0 THEN 
+	                ROUND(((P.PRICE_VALUE - P.PREVIOUS_PRICE) / P.PREVIOUS_PRICE) * 100, 1)
+	            ELSE 0 
+	        END AS PRICE_CHANGE_PERCENT
+	        
 	    FROM (
-	        <!-- 같은 이름의 식재료 중 KAMIS_KIND_CODE가 가장 작은 것만 선택 -->
 	        SELECT 
 	            INGREDIENT_ID,
 	            NAME,
@@ -162,20 +177,21 @@
 	        FROM INGREDIENT_MASTER
 	    ) M
 	    LEFT JOIN (
-	        SELECT INGREDIENT_ID, PRICE_VALUE, COLLECTED_DATE
-	        FROM (
-	            SELECT 
-	                INGREDIENT_ID, 
-	                PRICE_VALUE, 
-	                COLLECTED_DATE,
-	                ROW_NUMBER() OVER(PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) as RN
-	            FROM PRICE_HISTORY
-	            WHERE REGION = '서울' 
-	              AND PRICE_TYPE = '소매'
-	        )
-	        WHERE RN = 1
-	    ) P ON M.INGREDIENT_ID = P.INGREDIENT_ID
-	    WHERE M.RN = 1  <!-- 각 이름별로 KAMIS_KIND_CODE가 가장 작은 것만 --> 
+	        SELECT 
+	            INGREDIENT_ID, 
+	            PRICE_VALUE, 
+	            COLLECTED_DATE,
+	            
+	            LEAD(PRICE_VALUE, 1) OVER (PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) AS PREVIOUS_PRICE,
+	            LEAD(COLLECTED_DATE, 1) OVER (PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) AS PREVIOUS_COLLECTED_DATE,
+	            
+	            ROW_NUMBER() OVER(PARTITION BY INGREDIENT_ID ORDER BY COLLECTED_DATE DESC) as RN
+	        FROM PRICE_HISTORY
+	        WHERE REGION = '서울' 
+	          AND PRICE_TYPE = '소매'
+	    ) P ON M.INGREDIENT_ID = P.INGREDIENT_ID AND P.RN = 1 -- 최신 데이터 행만 조인
+	    
+	    WHERE M.RN = 1 
 	    ORDER BY M.NAME ASC
 	</select>
 

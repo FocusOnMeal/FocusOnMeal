@@ -134,28 +134,28 @@
         WHERE ROWNUM = 1
     </select>
     
-    <!-- 특정 날짜에 가장 가까운 가격 조회 -->
-    <select id="selectClosestPrice" resultMap="PriceHistory" parameterType="map">
-        SELECT *
-        FROM (
-            SELECT 
-                PRICE_HISTORY_ID,
-                INGREDIENT_ID,
-                PRICE_VALUE,
-                PRICE_TYPE,
-                REGION,
-                COLLECTED_DATE,
-                ABS(EXTRACT(DAY FROM (COLLECTED_DATE - #{targetDate}))) AS date_diff
-            FROM PRICE_HISTORY
-            WHERE INGREDIENT_ID = #{ingredientId}
-            <if test="priceType != null and priceType != ''">
-                AND PRICE_TYPE = #{priceType}
-            </if>
-            <if test="region != null and region != ''">
-                AND REGION = #{region}
-            </if>
-            ORDER BY date_diff ASC, COLLECTED_DATE DESC
-        )
-        WHERE ROWNUM = 1
-    </select>
+	<!-- 특정 날짜에 가장 가까운 가격 조회 -->
+	<select id="selectClosestPrice" resultMap="PriceHistory" parameterType="map">
+	    SELECT *
+	    FROM (
+	        SELECT 
+	            PRICE_HISTORY_ID,
+	            INGREDIENT_ID,
+	            PRICE_VALUE,
+	            PRICE_TYPE,
+	            REGION,
+	            COLLECTED_DATE,
+	            ABS(TRUNC(COLLECTED_DATE) - TRUNC(#{targetDate})) AS date_diff
+	        FROM PRICE_HISTORY
+	        WHERE INGREDIENT_ID = #{ingredientId}
+	        <if test="priceType != null and priceType != ''">
+	            AND PRICE_TYPE = #{priceType}
+	        </if>
+	        <if test="region != null and region != ''">
+	            AND REGION = #{region}
+	        </if>
+	        ORDER BY date_diff ASC, COLLECTED_DATE DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
 </mapper>

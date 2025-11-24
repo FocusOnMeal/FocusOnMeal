@@ -115,6 +115,9 @@ public class PriceHistoryServiceImpl implements PriceHistoryService {
             throw new RuntimeException("가격 정보가 없습니다. 식자재 ID: " + ingredientId);
         }
         
+        params.put("priceType", latestPrice.getPriceType());
+        params.put("region", latestPrice.getRegion());
+        
         // 1주일 전 가격 조회
         LocalDateTime oneWeekAgo = latestPrice.getCollectedDate().minusWeeks(1);
         params.put("targetDate", oneWeekAgo);

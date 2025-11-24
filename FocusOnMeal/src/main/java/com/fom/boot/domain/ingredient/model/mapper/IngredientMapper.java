@@ -46,5 +46,6 @@ public interface IngredientMapper {
 	List<IngredientDTO> selectListWithLatestPrice();
 	
 	List<FavoriteIngredientSummaryDTO> selectFavoritesByMemberId(String memberId);
+	List<IngredientDTO> getIngredientList();
 	
 }
