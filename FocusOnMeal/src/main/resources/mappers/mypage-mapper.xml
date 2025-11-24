@@ -46,7 +46,7 @@
         SELECT 
             f.FAVORITE_ID AS favoriteId,
             f.INGREDIENT_ID AS ingredientId,
-            im.NAME AS name,
+            im.NAME AS ingredientName,
             f.IS_CUSTOM AS isCustom,
             im.STANDARD_UNIT AS standardUnit,
             (

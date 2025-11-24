@@ -28,14 +28,35 @@ function IngredientSearch() {
 
   const [wishlist, setWishlist] = useState(new Set()); 
   
-  const toggleWishlist = (ingredientId) => {
-    setWishlist(prev => {
-      const newSet = new Set(prev);
-      newSet.has(ingredientId) ? newSet.delete(ingredientId) : newSet.add(ingredientId);
-      return newSet;
-    });
+  // ✅ [수정] 찜 토글 기능: 실제 백엔드 API 호출로 변경
+const toggleWishlist = async (ingredientId) => {
+    try {
+        // Post 요청 시 Body가 비어있으면 400 에러가 날 수 있으므로 빈 객체 {}를 넣어줍니다.
+        const response = await axios.post(`/ingredient/detail/${ingredientId}/favorite`, {});
+        
+        if (response.data.success) {
+            setWishlist(prev => {
+                const newSet = new Set(prev);
+                // 백엔드 응답(isFavorite)에 따라 상태 동기화
+                if (response.data.isFavorite) {
+                    newSet.add(ingredientId);
+                } else {
+                    newSet.delete(ingredientId);
+                }
+                return newSet;
+            });
+        }
+    } catch (error) {
+        if (error.response?.status === 401) {
+            alert("로그인이 필요한 서비스입니다.");
+        } else {
+            console.error("찜하기 오류:", error);
+            alert("오류가 발생했습니다.");
+        }
+    }
   };
 
+  // 1. 식재료 전체 목록 조회
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -63,6 +84,29 @@ function IngredientSearch() {
       }
     };
     fetchData();
+  }, []);
+
+// 2. 내 찜 목록 불러오기 (초기화)
+  useEffect(() => {
+    // 1. 토큰이 있는지 먼저 확인
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    
+    // 🚨 [핵심] 토큰이 없으면(비로그인 상태면) 여기서 멈춤! 서버에 요청 안 보냄!
+    if (!token) return; 
+
+    const fetchMyFavorites = async () => {
+        try {
+            const response = await axios.get('/api/mypage/favorites');
+            if (response.data && Array.isArray(response.data)) {
+                const myFavoriteIds = response.data.map(item => item.ingredientId);
+                setWishlist(new Set(myFavoriteIds));
+            }
+        } catch{
+            // 토큰이 만료되었거나 오류가 나도, 리스트 페이지 보는 데는 지장 없으니 조용히 넘어감
+        }
+    };
+    
+    fetchMyFavorites();
   }, []);
   
   const filteredResults = (originalResults || []).filter(item => {
@@ -258,7 +302,7 @@ function IngredientSearch() {
                         }
                     </p>
                     
-                    {/* 🚨 가격 변동 정보를 별도 줄로 표시 */}
+                    {/* 가격 변동 정보를 별도 줄로 표시 */}
                     {hasPriceChange && (
                         <p style={{fontSize: '0.85em', color: '#666', marginTop: '4px', marginBottom: '4px'}}>
                             {item.priceChangePercent === 0 ? (

@@ -45,7 +45,7 @@
     <insert id="insertFavorite" parameterType="com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient">
         <!-- 오라클 시퀀스를 사용한 자동 번호 생성 -->
         <selectKey keyProperty="favoriteId" resultType="int" order="BEFORE">
-            SELECT SEQ_FAVORITE_ID.NEXTVAL FROM DUAL
+            SELECT SEQ_FAVORITE.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO FAVORITE (
             FAVORITE_ID,

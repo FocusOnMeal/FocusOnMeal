@@ -59,15 +59,24 @@ function IngredientDetail() {
                 setItemInfo(info); 
                 setPriceHistory(history);
                 
-                // 🚨 찜 상태 확인
-                try {
-                    const favoriteResponse = await axios.get('/ingredient/api/favorites');
-                    if (favoriteResponse.data && Array.isArray(favoriteResponse.data)) {
-                        const isFavorited = favoriteResponse.data.some(fav => fav.ingredientId === parseInt(id));
-                        setIsWished(isFavorited);
+                const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+
+                // 찜 상태 확인 (MyPageController 경로 사용)
+                if (token) {
+
+                    try {
+                        // 기존: '/ingredient/api/favorites' -> 변경: '/api/mypage/favorites'
+                        const favoriteResponse = await axios.get('/api/mypage/favorites');
+                        
+                        if (favoriteResponse.data && Array.isArray(favoriteResponse.data)) {
+                            // 현재 보고 있는 상세 페이지의 ID가 찜 목록에 있는지 확인
+                            const isFavorited = favoriteResponse.data.some(fav => fav.ingredientId === parseInt(id));
+                            setIsWished(isFavorited);
+                        }
+                    } catch{
+                        // 비로그인 상태 등 에러 발생 시 찜 안 된 상태로 유지
+                        // console.log("찜 상태 확인 실패 (로그인 필요):", favError);
                     }
-                } catch (favError) {
-                    console.log("찜 상태 확인 실패 (로그인 필요):", favError);
                 }
 
             } catch (error) {
@@ -81,10 +90,11 @@ function IngredientDetail() {
 
     const handleWishClick = async () => {
         try {
+            // 찜 등록/해제는 여전히 IngredientController 사용
             const response = await axios.post(`/ingredient/detail/${id}/favorite`);
             if (response.data.success) {
                 setIsWished(response.data.isFavorite);
-                alert(response.data.message);
+                // alert(response.data.message); // 너무 자주 뜨면 주석 처리 추천
             }
         } catch (error) {
             if (error.response?.status === 401) {
@@ -133,13 +143,8 @@ function IngredientDetail() {
             
             <div className={styles.mainContent}>
                 
-                {/* 1. 왼쪽 컬럼: 이미지 및 영양 성분 */}
+                {/* 1. 왼쪽 컬럼: 영양 성분 */}
                 <div className={styles.leftColumn}>
-                    
-                    {/* 식자재 이미지 [300x300] */}
-                    <div className={styles.imagePlaceholder}>
-                        식자재 이미지 [300x300]
-                    </div>
                     
                     {/* 영양 성분 섹션 */}
                     <div className={styles.nutritionSection}>

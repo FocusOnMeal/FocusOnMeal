@@ -24,9 +24,16 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: path => path.replace(/^\/react/, '')
             },
-                '/ingredient/api': {
+            '/ingredient': { 
                 target: 'http://localhost:8080',
-                changeOrigin: true
+                changeOrigin: true,
+                // 중요: HTML 요청(페이지 이동/새로고침)은 백엔드로 보내지 않음(새로고침 시 404 에러 방지)
+                bypass: function (req, res, options) {
+                    if (req.headers.accept && req.headers.accept.indexOf('html') !== -1) {
+                        console.log('Skipping proxy for browser request.');
+                        return req.url;
+                    }
+                }
             }
         }
     }
