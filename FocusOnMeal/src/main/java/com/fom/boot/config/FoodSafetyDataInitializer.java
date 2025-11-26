@@ -25,9 +25,17 @@ public class FoodSafetyDataInitializer implements ApplicationRunner {
         try {
             // 최근 3일치 동기화 (평상시 운영용)
             int savedCount = foodSafetyDataSyncService.syncRecentAlerts();
-            log.info("Food Safety data sync result: {} alerts saved (3 days)", savedCount);
+
+            if (savedCount > 0) {
+                log.info("Food Safety data sync success: {} alerts saved (recent 3 days)", savedCount);
+            } else {
+                log.warn("Food Safety data sync completed but no data was saved. " +
+                        "This may be due to API unavailability or no new data available.");
+            }
         } catch (Exception e) {
-            log.error("Food Safety data auto sync failed", e);
+            log.error("Food Safety data auto sync failed due to unexpected error", e);
+            log.warn("Server will continue to start normally despite sync failure. " +
+                    "Manual sync or scheduler will retry later.");
             // 동기화 실패해도 서버는 정상 구동
         }
 
