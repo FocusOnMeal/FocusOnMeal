@@ -1,0 +1,183 @@
+/* 전체 컨테이너 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 80vh;
+}
+
+/* 로딩/에러 메시지 */
+.loading, .error {
+    text-align: center;
+    padding: 50px;
+    font-size: 18px;
+    color: #c53030;
+}
+
+/* 상세 내용 래퍼 */
+.detailWrapper {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-top: 0px;
+}
+
+/* 페이지 제목 */
+.pageTitle {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 30px;
+    border: 1px solid #67932A;
+    padding-bottom: 5px;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(26, 82, 10, 0.05);
+}
+
+/* 안전 정보 헤더 영역 */
+.alertHeader {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+/* 제목과 뱃지 정렬 */
+.subjectRow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* 안전 정보 제목 */
+.alertTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+    letter-spacing: -0.3px;
+    line-height: 1.4;
+}
+
+/* 정보 표시줄 (공표 국가, 공표일) */
+.infoBar {
+    font-size: 13px;
+    color: #777;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.5;
+}
+
+.separator {
+    color: #ccc;
+}
+
+/* 위험 유형 뱃지 */
+.badgeDanger, .badgeGlobal, .badgeDefault {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.badgeDanger {
+    background-color: #ff4d4f;
+    color: #fff;
+}
+
+.badgeGlobal {
+    background-color: #0796E5;
+    color: #fff;
+}
+
+.badgeDefault {
+    background-color: #52c41a;
+    color: #fff;
+}
+
+/* 안전 정보 내용 영역 */
+.alertContent {
+    min-height: 250px;
+    padding: 20px 0;
+    font-size: 16px;
+    line-height: 1.9;
+    color: #333;
+}
+
+.alertContent p {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+/* 전체 영역: 좌 - 우 정렬 */
+.actionButtons {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* 목록 버튼 (오른쪽) */
+.listButtonWrapper {
+    margin-top: 40px; 
+    text-align: right; 
+}
+
+.listBtn {
+    background-color: #67932A;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.listBtn:hover {
+    background-color: #587b24;
+}
+
+/* 왼쪽(이전/다음) 묶음 */
+.prevNextWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 이전글/다음글 한 줄 */
+.prevRow,
+.nextRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+    border-radius: 4px;
+}
+
+.prevRow:hover,
+.nextRow:hover {
+    background: #f7f7f7;
+    cursor: pointer;
+}
+
+.label {
+    font-weight: bold;
+    color: #444;
+    width: 50px;
+}
+
+.title {
+    color: #2b6cb0;
+    cursor: pointer;
+}
+
+.title:hover {
+    text-decoration: underline;
+    color: #224e85;
+}

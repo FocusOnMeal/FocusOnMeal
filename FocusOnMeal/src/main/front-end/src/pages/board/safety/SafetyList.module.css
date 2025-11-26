@@ -1,0 +1,145 @@
+/* ============================= */
+/* 기본 레이아웃 */
+/* ============================= */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 60px auto;
+    font-family: "Noto Sans KR", sans-serif;
+}
+
+.main {
+    width: 100%;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+/* ============================= */
+/* 검색 박스 */
+/* ============================= */
+.searchBox {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.select, .input {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.searchBtn {
+    border: 1px solid #67932A;
+    background-color: #67932A;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.searchBtn:hover {
+    background-color: #587b24;
+}
+
+/* ============================= */
+/* 테이블 기본 */
+/* ============================= */
+.alertTable {
+    width: 100%;
+    border-collapse: collapse;
+    border-top: 2px solid #444;
+}
+
+.alertTable th, 
+.alertTable td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 15px;
+}
+
+.alertTable th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+/* 행 hover */
+.alertTable tbody tr:hover {
+    background-color: #fafafa;
+    transition: 0.15s ease-in-out;
+}
+
+/* ============================= */
+/* 정렬 가능한 th (hover + 아이콘 정렬) */
+/* ============================= */
+.alertTable th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: 0.2s;
+}
+
+.alertTable th.sortable:hover {
+    background-color: #e9ecef;
+}
+
+/* ============================= */
+/* 제목 링크 */
+/* ============================= */
+.titleCell {
+    text-align: left !important;
+    max-width: 400px;
+}
+
+.alertTable td a {
+    text-decoration: none;
+    color: #333;
+}
+
+.alertTable td a:hover {
+    color: #0796E5;
+    text-decoration: underline;
+}
+
+/* ============================= */
+/* 위험 유형 뱃지 */
+/* ============================= */
+.badgeDanger {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: #ff4d4f;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+.badgeGlobal {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: #0796E5;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+.badgeDefault {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: #52c41a;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+}

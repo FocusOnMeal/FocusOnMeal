@@ -40,6 +40,10 @@ import MealPlan from './pages/meal/MealPlan';
 import NoticeList from './pages/board/notice/NoticeList';
 import NoticeDetail from './pages/board/notice/NoticeDetail';
 
+// 안전정보게시판
+import SafetyAlertList from './pages/board/safety/SafetyList';
+import SafetyAlertDetail from './pages/board/safety/SafetyDetail';
+
 //관리자
 import AdminDashboard from './pages/admin/AdminDashboard';
 import MemberInfo from './pages/admin/MemberInfo';
@@ -113,6 +117,8 @@ function App() {
         <Route path="/board/notice/detail/:noticeNo" element={<NoticeDetail />} />
 
         {/* 안전정보 게시판 관련 */}
+        <Route path="/board/safety/list" element={<SafetyAlertList />} />
+        <Route path="/board/safety/detail/:alertId" element={<SafetyAlertDetail />} />
       </Routes>
     </>
   );

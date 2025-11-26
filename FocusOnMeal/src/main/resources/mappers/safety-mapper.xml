@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.fom.boot.domain.safety.model.mapper.SafetyMapper">
+  
+  <!-- ResultMap 정의 -->
+    <resultMap id="safetyAlertResultMap" type="com.fom.boot.domain.alert.model.vo.SafetyAlert">
+        <id property="alertId" column="ALERT_ID" />
+        <result property="ingredientId" column="INGREDIENT_ID" />
+        <result property="nation" column="NATION" />
+        <result property="hazardType" column="HAZARD_TYPE" />
+        <result property="title" column="TITLE" />
+        <result property="description" column="DESCRIPTION" />
+        <result property="publicationDate" column="PUBLICATION_DATE" />
+    </resultMap>
+
+    <!-- 검색 조건 SQL 조각 -->
+    <sql id="searchCondition">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="type == 'title'">
+                        AND TITLE LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'nation'">
+                        AND NATION LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'hazardType'">
+                        AND HAZARD_TYPE LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <otherwise>
+                        AND (
+                            TITLE LIKE '%' || #{keyword} || '%'
+                            OR NATION LIKE '%' || #{keyword} || '%'
+                            OR HAZARD_TYPE LIKE '%' || #{keyword} || '%'
+                        )
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 정렬 조건 SQL 조각 -->
+    <sql id="orderByCondition">
+        ORDER BY 
+            <choose>
+                <when test="sortColumn == 'nation'">
+                    NATION
+                </when>
+                <when test="sortColumn == 'hazardType'">
+                    HAZARD_TYPE
+                </when>
+                <when test="sortColumn == 'title'">
+                    TITLE
+                </when>
+                <when test="sortColumn == 'publicationDate'">
+                    PUBLICATION_DATE
+                </when>
+                <otherwise>
+                    ALERT_ID
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="sortOrder == 'asc'">
+                    ASC
+                </when>
+                <otherwise>
+                    DESC
+                </otherwise>
+            </choose>
+    </sql>
+
+    <!-- 안전 정보 개수 조회 -->
+    <select id="selectAlertListCount" resultType="int">
+        SELECT COUNT(*)
+        FROM SAFETY_ALERT_MASTER
+        <include refid="searchCondition" />
+    </select>
+
+    <!-- 안전 정보 목록 조회 (Oracle 페이징 처리) -->
+    <select id="selectAlertList" resultMap="safetyAlertResultMap">
+        SELECT *
+        FROM (
+            SELECT 
+                ROWNUM AS RNUM,
+                A.*
+            FROM (
+                SELECT 
+                    ALERT_ID,
+                    INGREDIENT_ID,
+                    NATION,
+                    HAZARD_TYPE,
+                    TITLE,
+                    DESCRIPTION,
+                    PUBLICATION_DATE
+                FROM SAFETY_ALERT_MASTER
+                <include refid="searchCondition" />
+                <include refid="orderByCondition" />
+            ) A
+        )
+        WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+    </select>
+
+    <!-- 안전 정보 상세 조회 -->
+    <select id="selectAlertDetail" resultMap="safetyAlertResultMap">
+        SELECT 
+            ALERT_ID,
+            INGREDIENT_ID,
+            NATION,
+            HAZARD_TYPE,
+            TITLE,
+            DESCRIPTION,
+            PUBLICATION_DATE
+        FROM SAFETY_ALERT_MASTER
+        WHERE ALERT_ID = #{alertId}
+    </select>
+
+    <!-- 이전 글 조회 -->
+    <select id="selectPrevAlert" resultMap="safetyAlertResultMap">
+        SELECT 
+            ALERT_ID,
+            TITLE
+        FROM SAFETY_ALERT_MASTER
+        WHERE ALERT_ID &lt; #{alertId}
+        ORDER BY ALERT_ID DESC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <!-- 다음 글 조회 -->
+    <select id="selectNextAlert" resultMap="safetyAlertResultMap">
+        SELECT 
+            ALERT_ID,
+            TITLE
+        FROM SAFETY_ALERT_MASTER
+        WHERE ALERT_ID &gt; #{alertId}
+        ORDER BY ALERT_ID ASC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+  
+  </mapper>
