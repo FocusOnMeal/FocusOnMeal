@@ -4,15 +4,16 @@ import axios from "axios";
 import styles from "./NoticeDetail.module.css";
 
 const NoticeDetail = () => {
-    const { noticeNo } = useParams();                  // URL의 {noticeNo}
+    const { noticeNo } = useParams();
     const navigate = useNavigate();
 
+    const [prev, setPrev] = useState(null);
+    const [next, setNext] = useState(null);
     const [notice, setNotice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // 번호 validation
         if (!noticeNo || isNaN(parseInt(noticeNo))) {
             setError("공지 번호가 유효하지 않습니다.");
             setLoading(false);
@@ -23,16 +24,22 @@ const NoticeDetail = () => {
             try {
                 setLoading(true);
 
-                // ✔ 실제 API 호출
-                const response = await axios.get(
-                    `/api/board/notice/detail/${noticeNo}`
-                );
-
-                setNotice(response.data);
+                const response = await axios.get(`/api/board/notice/view/${noticeNo}`);
+                
+                console.log("=== API 응답 ===");
+                console.log("response.data:", response.data);
+                console.log("notice:", response.data.notice);
+                console.log("prev:", response.data.prev);
+                console.log("next:", response.data.next);
+                
+                setNotice(response.data.notice);
+                setPrev(response.data.prev);  // null이면 null로 설정됨
+                setNext(response.data.next);  // null이면 null로 설정됨
+                
                 setLoading(false);
 
             } catch (err) {
-                console.error(err);
+                console.error("❌ 에러:", err);
                 setError("해당 공지사항을 찾을 수 없습니다.");
                 setLoading(false);
             }
@@ -60,13 +67,10 @@ const NoticeDetail = () => {
 
                 <div className={styles.noticeHeader}>
                     <div className={styles.subjectRow}>
-
-                        {/* 필독 */}
                         {notice.noticeImportant === "Y" && (
                             <span className={styles.badgeImportant}>필독 !</span>
                         )}
 
-                        {/* NEW */}
                         {notice.noticeImportant !== "Y" &&
                             notice.noticeIsNew === "Y" && (
                                 <span className={styles.badgeIsNew}>NEW</span>
@@ -102,12 +106,47 @@ const NoticeDetail = () => {
                         <div className={styles.prevRow}>
                             <span className={styles.label}>이전글</span>
                             <span className={styles.separator}>|</span>
-                            <span className={styles.title}>이전글 제목</span>
+
+                            {prev ? (
+                                <span
+                                    className={styles.title}
+                                    onClick={() => navigate(`/board/notice/detail/${prev.noticeNo}`)}
+                                    style={{ 
+                                        cursor: "pointer", 
+                                        color: "#007bff", 
+                                        textDecoration: "underline" 
+                                    }}
+                                >
+                                    {prev.noticeTitle}
+                                </span>
+                            ) : (
+                                <span className={styles.title} style={{ color: "#999" }}>
+                                    이전 글이 없습니다.
+                                </span>
+                            )}
                         </div>
+
                         <div className={styles.nextRow}>
                             <span className={styles.label}>다음글</span>
                             <span className={styles.separator}>|</span>
-                            <span className={styles.title}>다음글 제목</span>
+
+                            {next ? (
+                                <span
+                                    className={styles.title}
+                                    onClick={() => navigate(`/board/notice/detail/${next.noticeNo}`)}
+                                    style={{ 
+                                        cursor: "pointer", 
+                                        color: "#007bff", 
+                                        textDecoration: "underline" 
+                                    }}
+                                >
+                                    {next.noticeTitle}
+                                </span>
+                            ) : (
+                                <span className={styles.title} style={{ color: "#999" }}>
+                                    다음 글이 없습니다.
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>

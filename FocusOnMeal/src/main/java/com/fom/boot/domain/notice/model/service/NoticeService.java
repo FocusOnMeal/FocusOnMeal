@@ -1,6 +1,7 @@
 package com.fom.boot.domain.notice.model.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.domain.notice.model.vo.Notice;
@@ -24,5 +25,16 @@ public interface NoticeService {
 
 	// 필독 공지사항 목록
 	List<Notice> selectImportantNotices();
+
+	// 공지사항 이전, 다음 페이지 조회
+	Map<String, Object> selectPrevNotice(int noticeNo);
+
+	Map<String, Object> selectNextNotice(int noticeNo);
+
+	Notice getNoticeForView(int noticeNo);
+
+
+
+	
 
 }

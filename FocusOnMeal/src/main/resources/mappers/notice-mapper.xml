@@ -133,4 +133,51 @@
                 </choose>
             </if>
     </select>
+    
+    <!-- 조회수 증가 -->
+	<update id="increaseViewCount" parameterType="int">
+	    UPDATE NOTICE
+	    SET VIEW_COUNT = VIEW_COUNT + 1
+	    WHERE NOTICE_NO = #{noticeNo}
+	</update>
+
+	<!-- 상세 조회 + 조회수 증가 포함 -->
+	<select id="getNoticeForView" parameterType="int"
+	        resultType="com.fom.boot.domain.notice.model.vo.Notice">
+	    SELECT
+	        NOTICE_NO,
+	        MEMBER_ID,
+	        NOTICE_SUBJECT,
+	        NOTICE_CONTENT,
+	        NOTICE_CREATEAT,
+	        NOTICE_ISNEW,
+	        NOTICE_IMPORTANT,
+	        VIEW_COUNT
+	    FROM NOTICE
+	    WHERE NOTICE_NO = #{noticeNo}
+	      AND IS_DELETED = 'N'
+	</select>
+
+	
+	  <!-- 이전 글 -->
+	  <select id="selectPrevNotice" parameterType="int" resultType="map">
+		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    FROM NOTICE
+		    WHERE NOTICE_NO &lt; #{noticeNo}
+		      AND IS_DELETED = 'N'
+		    ORDER BY NOTICE_NO DESC
+		    FETCH FIRST 1 ROWS ONLY
+		</select>
+		
+		
+		<!-- 다음 글 -->
+		<select id="selectNextNotice" parameterType="int" resultType="map">
+		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    FROM NOTICE
+		    WHERE NOTICE_NO &gt; #{noticeNo}
+		      AND IS_DELETED = 'N'
+		    ORDER BY NOTICE_NO ASC
+		    FETCH FIRST 1 ROWS ONLY
+		</select>
+    
   </mapper>

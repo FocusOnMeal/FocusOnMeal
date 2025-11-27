@@ -1,8 +1,10 @@
 package com.fom.boot.domain.notice.model.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.domain.notice.model.mapper.NoticeMapper;
@@ -58,5 +60,47 @@ public class NoticeServiceImpl implements NoticeService {
 	public List<Notice> selectImportantNotices() {
 		return mapper.selectImportantNotices();
 	}
+
+	
+	// 공지사항 이전, 다음글 조회
+	@Override
+    public Map<String, Object> selectPrevNotice(int noticeNo) {
+        Map<String, Object> result = mapper.selectPrevNotice(noticeNo);
+        
+        // ✅ null 체크 및 빈 Map 반환 방지
+        if (result == null || result.isEmpty() || !result.containsKey("noticeNo")) {
+            return null;  // null 반환으로 통일
+        }
+        
+        return result;
+    }
+
+	
+	@Override
+    public Map<String, Object> selectNextNotice(int noticeNo) {
+        Map<String, Object> result = mapper.selectNextNotice(noticeNo);
+        
+        // ✅ null 체크 및 빈 Map 반환 방지
+        if (result == null || result.isEmpty() || !result.containsKey("noticeNo")) {
+            return null;  // null 반환으로 통일
+        }
+        
+        return result;
+    }
+
+	@Override
+	@Transactional
+	public Notice getNoticeForView(int noticeNo) {
+	    // 1) 조회수 증가
+		mapper.increaseViewCount(noticeNo);
+
+	    // 2) 상세 조회
+	    Notice notice = mapper.getNoticeForView(noticeNo);
+
+	    return notice;
+	}
+
+
+	
 
 }
