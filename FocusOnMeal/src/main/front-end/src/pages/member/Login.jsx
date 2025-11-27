@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from './Login.module.css';
 
 const Login = () => {
@@ -7,6 +7,10 @@ const Login = () => {
     const [memberPw, setMemberPw] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // 이전 페이지 정보 가져오기
+    const from = location.state?.from || '/';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,9 +44,11 @@ const Login = () => {
                 if (data.adminYn === 'Y') {
                     navigate('/admin');
                 } else {
-                    navigate('/');
+                    // 이전 페이지로 리다이렉트 (저장된 위치가 없으면 홈으로)
+                    navigate(from, { replace: true });
                     console.log("로그인 응답:", result);
                     console.log("닉네임:", result.data.memberNickname);
+                    console.log("리다이렉트:", from);
                 }
             } else {
                 const errorText = await response.text();

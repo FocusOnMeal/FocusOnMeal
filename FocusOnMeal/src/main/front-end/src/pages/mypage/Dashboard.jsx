@@ -26,7 +26,9 @@ const Dashboard = () => {
 
         if (!token) {
             alert('로그인이 필요합니다.');
-            navigate('/member/login');
+            navigate('/member/login', {
+                state: { from: '/mypage/dashboard' }
+            });
             return;
         }
 

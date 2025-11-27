@@ -634,7 +634,9 @@ function IngredientDetail() {
                                         <div className={styles.lockIcon}>🔒</div>
                                         <p>로그인 후 확인 가능</p>
                                         <button
-                                            onClick={() => navigate('/member/login')}
+                                            onClick={() => navigate('/member/login', {
+                                                state: { from: `/ingredient/detail/${id}` }
+                                            })}
                                             className={styles.loginButton}
                                         >
                                             로그인
