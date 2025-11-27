@@ -49,8 +49,8 @@ const SafetyAlert = () => {
         const newValue = !isNotificationEnabled;
 
         try {
-            // API 요청 시뮬레이션
-            await axios.patch("/api/mypage/setting/safetyAlert/toggle", { enabled: newValue ? 'Y' : 'N' }, {
+            await axios.patch("/api/mypage/settings/safetyAlert/toggle", 
+                { notificationEnabled: newValue ? 'Y' : 'N' }, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -143,7 +143,7 @@ const SafetyAlert = () => {
                                             to={`/ingredient/detail/${ing.ingredientId}`}
                                             className={styles.ingredientTag}
                                         >
-                                            {ing.name}
+                                            {ing.ingredientName}
                                         </Link>
                                     ))}
                                     <Link to="/ingredient/list" className={styles.addTagBtn}>+ 추가</Link>

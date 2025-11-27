@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +27,7 @@ import com.fom.boot.app.mypage.dto.ProfileUpdateRequest;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
 import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.common.pagination.Pagination;
+import com.fom.boot.domain.alert.model.service.AlertService;
 import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.member.model.service.MemberService;
@@ -49,6 +51,8 @@ public class MyPageController {
 	private final IngredientService iService;
 	
 	private final SafetyService sService;
+	
+	private final AlertService aService;
 	
 	// 마이페이지 대시보드 이동
 	@GetMapping("/dashboard")
@@ -418,7 +422,7 @@ public class MyPageController {
         
         // 검색 조건 구성
         Map<String, String> searchMap = new HashMap<>();
-        searchMap.put("memberId", memberId);   // 개인 알림 기능 확장 대비
+        searchMap.put("memberId", memberId);  
         searchMap.put("type", type);
         searchMap.put("keyword", keyword.trim());
         searchMap.put("sortColumn", sortColumn);
@@ -434,7 +438,7 @@ public class MyPageController {
         List<SafetyAlert> list = sService.selectAlertList(pi, searchMap);
 
         // 유저 알림
-        String userSetting = "Y";
+        Map<String, Object> setting = aService.getSafetyAlertSettings(memberId);
         
         // 사용자 관심 식재료
         List<FavoriteIngredientSummaryDTO> subscribedIngredients
@@ -444,9 +448,33 @@ public class MyPageController {
         Map<String, Object> response = new HashMap<>();
         response.put("alertList", list);
         response.put("pageInfo", pi);
-        response.put("userSetting", userSetting); 
+        response.put("userSetting", setting.get("notificationEnabled")); 
         response.put("subscribedIngredients", subscribedIngredients);
 
         return ResponseEntity.ok(response);
     }
+    
+    // 마이페이지 안전정보 전체 알림 토글
+    @PatchMapping("/settings/safetyAlert/toggle")
+    public ResponseEntity<?> toggleSafetyAlert(@RequestBody Map<String, String> body,
+    		Authentication authentication) {
+    	// 로그인 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인이 필요합니다."));
+        }
+        
+        String memberId = authentication.getName();
+        String notificationEnabled = body.get("notificationEnabled");
+        
+        // DB 저장 로직
+        aService.updateSafetyAlertSettings(memberId, notificationEnabled);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("notificationEnabled", notificationEnabled);
+    	
+    	return ResponseEntity.ok(response);
+    }
+    
 }
