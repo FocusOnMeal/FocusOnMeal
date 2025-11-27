@@ -508,3 +508,112 @@
 .chartArea {
     margin-top: 20px;
 }
+
+/* 가격 변동 정보 표시 */
+.priceChangeInfo {
+    display: flex;
+    gap: 20px;
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.changeBox {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.changeLabel {
+    font-size: 0.85em;
+    color: #666;
+    font-weight: 500;
+}
+
+.changeValue {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.priceUp {
+    color: #dc3545;
+}
+
+.priceDown {
+    color: #007aff;
+}
+
+.priceStable {
+    color: #757575;
+}
+
+.priceDiffSmall {
+    font-size: 0.85em;
+    opacity: 0.8;
+    margin-left: 4px;
+}
+
+/* 로그인 필요 메시지 */
+.loginRequired {
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    text-align: center;
+    margin: 20px 0;
+}
+.loginMessage {
+max-width: 400px;
+margin: 0 auto;
+}
+.lockIcon {
+font-size: 3em;
+display: block;
+margin-bottom: 20px;
+animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+0%, 100% {
+transform: scale(1);
+opacity: 1;
+}
+50% {
+transform: scale(1.1);
+opacity: 0.8;
+}
+}
+.mainMessage {
+font-size: 1.3em;
+font-weight: 600;
+color: #333;
+margin: 0 0 10px 0;
+}
+.subMessage {
+font-size: 0.95em;
+color: #666;
+margin: 0 0 25px 0;
+}
+.loginButton {
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+border: none;
+padding: 12px 30px;
+border-radius: 25px;
+font-size: 1em;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+.loginButton:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+.loginButton:active {
+transform: translateY(0);
+}
+/* 차트 영역 개선 */
+.chartArea {
+margin-top: 20px;
+}

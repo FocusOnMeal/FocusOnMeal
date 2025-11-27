@@ -13,6 +13,23 @@ import {
     ResponsiveContainer
 } from 'recharts';
 
+const getTokenSafe = () => {
+    const raw = sessionStorage.getItem('token') ?? localStorage.getItem('token');
+    if (!raw) return null;
+    const s = String(raw).trim();
+    if (s === '' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return null;
+    return s;
+};
+
+const clearToken = () => {
+    try {
+        sessionStorage.removeItem('token');
+        localStorage.removeItem('token');
+        // 로그인 상태 변경 이벤트(있으면 다른 컴포넌트가 반응하게)
+        window.dispatchEvent(new Event('loginStateChange'));
+    } catch (e) { /* 무시 */ }
+};
+
 // Y축 도메인 계산 (컴포넌트 외부로 분리)
 const calculateYAxisDomain = (dataPoints) => {
     if (!dataPoints || dataPoints.length === 0) return [0, 10000];
@@ -100,11 +117,14 @@ function IngredientDetail() {
     const [isPriceAlertEnabled, setIsPriceAlertEnabled] = useState(false);
     const [priceList, setPriceList] = useState([]);
     const [priceTrendData, setPriceTrendData] = useState(null);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         const fetchDetail = async () => {
             try {
-                const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+                const token = getTokenSafe();
+                setIsLoggedIn(!!token);
+                console.log('DEBUG token (safe):', token, 'isLoggedIn:', !!token);
                 
                 // 1. 기본 상세 정보
                 const response = await axios.get(`/ingredient/api/detail/${id}`);
@@ -152,6 +172,14 @@ function IngredientDetail() {
                         setPriceTrendData(trendResponse.data);
                     } catch (error) {
                         console.error('가격 추이 데이터 로드 실패:', error);
+                        if (error?.response?.status === 401) {
+                            console.log('가격 추이 API에서 401 받음 — 토큰 제거 및 로그인 상태 초기화');
+                            clearToken();
+                            setIsLoggedIn(false);
+                            setPriceTrendData(null);
+                            // 필요시 사용자에게 안내 (선택)
+                            // alert('세션이 만료되었습니다. 다시 로그인해 주세요.');
+                        }
                     }
 
                     // 찜 상태 확인
@@ -485,77 +513,96 @@ function IngredientDetail() {
                     <div className={styles.infoBox}>
                         <h3 className={styles.boxTitle}>가격 변동 추이 그래프 (최근 일주일)</h3>
                         
-                        {priceTrendData?.changeRate && (
+                        {!!priceTrendData?.changeRate && (
                             <PriceChangeDisplay changeRate={priceTrendData.changeRate} />
                         )}
 
-                        <div className={styles.chartArea}>
-                            {priceTrendData?.dataPoints?.length > 0 ? (
-                                <ResponsiveContainer width="100%" height={350}>
-                                    <LineChart 
-                                        data={priceTrendData.dataPoints}
-                                        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                                        
-                                        <XAxis
-                                            dataKey="date"
-                                            tickFormatter={(v) =>
-                                                new Date(v).toLocaleDateString("ko-KR", {
-                                                    month: "short",
-                                                    day: "numeric"
-                                                })
-                                            }
-                                            stroke="#666"
-                                        />
+                        {!isLoggedIn ? (
+                            <div style={{
+                                textAlign: 'center', 
+                                color: '#666', 
+                                padding: '60px 20px',
+                                background: '#f8f9fa',
+                                borderRadius: '8px'
+                            }}>
+                                <div style={{fontSize: '2.5em', marginBottom: '15px'}}>🔒</div>
+                                <p style={{fontSize: '1.1em', fontWeight: '600', margin: '0 0 8px 0'}}>
+                                    로그인이 필요한 기능입니다
+                                </p>
+                                <p style={{fontSize: '0.9em', color: '#999', margin: 0}}>
+                                    가격 변동 추이를 확인하려면 로그인해주세요
+                                </p>
+                            </div>
+                        ) : (
 
-                                        <YAxis
-                                            domain={calculateYAxisDomain(priceTrendData.dataPoints)}
-                                            tickFormatter={(v) => `${v.toLocaleString()}`}
-                                            label={{ 
-                                                value: '가격 (원)', 
-                                                angle: -90, 
-                                                position: 'insideLeft',
-                                                style: { textAnchor: 'middle' }
-                                            }}
-                                            stroke="#666"
-                                        />
+                            <div className={styles.chartArea}>
+                                {priceTrendData?.dataPoints?.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <LineChart 
+                                            data={priceTrendData.dataPoints}
+                                            margin={{ top: 50, right: 30, left: 10, bottom: 20 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                                            
+                                            <XAxis
+                                                dataKey="date"
+                                                tickFormatter={(v) =>
+                                                    new Date(v).toLocaleDateString("ko-KR", {
+                                                        month: "short",
+                                                        day: "numeric"
+                                                    })
+                                                }
+                                                stroke="#666"
+                                            />
 
-                                        <Tooltip
-                                            formatter={(value) => [`${value.toLocaleString()}원`, '가격']}
-                                            labelFormatter={(label) =>
-                                                new Date(label).toLocaleDateString("ko-KR", {
-                                                    year: "numeric",
-                                                    month: "2-digit",
-                                                    day: "2-digit",
-                                                })
-                                            }
-                                            contentStyle={{ 
-                                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                                border: '1px solid #ccc',
-                                                borderRadius: '4px',
-                                                padding: '10px'
-                                            }}
-                                        />
-                                        <Legend />
+                                            <YAxis
+                                                domain={calculateYAxisDomain(priceTrendData.dataPoints)}
+                                                tickFormatter={(v) => `${v.toLocaleString()}`}
+                                                label={{ 
+                                                    value: '가격 (원)', 
+                                                    angle: -90, 
+                                                    position: 'insideLeft',
+                                                    style: { textAnchor: 'middle' }
+                                                }}
+                                                stroke="#666"
+                                            />
 
-                                        <Line
-                                            type="monotone"
-                                            dataKey="price"
-                                            stroke="#4F75FF"
-                                            strokeWidth={2.5}
-                                            name="가격 (원)"
-                                            dot={{ r: 4, fill: '#4F75FF' }}
-                                            activeDot={{ r: 6, fill: '#3A5BC7' }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div style={{textAlign: 'center', color: '#aaa', padding: '50px 0'}}>
-                                    📊 가격 추이 데이터가 없습니다
-                                </div>
-                            )}
-                        </div>
+                                            <Tooltip
+                                                formatter={(value) => [`${value.toLocaleString()}원`, '가격']}
+                                                labelFormatter={(label) =>
+                                                    new Date(label).toLocaleDateString("ko-KR", {
+                                                        year: "numeric",
+                                                        month: "2-digit",
+                                                        day: "2-digit",
+                                                    })
+                                                }
+                                                contentStyle={{ 
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '4px',
+                                                    padding: '10px'
+                                                }}
+                                            />
+                                            <Legend />
+
+                                            <Line
+                                                type="monotone"
+                                                dataKey="price"
+                                                stroke="#4F75FF"
+                                                strokeWidth={2.5}
+                                                name="가격 (원)"
+                                                dot={{ r: 4, fill: '#4F75FF' }}
+                                                activeDot={{ r: 6, fill: '#3A5BC7' }}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div style={{textAlign: 'center', color: '#aaa', padding: '50px 0'}}>
+                                        📊 가격 추이 데이터가 없습니다
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         
                         {priceTrendData && (
                             <div style={{
