@@ -103,6 +103,10 @@ function IngredientDetail() {
     const [priceTrendData, setPriceTrendData] = useState(null);
     const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
 
+    const handleImageError = (e) => {
+        e.target.src = '/images/default_ingredient.png'; // public 폴더에 기본 이미지 필요
+    };
+
     useEffect(() => {
         const fetchDetail = async () => {
             try {
@@ -302,7 +306,16 @@ function IngredientDetail() {
                 
                 {/* 왼쪽: 영양 성분 */}
                 <div className={styles.leftColumn}>
+                    
                     <div className={styles.nutritionSection}>
+                        <div className={styles.imageWrapper}>
+                            <img 
+                                src={`/images/ingredients/${id}.jpg`} 
+                                alt={itemInfo.name} 
+                                className={styles.ingredientImage}
+                                onError={handleImageError}
+                            />
+                        </div>
                         <h3 className={styles.sectionTitle}>영양 성분 표</h3>
                         <div className={styles.nutritionTablePlaceholder}>
                             <table className={styles.nutritionTable}>
