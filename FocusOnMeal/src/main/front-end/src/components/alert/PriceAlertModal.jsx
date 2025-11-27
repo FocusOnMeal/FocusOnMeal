@@ -1,104 +1,284 @@
-// src/components/alert/PriceAlertModal.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Modal from '../Modal'; // 👈 작성하신 모달 틀 Import (경로 맞춰주세요)
-import './PriceAlertModal.css'; // 내용물 스타일
+import Modal from '../Modal';
+import './PriceAlertModal.css';
 
-const PriceAlertModal = ({ isOpen, onClose, ingredientId, ingredientName, currentPrice }) => {
-    const [targetPrice, setTargetPrice] = useState('');
+const PriceAlertModal = ({ isOpen, onClose, ingredientId, ingredientName, currentPrice, onAlertChange }) => {
+    const [alertList, setAlertList] = useState([]); 
     const [isLoading, setIsLoading] = useState(false);
+    const [customPrice, setCustomPrice] = useState('');
+    const [customType, setCustomType] = useState('decrease'); 
 
-    // 모달 열릴 때 내 설정 가져오기
+    // 모달이 열릴 때 Body 스크롤 잠금
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [isOpen]);
+
+    // 초기 데이터 로드
     useEffect(() => {
         if (isOpen && ingredientId) {
-            fetchMySetting();
+            fetchMyAlerts();
         } else {
-            setTargetPrice('');
+            setCustomPrice('');
+            setCustomType('decrease');
         }
     }, [isOpen, ingredientId]);
 
-    const fetchMySetting = async () => {
+    const fetchMyAlerts = async () => {
         try {
-            const token = localStorage.getItem('token'); // 토큰 키 확인 필요
+            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
             if (!token) return;
 
-            const res = await axios.get(`/api/price-alert`, {
+            const res = await axios.get(`/api/price-alert/all`, {
                 params: { ingredientId },
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            if (res.data) {
-                setTargetPrice(res.data.thresholdPrice);
+            if (res.data && Array.isArray(res.data)) {
+                setAlertList(res.data);
             }
         } catch (error) {
-            console.error(error);
+            console.error('기존 알림 조회 실패:', error);
+            setAlertList([]);
         }
     };
 
-    const handleSave = async () => {
-        if (!targetPrice) return alert("가격을 입력해주세요.");
-        
+    const addAlert = async (targetPrice, alertType) => {
+        const isDuplicate = alertList.some(alert => 
+            alert.thresholdPrice === targetPrice
+        );
+
+        if (isDuplicate) {
+            alert('이미 동일한 가격의 알림이 설정되어 있습니다.');
+            return;
+        }
+
         try {
             setIsLoading(true);
-            const token = localStorage.getItem('token');
-            
+            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+
             await axios.post('/api/price-alert', {
                 ingredientId: Number(ingredientId),
-                targetPrice: Number(targetPrice)
+                targetPrice: Number(targetPrice),
+                alertType: alertType
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            alert('알림이 설정되었습니다.');
-            onClose(); // 저장 후 닫기
+            await fetchMyAlerts();
+            
+            if (onAlertChange) {
+                onAlertChange(true);
+            }
+
         } catch (error) {
-            alert('저장에 실패했습니다.');
+            console.error('알림 추가 실패:', error);
+            alert('알림 설정에 실패했습니다.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    // 퍼센트 계산 도우미
-    const applyDiscount = (percent) => {
-        const discounted = currentPrice * (1 - percent / 100);
-        setTargetPrice(Math.floor(discounted / 10) * 10); // 1원단위 절삭
+    // [수정됨] 1원 단위(일의 자리)까지 정확하게 계산
+    const handleAddAlertByPercent = async (percent) => {
+        const isDecrease = percent < 0;
+        const targetPrice = isDecrease
+            ? Math.floor(currentPrice * (1 + percent / 100)) // 10으로 나누던 로직 제거
+            : Math.ceil(currentPrice * (1 + percent / 100)); // 10으로 나누던 로직 제거
+
+        await addAlert(targetPrice, isDecrease ? 'decrease' : 'increase');
+    };
+
+    // [수정됨] 1원 단위(일의 자리) 그대로 입력 반영
+    const handleAddCustomAlert = async () => {
+    // 1. 아무것도 입력하지 않았을 때
+        if (!customPrice) {
+            alert('설정할 목표 가격을 입력해주세요!');
+            return;
+        }
+
+        // 2. 0원이나 음수를 입력했을 때
+        if (Number(customPrice) <= 0) {
+            alert('1원 이상의 가격을 입력해주세요.');
+            return;
+        }
+
+        const targetPrice = Number(customPrice); // 10원 단위 절삭 로직 제거
+        await addAlert(targetPrice, customType);
+        setCustomPrice(''); // 입력 초기화
+    };
+
+    const handleDeleteAlert = async (alertId) => {
+        if (!window.confirm('이 알림을 삭제하시겠습니까?')) return;
+
+        try {
+            setIsLoading(true);
+            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+
+            await axios.delete('/api/price-alert', {
+                params: { ingredientId, alertId },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            await fetchMyAlerts();
+            
+            if (alertList.length <= 1) {
+                if (onAlertChange) onAlertChange(false);
+            }
+
+        } catch (error) {
+            console.error('알림 삭제 실패:', error);
+            alert('알림 삭제에 실패했습니다.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDeleteAll = async () => {
+        if (!window.confirm('모든 알림을 삭제하시겠습니까?')) return;
+
+        try {
+            setIsLoading(true);
+            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+
+            await axios.delete('/api/price-alert/all', {
+                params: { ingredientId },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setAlertList([]);
+            
+            if (onAlertChange) onAlertChange(false);
+
+            alert('모든 알림이 삭제되었습니다.');
+
+        } catch (error) {
+            console.error('전체 삭제 실패:', error);
+            alert('알림 삭제에 실패했습니다.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        /* 만들어두신 Modal 컴포넌트를 사용합니다.
-        title은 props로 넘기고, 내용은 children으로 사이에 넣습니다.
-        */
-        <Modal isOpen={isOpen} onClose={onClose} title="📉 가격 변동 알림 설정">
-            <div className="alert-content-wrapper">
-                <p className="alert-desc">
+        <Modal isOpen={isOpen} onClose={onClose} title="가격 변동 알림 설정">
+            <div className="alert-scroll-container">
+                
+                {/* 1. 가격 정보 헤더 (sticky 적용됨) */}
+                <div className="alert-header-box">
                     <strong>{ingredientName}</strong>의 현재 가격은{' '}
                     <span className="current-price">{currentPrice?.toLocaleString()}원</span>입니다.<br/>
-                    얼마 이하로 내려가면 알려드릴까요?
-                </p>
-
-                {/* 빠른 선택 버튼 */}
-                <div className="discount-buttons">
-                    <button onClick={() => applyDiscount(5)}>-5%</button>
-                    <button onClick={() => applyDiscount(10)}>-10%</button>
-                    <button onClick={() => applyDiscount(20)}>-20%</button>
+                    원하는 가격에 알림을 추가하세요!
                 </div>
 
-                {/* 가격 입력 */}
-                <div className="price-input-area">
-                    <input
-                        type="number"
-                        value={targetPrice}
-                        onChange={(e) => setTargetPrice(e.target.value)}
-                        placeholder="목표 가격 입력"
-                    />
-                    <span>원</span>
+                {/* 2. 빠른 추가 버튼 */}
+                <p className="section-label">가격 하락 알림</p>
+                <div className="percent-buttons">
+                    <button onClick={() => handleAddAlertByPercent(-5)} disabled={isLoading} className="btn-decrease">
+                        -5% <span className="price-preview">({Math.floor(currentPrice * 0.95).toLocaleString()}원)</span>
+                    </button>
+                    <button onClick={() => handleAddAlertByPercent(-10)} disabled={isLoading} className="btn-decrease">
+                        -10% <span className="price-preview">({Math.floor(currentPrice * 0.9).toLocaleString()}원)</span>
+                    </button>
+                    <button onClick={() => handleAddAlertByPercent(-15)} disabled={isLoading} className="btn-decrease">
+                        -15% <span className="price-preview">({Math.floor(currentPrice * 0.85).toLocaleString()}원)</span>
+                    </button>
                 </div>
 
-                {/* 저장 버튼 (모달 하단) */}
+                <p className="section-label">가격 상승 알림</p>
+                <div className="percent-buttons">
+                    <button onClick={() => handleAddAlertByPercent(5)} disabled={isLoading} className="btn-increase">
+                        +5% <span className="price-preview">({Math.ceil(currentPrice * 1.05).toLocaleString()}원)</span>
+                    </button>
+                    <button onClick={() => handleAddAlertByPercent(10)} disabled={isLoading} className="btn-increase">
+                        +10% <span className="price-preview">({Math.ceil(currentPrice * 1.1).toLocaleString()}원)</span>
+                    </button>
+                    <button onClick={() => handleAddAlertByPercent(15)} disabled={isLoading} className="btn-increase">
+                        +15% <span className="price-preview">({Math.ceil(currentPrice * 1.15).toLocaleString()}원)</span>
+                    </button>
+                </div>
+
+                {/* 3. 직접 입력 (스크롤 방지 적용됨) */}
+                <div className="custom-input-section">
+                    <p className="section-label" style={{marginTop:0}}>직접 입력</p>
+                    <div className="custom-input-wrapper">
+                        <input
+                            type="number"
+                            value={customPrice}
+                            onChange={(e) => setCustomPrice(e.target.value)}
+                            onWheel={(e) => e.target.blur()} 
+                            placeholder="목표 가격 입력"
+                            className="custom-price-input"
+                        />
+                        <span className="input-unit">원</span>
+                        <button 
+                            className="btn-add-custom"
+                            onClick={handleAddCustomAlert}
+                            disabled={isLoading || !customPrice}
+                        >
+                            설정
+                        </button>
+                    </div>
+                </div>
+
+                {/* 4. 설정된 알림 목록 */}
+                <div className="alert-list-section">
+                    <div className="list-header">
+                        <h4>설정된 알림 ({alertList.length}개)</h4>
+                        {alertList.length > 0 && (
+                            <button className="btn-delete-all" onClick={handleDeleteAll} disabled={isLoading}>
+                                전체 삭제
+                            </button>
+                        )}
+                    </div>
+
+                    {alertList.length === 0 ? (
+                        <div className="empty-alert">
+                            설정된 알림이 없습니다.<br/>
+                            위의 버튼을 눌러 알림을 추가하세요!
+                        </div>
+                    ) : (
+                        <div className="alert-items">
+                            {alertList.map((alert, index) => {
+                                const isDecrease = alert.thresholdPrice < currentPrice;
+                                const priceDiff = alert.thresholdPrice - currentPrice;
+                                const percentDiff = ((priceDiff / currentPrice) * 100).toFixed(1);
+                                
+                                return (
+                                    <div key={alert.alertId || index} className={`alert-item ${isDecrease ? 'decrease' : 'increase'}`}>
+                                        <div className="alert-item-icon">{isDecrease ? '📉' : '📈'}</div>
+                                        <div className="alert-item-info">
+                                            {/* 가격 (검은색) */}
+                                            <div className="alert-item-price">
+                                                {alert.thresholdPrice?.toLocaleString()}원 {isDecrease ? '이하' : '이상'}
+                                            </div>
+                                            {/* 상세 (색상 적용) */}
+                                            <div className="alert-item-detail">
+                                                {isDecrease ? '▼' : '▲'} {Math.abs(percentDiff)}% 
+                                                ({priceDiff > 0 ? '+' : ''}{priceDiff.toLocaleString()}원)
+                                            </div>
+                                        </div>
+                                        <button className="btn-delete-item" onClick={() => handleDeleteAlert(alert.alertId)} disabled={isLoading}>
+                                            ✕
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* 5. 닫기 버튼 */}
                 <div className="alert-footer">
-                    <button className="btn-cancel" onClick={onClose}>취소</button>
-                    <button className="btn-save" onClick={handleSave} disabled={isLoading}>
-                        {isLoading ? '저장 중...' : '알림 받기'}
+                    <button className="btn-close" onClick={onClose}>
+                        닫기
                     </button>
                 </div>
             </div>

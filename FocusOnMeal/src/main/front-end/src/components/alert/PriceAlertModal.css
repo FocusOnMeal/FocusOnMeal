@@ -1,0 +1,241 @@
+/* src/components/alert/PriceAlertModal.css */
+
+/* [수정] 높이 제한과 자체 스크롤을 제거하여 모달(부모) 스크롤에 맡김 */
+.alert-scroll-container {
+    height: auto;          /* 높이 제한 해제 */
+    overflow: visible;     /* 스크롤 제거 */
+    padding-right: 0;      /* 여백 초기화 */
+}
+
+/* 1. 상단 가격 박스 (헤더) */
+.alert-header-box {
+    /* [핵심] 모달 전체 스크롤 시에도 상단에 고정 */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    /* 스크롤 될 때 뒤에 내용이 비치지 않도록 배경색 지정 */
+    background: #ffffff; 
+    /* 또는 기존 그라데이션 유지 */
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    
+    border: 2px solid #dee2e6;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+    
+    /* 입체감 추가 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.alert-header-box::before {
+    content: "";
+    display: block;
+    position: absolute;
+    
+    /* 헤더 위쪽으로 50px만큼 넉넉하게 덮개 생성 */
+    top: -50px; 
+    left: -30px;
+    right: -30px;
+    height: 50px; 
+    
+    /* 모달 배경과 같은 흰색으로 설정 */
+    background-color: #fff; 
+    
+    /* 글자보다는 뒤, 스크롤되는 내용보다는 앞에 위치 */
+    z-index: -1; 
+}
+
+.alert-header-box strong {
+    color: #4F75FF;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.current-price {
+    color: #dc3545;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+/* 섹션 라벨 공통 */
+.section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+/* 퍼센트 버튼들 */
+.percent-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.percent-buttons button {
+    padding: 12px 5px;
+    border: 2px solid;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: white;
+}
+
+.btn-decrease { border-color: #007aff; color: #007aff; background: #f0f7ff; }
+.btn-increase { border-color: #dc3545; color: #dc3545; background: #fff0f1; }
+.percent-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.price-preview {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* 직접 입력 섹션 */
+.custom-input-section {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.custom-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.custom-price-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+}
+.custom-price-input:focus { outline: none; border-color: #4F75FF; }
+.input-unit { font-size: 15px; font-weight: 600; color: #666; }
+
+.btn-add-custom {
+    padding: 10px 20px;
+    background: #4F75FF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn-add-custom:disabled { background: #adb5bd; cursor: not-allowed; }
+
+/* 알림 리스트 섹션 */
+.alert-list-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.list-header h4 { margin: 0; font-size: 16px; color: #495057; }
+
+.btn-delete-all {
+    padding: 6px 12px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.empty-alert {
+    text-align: center;
+    padding: 30px 20px;
+    color: #adb5bd;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.alert-items { display: flex; flex-direction: column; gap: 10px; }
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #eee;
+}
+.alert-item.decrease { border-color: #007aff; }
+.alert-item.increase { border-color: #dc3545; }
+
+.alert-item-icon { font-size: 24px; }
+.alert-item-info { flex: 1; }
+
+.alert-item-price { 
+    font-size: 15px; 
+    font-weight: 700; 
+    color: #333; 
+    margin-bottom: 4px;
+}
+
+.alert-item-detail { 
+    font-size: 13px; 
+    font-weight: 600;
+}
+
+/* 하락일 때 파란색 */
+.alert-item.decrease .alert-item-detail {
+    color: #007aff; 
+}
+
+/* 상승일 때 빨간색 */
+.alert-item.increase .alert-item-detail {
+    color: #dc3545; 
+}
+
+.btn-delete-item {
+    width: 28px; height: 28px;
+    border: none; background: #dee2e6; color: #495057;
+    border-radius: 50%; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-delete-item:hover { background: #dc3545; color: white; }
+
+/* 하단 닫기 버튼 */
+.alert-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+    margin-top: 20px;
+    padding-bottom: 10px;
+}
+
+.btn-close {
+    padding: 12px 40px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}

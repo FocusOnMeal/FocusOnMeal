@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './detail.module.css';
+import PriceAlertModal from '../../components/alert/PriceAlertModal';
 import {
     LineChart,
     Line,
@@ -102,6 +103,11 @@ function IngredientDetail() {
     const [priceTrendData, setPriceTrendData] = useState(null);
     const [pricePrediction, setPricePrediction] = useState(null); // 가격 예측 데이터
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
+    const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
+
+    const handleImageError = (e) => {
+        e.target.src = '/images/default_ingredient.png'; // public 폴더에 기본 이미지 필요
+    };
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -259,7 +265,7 @@ function IngredientDetail() {
     };
 
     // 가격 알림 핸들러
-    const handlePriceAlertClick = async () => {
+    const handlePriceAlertClick = () => {
         const token = sessionStorage.getItem('token') || localStorage.getItem('token');
 
         if (!token) {
@@ -267,22 +273,9 @@ function IngredientDetail() {
             return;
         }
 
-        try {
-            const response = await axios.post(`/ingredient/api/${id}/price-alert`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (response.data.success) {
-                setIsPriceAlertEnabled(response.data.isEnabled);
-            }
-        } catch (error) {
-            if (error.response?.status === 401) {
-                alert("로그인이 필요합니다.");
-            } else {
-                alert("오류가 발생했습니다.");
-            }
-        }
-    };
+        // 모달 열기
+        setIsPriceModalOpen(true);
+    };  
 
     // 로딩 중
     if (loading) {
@@ -324,7 +317,16 @@ function IngredientDetail() {
                 
                 {/* 왼쪽: 영양 성분 */}
                 <div className={styles.leftColumn}>
+                    
                     <div className={styles.nutritionSection}>
+                        <div className={styles.imageWrapper}>
+                            <img 
+                                src={`/images/ingredients/${id}.jpg`} 
+                                alt={itemInfo.name} 
+                                className={styles.ingredientImage}
+                                onError={handleImageError}
+                            />
+                        </div>
                         <h3 className={styles.sectionTitle}>영양 성분 표</h3>
                         <div className={styles.nutritionTablePlaceholder}>
                             <table className={styles.nutritionTable}>
@@ -396,7 +398,7 @@ function IngredientDetail() {
 
                                     {itemInfo.previousPrice > 0 && itemInfo.previousCollectedDate && (
                                         <span style={{marginLeft: '8px', color: '#999'}}>
-                                            (직전: {itemInfo.previousPrice.toLocaleString()}원, 
+                                            (전일 : {itemInfo.previousPrice.toLocaleString()}원, 
                                             {' ' + new Date(itemInfo.previousCollectedDate).toLocaleDateString('ko-KR', {
                                                 month: 'numeric',
                                                 day: 'numeric',
@@ -701,6 +703,15 @@ function IngredientDetail() {
                     </div>
                 </div>
             </div>
+            <PriceAlertModal
+                isOpen={isPriceModalOpen}
+                onClose={() => setIsPriceModalOpen(false)}
+                ingredientId={id}
+                ingredientName={itemInfo?.name}
+                currentPrice={itemInfo?.currentPrice}
+                isAlertEnabled={isPriceAlertEnabled}
+                onAlertChange={(isEnabled) => setIsPriceAlertEnabled(isEnabled)}
+            />
         </div>
     );
 }

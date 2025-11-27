@@ -1,11 +1,13 @@
 package com.fom.boot.app.alert.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,51 +28,89 @@ public class PriceAlertController {
     private final PriceAlertService priceAlertService;
 
     /**
-     * 설정 조회 (모달 Open 시 호출)
-     * GET /api/price-alert?ingredientId=101
+     * 모든 알림 조회 (하락/상승 모두)
+     * GET /api/price-alert/all?ingredientId=101
      */
-    @GetMapping
-    public ResponseEntity<?> getAlertSetting(Authentication auth, @RequestParam int ingredientId) {
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllAlerts(Authentication auth, @RequestParam int ingredientId) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
-        
-        // Service 메서드명: getMyPriceAlert (VO 리턴)
-        PriceAlert alert = priceAlertService.getMyPriceAlert(auth.getName(), ingredientId);
-        
-        // 설정이 없으면 null이 리턴되는데, 프론트에서는 200 OK에 body가 비어있거나 null로 받아서 처리
-        return ResponseEntity.ok(alert); 
+
+        List<PriceAlert> alerts = priceAlertService.getAllPriceAlerts(auth.getName(), ingredientId);
+        return ResponseEntity.ok(alerts);
     }
 
     /**
-     * 설정 저장/수정 (모달 Save 버튼)
+     * 알림 추가
      * POST /api/price-alert
-     * Body: { "ingredientId": 101, "targetPrice": 3000 }
+     * Body: { "ingredientId": 101, "targetPrice": 3000, "alertType": "decrease" }
      */
     @PostMapping
-    public ResponseEntity<?> saveAlertSetting(Authentication auth, @RequestBody Map<String, Object> req) {
+    public ResponseEntity<?> addAlert(Authentication auth, @RequestBody Map<String, Object> req) {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
-        
+
         try {
-            // 1. ID 파싱 (VO가 int이므로 int로 변환)
             int ingredientId = Integer.parseInt(req.get("ingredientId").toString());
-            
-            // 2. 가격 파싱 (VO가 BigDecimal이므로 변환 주의)
-            // toString() 후 생성자에 넣는 것이 가장 안전합니다.
             BigDecimal targetPrice = new BigDecimal(req.get("targetPrice").toString());
-            
-            // Service 메서드명: setPriceAlert
-            priceAlertService.setPriceAlert(auth.getName(), ingredientId, targetPrice);
-            
-            return ResponseEntity.ok("알림 설정이 저장되었습니다.");
-            
+            String alertType = req.getOrDefault("alertType", "decrease").toString();
+
+            priceAlertService.addPriceAlert(auth.getName(), ingredientId, targetPrice, alertType);
+
+            return ResponseEntity.ok("알림이 추가되었습니다.");
+
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body("잘못된 숫자 형식입니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("저장 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("알림 추가 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 알림 삭제 (개별)
+     * DELETE /api/price-alert?ingredientId=101&alertId=123
+     */
+    @DeleteMapping
+    public ResponseEntity<?> deleteAlert(
+            Authentication auth,
+            @RequestParam int ingredientId,
+            @RequestParam int alertId) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        try {
+            priceAlertService.deletePriceAlert(auth.getName(), ingredientId, alertId);
+            return ResponseEntity.ok("알림이 삭제되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("알림 삭제 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 전체 알림 삭제
+     * DELETE /api/price-alert/all?ingredientId=101
+     */
+    @DeleteMapping("/all")
+    public ResponseEntity<?> deleteAllAlerts(Authentication auth, @RequestParam int ingredientId) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        try {
+            priceAlertService.deleteAllPriceAlerts(auth.getName(), ingredientId);
+            return ResponseEntity.ok("모든 알림이 삭제되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("알림 삭제 중 오류가 발생했습니다.");
         }
     }
 }
