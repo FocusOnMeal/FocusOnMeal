@@ -1,6 +1,7 @@
 package com.fom.boot.domain.notice.model.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -33,4 +34,16 @@ public interface NoticeMapper {
 	// 필독 공지사항 조회
 	List<Notice> selectImportantNotices();
 
+	// 공지사항 이전, 다음글 조회
+	Map<String, Object> selectPrevNotice(int noticeNo);
+
+	Map<String, Object> selectNextNotice(int noticeNo);
+
+	void increaseViewCount(int noticeNo);
+
+	Notice getNoticeForView(int noticeNo);
+
+
+
+	
 }
