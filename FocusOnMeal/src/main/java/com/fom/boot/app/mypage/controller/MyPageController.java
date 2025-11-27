@@ -69,11 +69,6 @@ public class MyPageController {
             @RequestParam(defaultValue = "30") int days,
             Authentication authentication) {
         
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "로그인이 필요합니다."));
-        }
-        
         try {
             PriceTrendResponse chartData = mService.getPriceChartData(ingredientId, days);
             return ResponseEntity.ok(chartData);
