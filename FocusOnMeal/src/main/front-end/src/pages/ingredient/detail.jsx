@@ -325,7 +325,7 @@ function IngredientDetail() {
 
         // 모달 열기
         setIsPriceModalOpen(true);
-    };  
+
         try {
             const response = await axios.post(`/ingredient/api/${id}/price-alert`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
