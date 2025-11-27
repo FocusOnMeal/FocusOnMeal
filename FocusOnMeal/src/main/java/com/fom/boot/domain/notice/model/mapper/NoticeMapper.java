@@ -12,10 +12,19 @@ import com.fom.boot.domain.notice.model.vo.Notice;
 public interface NoticeMapper {
 
 	// 관리자 공지사항 목록 조회용
-	List<Notice> selectAllNotices();
+	List<Notice> selectAllNotices(@Param("startRow") int startRow,
+			@Param("endRow") int endRow,
+			@Param("type") String type,
+			@Param("keyword") String keyword,
+			@Param("sortColumn") String sortColumn,
+			@Param("sortOrder") String sortOrder,
+			@Param("filterType") String filterType);
 
 	// 관리자 공지사항 수정용
 	int modifyNotice(Notice notice);
+
+	// 관리자 공지사항 삭제
+	int deleteNotice(int noticeNo);
 	
 	// 일반 공지사항 조회
 	List<Notice> selectPublicNotices(@Param("startRow") int startRow,
@@ -42,8 +51,5 @@ public interface NoticeMapper {
 	void increaseViewCount(int noticeNo);
 
 	Notice getNoticeForView(int noticeNo);
-
-
-
 	
 }

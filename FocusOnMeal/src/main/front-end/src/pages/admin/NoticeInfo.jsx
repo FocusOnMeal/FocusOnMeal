@@ -3,11 +3,30 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./NoticeInfo.module.css";
 import Sidebar from "../../components/admin/Sidebar";
+import Pagination from "../../components/common/Pagination";
 
 
 const NoticeInfo = () => {
 
     const [noticeInfo, setNoticeInfo] = useState([]);
+
+    // 페이지네이션
+    const [pageInfo, setPageInfo] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // api 요청용 검색
+    const [fetchSearchType, setFetchSearchType] = useState('all'); 
+    const [fetchSearchKeyword, setFetchSearchKeyword] = useState('');
+
+    // 화면용 검색
+    const [searchType, setSearchType] = useState('all');
+    const [searchKeyword, setSearchKeyword] = useState('');
+
+    // 정렬기준 컬럼
+    const [sortColumn, setSortColumn] = useState(null);
+
+    // 정렬 순서
+    const [sortOrder, setSortOrder] = useState("asc");
 
     // 뱃지 필터
     const [filterType, setFilterType] = useState("ALL"); 
@@ -51,6 +70,64 @@ const NoticeInfo = () => {
         .catch(err => console.error(err));
     };
 
+    // 공지 삭제
+    const handleDelete = (noticeNo) => {
+        if (!window.confirm("해당 공지사항을 삭제하시겠습니까?")) return;
+
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+            return;
+        }
+
+        axios
+            .delete(`/api/admin/noticeInfo/${noticeNo}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(() => {
+                // 삭제 성공 시, 화면 목록에서도 제거
+                setNoticeInfo((prev) => prev.filter((n) => n.noticeNo !== noticeNo));
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("공지사항 삭제 중 오류가 발생했습니다.");
+            });
+    };
+
+    // 검색 핸들러
+    const handleSearch = () =>{
+        setCurrentPage(1);
+        setFetchSearchType(searchType);
+        setFetchSearchKeyword(searchKeyword);
+    }
+
+    // Enter 키로 검색
+    const handleSearchOnEnter = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    // 정렬 핸들러
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            // 같은 컬럼 클릭 → asc ↔ desc 토글
+            setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+        } else {
+            // 새로운 컬럼 클릭 → 오름차순으로 초기화
+            setSortColumn(column);
+            setSortOrder("asc");
+        }
+        
+    };
+
+    // 필터 변경 핸들러
+    const handleFilterChange = (type) => {
+        setFilterType(type);   // ALL / NEW / IMPORTANT
+        setCurrentPage(1);     // 필터 바꿀 때 페이지 1로
+    };
+
+
     useEffect(() => {
         const fetchNoticeInfo = () => {
             const token = sessionStorage.getItem("token");
@@ -59,16 +136,31 @@ const NoticeInfo = () => {
                 return;
             }
 
+            const params = {
+                page: currentPage,
+                type: fetchSearchType,
+                keyword: fetchSearchKeyword,
+                sortColumn,
+                sortOrder,
+                filterType
+            }
+
+            if(!params.keyword){
+                params.type = 'all';
+            }
+
                 axios.get("/api/admin/noticeInfo", {
-                                headers: {
-                                    Authorization: `Bearer ${token}`
-                                }
-                            })
+                    params : params,
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 .then(res => {
                     console.log("[API 성공] 서버 응답:", res);
                     console.log("[API 성공] 받은 데이터:", res.data);
                     
-                    setNoticeInfo(res.data);
+                    setNoticeInfo(res.data.noticeList);
+                    setPageInfo(res.data.pageInfo);
                 })
                 .catch(err => {
                     console.error("[API 실패] 에러 발생:", err);
@@ -91,8 +183,8 @@ const NoticeInfo = () => {
                     }
                 });
         };
-        fetchNoticeInfo();
-    }, []);
+        fetchNoticeInfo(currentPage);
+    }, [currentPage, fetchSearchType, fetchSearchKeyword, sortColumn, sortOrder, filterType]);
 
 
     return (
@@ -104,67 +196,100 @@ const NoticeInfo = () => {
                     {/* NEW / 필독 버튼 필터 */}
                     <div className={styles.filterButtons}>
                         <button
-                            className={`${styles.filterBtn} ${filterType === "ALL" ? styles.activeFilter : ""}`}
-                            onClick={() => setFilterType("ALL")}
+                            className={`${styles.filterBtn} ${
+                                filterType === "ALL" ? styles.activeFilter : ""
+                            }`}
+                            onClick={() => handleFilterChange("ALL")}
                         >
                             전체
                         </button>
 
                         <button
-                            className={`${styles.filterBtn} ${filterType === "NEW" ? styles.activeFilter : ""}`}
-                            onClick={() => setFilterType("NEW")}
+                            className={`${styles.filterBtn} ${
+                                filterType === "NEW" ? styles.activeFilter : ""
+                            }`}
+                            onClick={() => handleFilterChange("NEW")}
                         >
                             NEW
                         </button>
 
                         <button
-                            className={`${styles.filterBtn} ${filterType === "IMPORTANT" ? styles.activeFilter : ""}`}
-                            onClick={() => setFilterType("IMPORTANT")}
+                            className={`${styles.filterBtn} ${
+                                filterType === "IMPORTANT" ? styles.activeFilter : ""
+                            }`}
+                            onClick={() => handleFilterChange("IMPORTANT")}
                         >
                             필독!
                         </button>
                     </div>
+
                     
                     {/* 🔎 검색 UI */}
                     <div className={styles.searchBox}>
-                        <select className={styles.selectBox}>
-                            <option>전체</option>
-                            <option>제목</option>
-                            <option>작성자</option>
-                            <option>내용</option>
+                        <select 
+                            value={searchType}
+                            onChange={(e) => setSearchType(e.target.value)}
+                            className={styles.selectBox}
+                        >
+                            <option value="all">전체</option>
+                            <option value="title">제목</option>
+                            <option value="content">내용</option>
                         </select>
 
                         <input
                             type="text"
                             placeholder="검색어를 입력하세요"
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
+                            onKeyDown={handleSearchOnEnter}
                             className={styles.searchInput}
                             />
 
-                        <button className={styles.searchBtn}>검색</button>
+                        <button 
+                            onClick={handleSearch}
+                            className={styles.searchBtn}
+                        >
+                            검색
+                        </button>
                     </div>
                 </div>
                 <table className={styles.noticeTable}>
                     <thead>
                         <tr>
-                            <th>
+                            <th onClick={() => handleSort("noticeNo")}>
                                 번호
-                                <span className={styles.sortIcon}>▲▼</span>
+                                <span className={`${styles.sortIcon} ${
+                                    sortColumn === "noticeNo" ? (sortOrder === "asc" ? styles.asc : styles.desc) : ""
+                                }`}>
+                                    ▲▼
+                                </span>
                             </th>
-                            <th className={styles.titleCol}>
+                            <th onClick={() => handleSort("noticeSubject")}>
                                 제목
-                                <span className={styles.sortIcon}>▲▼</span>
+                                <span className={`${styles.sortIcon} ${
+                                    sortColumn === "noticeSubject" ? (sortOrder === "asc" ? styles.asc : styles.desc) : ""
+                                }`}>
+                                    ▲▼
+                                </span>
                             </th>
                             <th>
                                 작성자
-                                <span className={styles.sortIcon}>▲▼</span>
                             </th>
-                            <th>
+                            <th onClick={() => handleSort("noticeCreateAt")}>
                                 작성일
-                                <span className={styles.sortIcon}>▲▼</span>
+                                <span className={`${styles.sortIcon} ${
+                                    sortColumn === "noticeCreateAt" ? (sortOrder === "asc" ? styles.asc : styles.desc) : ""
+                                }`}>
+                                    ▲▼
+                                </span>
                             </th>
-                            <th>
+                            <th onClick={() => handleSort("viewCount")}>
                                 조회수
-                                <span className={styles.sortIcon}>▲▼</span>
+                                <span className={`${styles.sortIcon} ${
+                                    sortColumn === "viewCount" ? (sortOrder === "asc" ? styles.asc : styles.desc) : ""
+                                }`}>
+                                    ▲▼
+                                </span>
                             </th>
                             <th>관리</th>
                         </tr>
@@ -212,7 +337,12 @@ const NoticeInfo = () => {
                                             >
                                                 수정
                                             </button>
-                                            <button className={styles.deleteBtn}>삭제</button>
+                                            <button
+                                                className={styles.deleteBtn}
+                                                onClick={() => handleDelete(notice.noticeNo)}
+                                            >
+                                                삭제
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -231,14 +361,11 @@ const NoticeInfo = () => {
                         공지사항 추가 +
                     </button>
                 </div>
-                {/* 🔢 정적 페이지네이션 UI */}
-                <div className={styles.pagination}>
-                    <button className={styles.pageBtn}>{`<`}</button>
-                    <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-                    <button className={styles.pageBtn}>2</button>
-                    <button className={styles.pageBtn}>3</button>
-                    <button className={styles.pageBtn}>{`>`}</button>
-                </div>
+                <Pagination
+                    pageInfo={pageInfo}
+                    currentPage={currentPage}
+                    changePage={(page) => setCurrentPage(page)}
+                />
             </div>
 
             {/* Modal */}

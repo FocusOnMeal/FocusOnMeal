@@ -21,14 +21,32 @@ public class NoticeServiceImpl implements NoticeService {
 	
 	// 관리자 공지사항 목록 조회용
 	@Override
-	public List<Notice> selectAllNotices() {
-		return mapper.selectAllNotices();
+	public List<Notice> selectAllNotices(PageInfo pageInfo, String type ,String keyword, 
+										String sortColumn, String sortOrder, String filterType) {
+		return mapper.selectAllNotices(pageInfo.getStartRow(),
+	            pageInfo.getEndRow(),
+	            type,
+	            keyword,
+	            sortColumn,
+	            sortOrder,
+	            filterType);
 	}
 
 	// 관리자 공지사항 수정
 	@Override
 	public int modifyNotice(Notice notice) {	
 		return mapper.modifyNotice(notice);
+	}
+	
+	// 관리자 공지사항 삭제
+	@Override
+	public void deleteNotice(int noticeNo) {
+		int result = mapper.deleteNotice(noticeNo);
+
+        if (result == 0) {
+            throw new RuntimeException("해당 공지사항이 존재하지 않습니다.");
+        }
+		
 	}
 
 	// 일반 공지사항 조회
@@ -60,6 +78,7 @@ public class NoticeServiceImpl implements NoticeService {
 	public List<Notice> selectImportantNotices() {
 		return mapper.selectImportantNotices();
 	}
+	
 
 	
 	// 공지사항 이전, 다음글 조회

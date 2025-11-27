@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styles from './SafetyAlert.module.css';
 import Sidebar from '../../components/mypage/Sidebar';
 import Pagination from '../../components/common/Pagination';
+import axios from 'axios';
 
 const SafetyAlert = () => {
 
@@ -44,16 +45,17 @@ const SafetyAlert = () => {
 
     // 알림 수신 여부 토글 핸들러
     const handleToggleNotification = async () => {
-        // 실제 환경에서는 로컬스토리지 토큰 사용
-        // const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         const newValue = !isNotificationEnabled;
 
         try {
-            // API 요청 시뮬레이션
-            // await axios.patch("/api/mypage/setting/safetyAlert/toggle", { enabled: newValue ? 'Y' : 'N' }, ...);
-            
+            await axios.patch("/api/mypage/settings/safetyAlert/toggle", 
+                { notificationEnabled: newValue ? 'Y' : 'N' }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             setIsNotificationEnabled(newValue);
-            
             if (newValue) {
                 alert("모든 안전 알림을 수신합니다.");
             } else {
@@ -67,32 +69,37 @@ const SafetyAlert = () => {
 
     // 데이터 조회
     useEffect(() => {
-        // API 호출 시뮬레이션 (미리보기용 데이터)
-        const mockData = {
-            userSetting: 'N', // 초기값: 전체 알림 꺼짐
-            subscribedIngredients: [
-                { ingredientId: 1, name: '아보카도' },
-                { ingredientId: 2, name: '연어' },
-                { ingredientId: 3, name: '우유' }
-            ],
-            alertList: [
-                { alertId: 105, nation: "중국", hazardType: "잔류농약", title: "수입산 브로콜리 잔류농약 기준 초과", publicationDate: "2025-11-21T10:00:00", originalUrl: "#" },
-                { alertId: 104, nation: "일본", hazardType: "방사능", title: "수산물 방사능 검출 보고", publicationDate: "2025-11-20T14:30:00", originalUrl: "#" },
-                { alertId: 103, nation: "미국", hazardType: "이물질", title: "냉동 피자 금속 이물질 혼입 가능성", publicationDate: "2025-11-19T09:00:00", originalUrl: "#" },
-                { alertId: 102, nation: "국내", hazardType: "식중독균", title: "가을철 김밥 식중독 주의보 발령", publicationDate: "2025-11-18T11:20:00", originalUrl: "#" },
-                { alertId: 101, nation: "베트남", hazardType: "품질부적합", title: "건조 망고 당도 표기 위반", publicationDate: "2025-11-15T16:45:00", originalUrl: "#" },
-            ],
-            pageInfo: { currentPage: 1, maxPage: 5, startPage: 1, endPage: 5 }
+        const fetchAlerts = async () => {
+            try {
+                const token = sessionStorage.getItem("token");
+
+                const res = await axios.get("/api/mypage/settings/safetyAlert", {
+                    params: {
+                        page: currentPage,
+                        type: fetchSearchType,
+                        keyword: fetchSearchKeyword,
+                        sortColumn,
+                        sortOrder
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                // response 구조에 맞게 저장
+                setAlertList(res.data.alertList);
+                setPageInfo(res.data.pageInfo);
+                setIsNotificationEnabled(res.data.userSetting === "Y");
+                setSubscribedIngredients(res.data.subscribedIngredients);
+
+            } catch (err) {
+                console.error("안전 정보 조회 실패:", err);
+            }
         };
 
-        // 실제 구현 시 axios 호출
-        setAlertList(mockData.alertList);
-        setPageInfo(mockData.pageInfo);
-        setIsNotificationEnabled(mockData.userSetting === 'Y');
-        setSubscribedIngredients(mockData.subscribedIngredients);
-
+        fetchAlerts();
     }, [currentPage, fetchSearchType, fetchSearchKeyword, sortColumn, sortOrder]);
-    
+
     return(
         <div className={styles.container}>
             <Sidebar />
@@ -136,7 +143,7 @@ const SafetyAlert = () => {
                                             to={`/ingredient/detail/${ing.ingredientId}`}
                                             className={styles.ingredientTag}
                                         >
-                                            {ing.name}
+                                            {ing.ingredientName}
                                         </Link>
                                     ))}
                                     <Link to="/ingredient/list" className={styles.addTagBtn}>+ 추가</Link>

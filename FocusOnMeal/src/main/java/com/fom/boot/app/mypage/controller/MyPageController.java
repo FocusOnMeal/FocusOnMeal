@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,9 +25,14 @@ import com.fom.boot.app.mypage.dto.MyPageDashboardDTO;
 import com.fom.boot.app.mypage.dto.ProfileResponse;
 import com.fom.boot.app.mypage.dto.ProfileUpdateRequest;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
+import com.fom.boot.common.pagination.PageInfo;
+import com.fom.boot.common.pagination.Pagination;
+import com.fom.boot.domain.alert.model.service.AlertService;
+import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.member.model.service.MemberService;
 import com.fom.boot.domain.mypage.model.service.MyPageService;
+import com.fom.boot.domain.safety.model.service.SafetyService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +49,10 @@ public class MyPageController {
 	private final MemberService bService;
 	
 	private final IngredientService iService;
+	
+	private final SafetyService sService;
+	
+	private final AlertService aService;
 	
 	// 마이페이지 대시보드 이동
 	@GetMapping("/dashboard")
@@ -372,7 +382,7 @@ public class MyPageController {
     }
     
     // 찜한 식재료 목록 조회 (마이페이지용)
-    @GetMapping("/favorites")
+    @GetMapping("/ingredients/favorite")
     public ResponseEntity<?> getFavoriteIngredients(Authentication authentication) {
         
         // 로그인 확인
@@ -383,10 +393,82 @@ public class MyPageController {
         
         String memberId = authentication.getName();
         
-        // 로직은 IngredientService에 있는 것을 그대로 재사용합니다.
         List<FavoriteIngredientSummaryDTO> favorites = iService.getFavoritesByMemberId(memberId);
         
         return ResponseEntity.ok(favorites);
+    }
+    
+    // 마이페이지 안전정보알림
+    @GetMapping("/settings/safetyAlert")
+    public ResponseEntity<?> getSafetyAlerts(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "all") String type,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "alertId") String sortColumn,
+            @RequestParam(defaultValue = "desc") String sortOrder,
+            Authentication authentication) {
+    	// 로그인 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인이 필요합니다."));
+        }
+        
+        String memberId = authentication.getName();
+        
+        // 검색 조건 구성
+        Map<String, String> searchMap = new HashMap<>();
+        searchMap.put("memberId", memberId);  
+        searchMap.put("type", type);
+        searchMap.put("keyword", keyword.trim());
+        searchMap.put("sortColumn", sortColumn);
+        searchMap.put("sortOrder", sortOrder);
+
+        // 전체 개수 조회
+        int total = sService.selectAlertListCount(searchMap);
+
+        // 페이징 생성
+        PageInfo pi = Pagination.getPageInfo(page, total);
+
+        // 목록 조회
+        List<SafetyAlert> list = sService.selectAlertList(pi, searchMap);
+
+        // 유저 알림
+        Map<String, Object> setting = aService.getSafetyAlertSettings(memberId);
+        
+        // 사용자 관심 식재료
+        List<FavoriteIngredientSummaryDTO> subscribedIngredients
+        = iService.getFavoritesByMemberId(memberId);
+
+        // 응답 데이터 구성
+        Map<String, Object> response = new HashMap<>();
+        response.put("alertList", list);
+        response.put("pageInfo", pi);
+        response.put("userSetting", setting.get("notificationEnabled")); 
+        response.put("subscribedIngredients", subscribedIngredients);
+
+        return ResponseEntity.ok(response);
+    }
+    
+    // 마이페이지 안전정보 전체 알림 토글
+    @PatchMapping("/settings/safetyAlert/toggle")
+    public ResponseEntity<?> toggleSafetyAlert(@RequestBody Map<String, String> body,
+    		Authentication authentication) {
+    	// 로그인 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인이 필요합니다."));
+        }
+        
+        String memberId = authentication.getName();
+        String notificationEnabled = body.get("notificationEnabled");
+        
+        // DB 저장 로직
+        aService.updateSafetyAlertSettings(memberId, notificationEnabled);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("notificationEnabled", notificationEnabled);
+    	
+    	return ResponseEntity.ok(response);
     }
     
 }

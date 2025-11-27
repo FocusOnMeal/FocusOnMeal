@@ -6,11 +6,78 @@
   
 	<!-- 관리자: 전체 공지사항 목록 조회 -->
 	<select id="selectAllNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
-	    SELECT
-	        *
-	    FROM NOTICE
-	    ORDER BY NOTICE_CREATEAT DESC
+	    SELECT *
+	    FROM (
+	        SELECT ROWNUM AS RNUM, N.*
+	        FROM (
+	            SELECT
+	                NOTICE_NO,
+	                MEMBER_ID,
+	                NOTICE_SUBJECT,
+	                NOTICE_CONTENT,
+	                NOTICE_CREATEAT,
+	                NOTICE_ISNEW,
+	                NOTICE_IMPORTANT,
+	                VIEW_COUNT,
+	                IS_DELETED
+	            FROM NOTICE
+	            WHERE IS_DELETED = 'N'
+	            
+	            <!-- 검색 조건 -->
+	            <if test="type == 'all' and keyword != null and keyword != ''">
+	                AND (NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+	                     OR NOTICE_CONTENT LIKE '%' || #{keyword} || '%')
+	            </if>
+	            <if test="type == 'title' and keyword != null and keyword != ''">
+	                AND NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+	            </if>
+	            <if test="type == 'content' and keyword != null and keyword != ''">
+	                AND NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+	            </if>
+	
+	            <!-- ★ 필터 조건 (관리자용) -->
+	            <if test="filterType == 'NEW'">
+	                AND NOTICE_ISNEW = 'Y'
+	            </if>
+	            <if test="filterType == 'IMPORTANT'">
+	                AND NOTICE_IMPORTANT = 'Y'
+	            </if>
+	            
+	            <!-- filterType == 'ALL' 이면 아무 조건도 안 붙음 -->
+	
+	            <!-- 정렬 조건 -->
+	            <choose>
+	            	<when test="sortColumn == 'noticeNo'">
+	                    ORDER BY NOTICE_NO
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <when test="sortColumn == 'noticeSubject'">
+	                    ORDER BY NOTICE_SUBJECT
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <when test="sortColumn == 'noticeCreateAt'">
+	                    ORDER BY NOTICE_CREATEAT
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <when test="sortColumn == 'viewCount'">
+	                    ORDER BY VIEW_COUNT
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <otherwise>
+	                    ORDER BY NOTICE_CREATEAT DESC
+	                </otherwise>
+	            </choose>
+	        ) N
+	        WHERE ROWNUM &lt;= #{endRow}
+	    )
+	    WHERE RNUM &gt;= #{startRow}
 	</select>
+
+
 	
 	<!-- 관리자 : 공지사항 수정  -->
 	<update id="modifyNotice" parameterType="com.fom.boot.domain.notice.model.vo.Notice">
@@ -23,6 +90,13 @@
 	        IS_DELETED = #{isDeleted}
 	    WHERE NOTICE_NO = #{noticeNo}
 	</update>	
+	
+	<!-- 관리자 : 공지사항 삭제 -->
+	<update id="deleteNotice" parameterType="int">
+	UPDATE NOTICE
+		SET IS_DELETED = 'Y'
+		WHERE NOTICE_NO = #{noticeNo}
+	</update>
 	
 	<!-- 일반회원 : 필독공지 조희 -->
 	<select id="selectImportantNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">

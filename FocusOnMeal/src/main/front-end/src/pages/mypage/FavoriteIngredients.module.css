@@ -140,7 +140,7 @@
     background: none;
     border: none;
     color: #ff6b6b; /* 빨간 하트 */
-    font-size: 20px;
+    font-size: 30px;
     cursor: pointer;
     transition: transform 0.2s;
 }

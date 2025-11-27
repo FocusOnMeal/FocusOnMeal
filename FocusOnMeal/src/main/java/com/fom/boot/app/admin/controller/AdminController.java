@@ -9,8 +9,10 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -172,7 +174,14 @@ public class AdminController {
 	
 	// 관리자 공지사항 조회
 	@GetMapping("/noticeInfo")
-	public ResponseEntity<?> selectNotices(Authentication authentication) {
+	public ResponseEntity<?> selectNotices(
+			@RequestParam(defaultValue ="1") int page
+			,@RequestParam(defaultValue = "all") String type
+	        ,@RequestParam(defaultValue = "") String keyword
+	        ,@RequestParam(required = false) String sortColumn
+	        ,@RequestParam(required = false) String sortOrder
+	        ,@RequestParam(defaultValue ="all") String filterType
+			,Authentication authentication) {
 		// 1. 토큰 인증 체크
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, String> error = new HashMap<>();
@@ -194,9 +203,18 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자만 접근 가능합니다.");
         }
 
+        int totalCount = nService.getTotalNoticesBySearch(type, keyword);
+        
+        // pagination
+        PageInfo pageInfo = Pagination.getPageInfo(page, totalCount);
+        
         // 3. 전체 회원 목록 조회
-        List<Notice> list = nService.selectAllNotices();
-        return ResponseEntity.ok(list);
+        List<Notice> nList = nService.selectAllNotices(pageInfo, type, keyword, sortColumn, sortOrder, filterType);
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("pageInfo", pageInfo);
+        data.put("noticeList", nList);
+        return ResponseEntity.ok(data);
 	}
 		
 	// 관리자 공지사항 수정
@@ -236,5 +254,13 @@ public class AdminController {
 	    } else {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("공지사항 수정 실패");
 	    }
+	}
+	
+	
+	// 관리자 공지사항 삭제
+	@DeleteMapping("/noticeInfo/{noticeNo}")
+	public ResponseEntity<?> deleteNotice(@PathVariable int noticeNo) {
+		nService.deleteNotice(noticeNo);
+	    return ResponseEntity.ok("삭제 완료");
 	}
 }
