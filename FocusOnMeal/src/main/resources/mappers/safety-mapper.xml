@@ -4,7 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <mapper namespace="com.fom.boot.domain.safety.model.mapper.SafetyMapper">
   
-  <!-- ResultMap 정의 -->
+  	<!-- ResultMap 정의 -->
     <resultMap id="safetyAlertResultMap" type="com.fom.boot.domain.alert.model.vo.SafetyAlert">
         <id property="alertId" column="ALERT_ID" />
         <result property="ingredientId" column="INGREDIENT_ID" />
@@ -20,23 +20,102 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 <choose>
-                    <when test="type == 'title'">
-                        AND TITLE LIKE '%' || #{keyword} || '%'
-                    </when>
-                    <when test="type == 'nation'">
-                        AND NATION LIKE '%' || #{keyword} || '%'
-                    </when>
-                    <when test="type == 'hazardType'">
-                        AND HAZARD_TYPE LIKE '%' || #{keyword} || '%'
-                    </when>
+                    <when test="type.equals('title')">
+			            TITLE LIKE '%' || #{keyword} || '%'
+			        </when>
+			        <when test="type.equals('nation')">
+			            NATION LIKE '%' || #{keyword} || '%'
+			        </when>
+			        <when test="type.equals('hazardType')">
+			            HAZARD_TYPE LIKE '%' || #{keyword} || '%'
+			        </when>
                     <otherwise>
-                        AND (
+                        (
                             TITLE LIKE '%' || #{keyword} || '%'
                             OR NATION LIKE '%' || #{keyword} || '%'
                             OR HAZARD_TYPE LIKE '%' || #{keyword} || '%'
                         )
                     </otherwise>
                 </choose>
+            </if>
+            <!-- 국가 초성 필터 -->
+            <if test="nationFilter != null and nationFilter != ''">
+                <choose>
+                    <when test="nationFilter.equals('ㄱ')"> 
+			            (NATION LIKE '가%' OR NATION LIKE '갸%' OR NATION LIKE '거%' OR NATION LIKE '겨%' 
+			            OR NATION LIKE '고%' OR NATION LIKE '교%' OR NATION LIKE '구%' OR NATION LIKE '규%' 
+			            OR NATION LIKE '그%' OR NATION LIKE '기%')
+			        </when>
+                    <when test="nationFilter.equals('ㄴ')"> 
+                        (NATION LIKE '나%' OR NATION LIKE '냐%' OR NATION LIKE '너%' OR NATION LIKE '녀%' 
+                        OR NATION LIKE '노%' OR NATION LIKE '뇨%' OR NATION LIKE '누%' OR NATION LIKE '뉴%' 
+                        OR NATION LIKE '느%' OR NATION LIKE '니%')
+                    </when>
+                    <when test="nationFilter.equals('ㄷ')"> 
+                        (NATION LIKE '다%' OR NATION LIKE '댜%' OR NATION LIKE '더%' OR NATION LIKE '뎌%' 
+                        OR NATION LIKE '도%' OR NATION LIKE '됴%' OR NATION LIKE '두%' OR NATION LIKE '듀%' 
+                        OR NATION LIKE '드%' OR NATION LIKE '디%')
+                    </when>
+                    <when test="nationFilter.equals('ㄹ')"> 
+                        (NATION LIKE '라%' OR NATION LIKE '랴%' OR NATION LIKE '러%' OR NATION LIKE '려%' 
+                        OR NATION LIKE '로%' OR NATION LIKE '료%' OR NATION LIKE '루%' OR NATION LIKE '류%' 
+                        OR NATION LIKE '르%' OR NATION LIKE '리%')
+                    </when>
+                    <when test="nationFilter.equals('ㅁ')"> 
+                        (NATION LIKE '마%' OR NATION LIKE '먀%' OR NATION LIKE '머%' OR NATION LIKE '며%' 
+                        OR NATION LIKE '모%' OR NATION LIKE '묘%' OR NATION LIKE '무%' OR NATION LIKE '뮤%' 
+                        OR NATION LIKE '므%' OR NATION LIKE '미%')
+                    </when>
+                    <when test="nationFilter.equals('ㅂ')"> 
+                        (NATION LIKE '바%' OR NATION LIKE '뱌%' OR NATION LIKE '버%' OR NATION LIKE '벼%' 
+                        OR NATION LIKE '보%' OR NATION LIKE '뵤%' OR NATION LIKE '부%' OR NATION LIKE '뷰%' 
+                        OR NATION LIKE '브%' OR NATION LIKE '비%')
+                    </when>
+                    <when test="nationFilter.equals('ㅅ')"> 
+                        (NATION LIKE '사%' OR NATION LIKE '샤%' OR NATION LIKE '서%' OR NATION LIKE '셔%' 
+                        OR NATION LIKE '소%' OR NATION LIKE '쇼%' OR NATION LIKE '수%' OR NATION LIKE '슈%' 
+                        OR NATION LIKE '스%' OR NATION LIKE '시%')
+                    </when>
+                    <when test="nationFilter.equals('ㅇ')"> 
+                        (NATION LIKE '아%' OR NATION LIKE '야%' OR NATION LIKE '어%' OR NATION LIKE '여%' 
+                        OR NATION LIKE '오%' OR NATION LIKE '요%' OR NATION LIKE '우%' OR NATION LIKE '유%' 
+                        OR NATION LIKE '으%' OR NATION LIKE '이%')
+                    </when>
+                    <when test="nationFilter.equals('ㅈ')"> 
+                        (NATION LIKE '자%' OR NATION LIKE '쟈%' OR NATION LIKE '저%' OR NATION LIKE '져%' 
+                        OR NATION LIKE '조%' OR NATION LIKE '죠%' OR NATION LIKE '주%' OR NATION LIKE '쥬%' 
+                        OR NATION LIKE '즈%' OR NATION LIKE '지%')
+                    </when>
+                    <when test="nationFilter.equals('ㅊ')"> 
+                        (NATION LIKE '차%' OR NATION LIKE '챠%' OR NATION LIKE '처%' OR NATION LIKE '쳐%' 
+                        OR NATION LIKE '초%' OR NATION LIKE '쵸%' OR NATION LIKE '추%' OR NATION LIKE '츄%' 
+                        OR NATION LIKE '츠%' OR NATION LIKE '치%')
+                    </when>
+                    <when test="nationFilter.equals('ㅋ')"> 
+                        (NATION LIKE '카%' OR NATION LIKE '캬%' OR NATION LIKE '커%' OR NATION LIKE '켜%' 
+                        OR NATION LIKE '코%' OR NATION LIKE '쿄%' OR NATION LIKE '쿠%' OR NATION LIKE '큐%' 
+                        OR NATION LIKE '크%' OR NATION LIKE '키%')
+                    </when>
+                    <when test="nationFilter.equals('ㅌ')"> 
+                        (NATION LIKE '타%' OR NATION LIKE '탸%' OR NATION LIKE '터%' OR NATION LIKE '텨%' 
+                        OR NATION LIKE '토%' OR NATION LIKE '툐%' OR NATION LIKE '투%' OR NATION LIKE '튜%' 
+                        OR NATION LIKE '트%' OR NATION LIKE '티%')
+                    </when>
+                    <when test="nationFilter.equals('ㅍ')"> 
+                        (NATION LIKE '파%' OR NATION LIKE '퍄%' OR NATION LIKE '퍼%' OR NATION LIKE '펴%' 
+                        OR NATION LIKE '포%' OR NATION LIKE '표%' OR NATION LIKE '푸%' OR NATION LIKE '퓨%' 
+                        OR NATION LIKE '프%' OR NATION LIKE '피%')
+                    </when>
+                    <when test="nationFilter.equals('ㅎ')"> 
+                        (NATION LIKE '하%' OR NATION LIKE '햐%' OR NATION LIKE '허%' OR NATION LIKE '혀%' 
+                        OR NATION LIKE '호%' OR NATION LIKE '효%' OR NATION LIKE '후%' OR NATION LIKE '휴%' 
+                        OR NATION LIKE '흐%' OR NATION LIKE '히%')
+                    </when>
+                </choose>
+            </if>
+            <!-- 위험 유형 필터 -->
+            <if test="hazardFilter != null and hazardFilter != ''">
+                HAZARD_TYPE = #{hazardFilter}
             </if>
         </where>
     </sql>
@@ -80,26 +159,28 @@
 
     <!-- 안전 정보 목록 조회 (Oracle 페이징 처리) -->
     <select id="selectAlertList" resultMap="safetyAlertResultMap">
-        SELECT *
+    SELECT *
+    FROM (
+        SELECT 
+            ROWNUM AS RNUM,
+            A.*
         FROM (
             SELECT 
-                ROWNUM AS RNUM,
-                A.*
-            FROM (
-                SELECT 
-                    ALERT_ID,
-                    INGREDIENT_ID,
-                    NATION,
-                    HAZARD_TYPE,
-                    TITLE,
-                    DESCRIPTION,
-                    PUBLICATION_DATE
-                FROM SAFETY_ALERT_MASTER
-                <include refid="searchCondition" />
-                <include refid="orderByCondition" />
-            ) A
-        )
-        WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+                ALERT_ID,
+                INGREDIENT_ID,
+                NATION,
+                HAZARD_TYPE,
+                TITLE,
+                DESCRIPTION,
+                PUBLICATION_DATE
+            FROM SAFETY_ALERT_MASTER
+            <include refid="searchCondition" />
+            <include refid="orderByCondition" />
+        ) A
+    )
+    WHERE RNUM BETWEEN 
+        #{startRow, jdbcType=NUMERIC}  AND 
+        #{endRow, jdbcType=NUMERIC}    
     </select>
 
     <!-- 안전 정보 상세 조회 -->

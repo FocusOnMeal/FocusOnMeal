@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import Pagination from '../../../components/common/Pagination';
 import styles from './SafetyList.module.css';
@@ -11,9 +11,40 @@ const SafetyAlertList = () => {
     const [searchType, setSearchType] = useState(searchParams.get('type') || 'all');
     const currentPage = parseInt(searchParams.get('page') || '1');
 
+    // 드롭다운 상태
+    const [showNationDropdown, setShowNationDropdown] = useState(false);
+    const [showHazardDropdown, setShowHazardDropdown] = useState(false);
+    const nationDropdownRef = useRef(null);
+    const hazardDropdownRef = useRef(null);
+
     // 정렬 파라미터 (기본값 설정)
-    const sort = searchParams.get('sort') || 'alertId'; // 기본 정렬 컬럼
-    const order = searchParams.get('order') || 'desc';   // 기본 정렬 방향
+    const sort = searchParams.get('sort') || 'alertId';
+    const order = searchParams.get('order') || 'desc';
+
+    // 필터 파라미터
+    const nationFilter = searchParams.get('nationFilter') || '';
+    const hazardFilter = searchParams.get('hazardFilter') || '';
+
+    // 국가 초성 배열
+    const nationInitials = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+    
+    // 위험 유형 배열
+    const hazardTypes = ['위해식품정보', '글로벌 동향정보', '연구평가정보', '법제도정보'];
+
+    // 외부 클릭 감지
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (nationDropdownRef.current && !nationDropdownRef.current.contains(event.target)) {
+                setShowNationDropdown(false);
+            }
+            if (hazardDropdownRef.current && !hazardDropdownRef.current.contains(event.target)) {
+                setShowHazardDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const fetchAlertList = () => {
@@ -49,14 +80,14 @@ const SafetyAlertList = () => {
         e.preventDefault();
         setSearchParams(prev => {
             const Params = new URLSearchParams(prev);
-            Params.set('type', searchType); // 로컬 state 값 사용
-            Params.set('keyword', keyword); // 로컬 state 값 사용
+            Params.set('type', searchType);
+            Params.set('keyword', keyword);
             Params.set('page', '1');
             return Params;
         }, { replace: true });
     };
 
-        const handleKeywordChange = (e) => {
+    const handleKeywordChange = (e) => {
         setKeyword(e.target.value);
     };
 
@@ -64,14 +95,36 @@ const SafetyAlertList = () => {
         setSearchType(e.target.value);
     };
 
-    const handleSearchChange = (e) => {
-        const { name, value } = e.target;
+    // 국가 필터 적용
+    const handleNationFilter = (initial) => {
         setSearchParams(prev => {
             const Params = new URLSearchParams(prev);
-            Params.set(name, value);
+            if (nationFilter === initial) {
+                // 같은 필터 클릭시 해제
+                Params.delete('nationFilter');
+            } else {
+                Params.set('nationFilter', initial);
+            }
             Params.set('page', '1');
             return Params;
         }, { replace: true });
+        setShowNationDropdown(false);
+    };
+
+    // 위험 유형 필터 적용
+    const handleHazardFilter = (type) => {
+        setSearchParams(prev => {
+            const Params = new URLSearchParams(prev);
+            if (hazardFilter === type) {
+                // 같은 필터 클릭시 해제
+                Params.delete('hazardFilter');
+            } else {
+                Params.set('hazardFilter', type);
+            }
+            Params.set('page', '1');
+            return Params;
+        }, { replace: true });
+        setShowHazardDropdown(false);
     };
 
     // 컬럼 정렬 핸들러
@@ -91,7 +144,7 @@ const SafetyAlertList = () => {
 
             Params.set('sortColumn', column);
             Params.set('sortOrder', newOrder);
-            Params.set('page', '1'); // 정렬 변경 시 1페이지로 이동
+            Params.set('page', '1');
 
             return Params;
         });
@@ -107,6 +160,8 @@ const SafetyAlertList = () => {
     const getHazardTypeBadgeClass = (hazardType) => {
         if (hazardType === '위해식품정보') return styles.badgeDanger;
         if (hazardType === '글로벌 동향정보') return styles.badgeGlobal;
+        if (hazardType === '연구평가정보') return styles.badgeResearch;
+        if (hazardType === '법제도정보') return styles.badgeLaw;
         return styles.badgeDefault;
     };
 
@@ -142,15 +197,81 @@ const SafetyAlertList = () => {
                     <thead>
                         <tr>
                             <th>번호</th>
-                            <th onClick={() => handleSort('nation')} className={styles.sortable}>
-                                공표 국가 {renderSortIcon('nation')}
+                            <th className={styles.filterHeader}>
+                                <div className={styles.filterWrapper} ref={nationDropdownRef}>
+                                        공표 국가 
+                                        {nationFilter && <span className={styles.activeFilter}>({nationFilter})</span>}
+                                    {showNationDropdown && (
+                                        <div className={styles.dropdownMenu}>
+                                            <div className={styles.dropdownHeader}>
+                                                초성 선택
+                                                {nationFilter && (
+                                                    <button 
+                                                        className={styles.resetButton}
+                                                        onClick={() => handleNationFilter(nationFilter)}
+                                                    >
+                                                        초기화
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className={styles.initialGrid}>
+                                                {nationInitials.map(initial => (
+                                                    <button
+                                                        key={initial}
+                                                        type="button"
+                                                        className={`${styles.initialButton} ${nationFilter === initial ? styles.active : ''}`}
+                                                        onClick={() => handleNationFilter(initial)}
+                                                    >
+                                                        {initial}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </th>
-                            <th onClick={() => handleSort('hazardType')} className={styles.sortable}>
-                                위험 유형 {renderSortIcon('hazardType')}
+                            <th className={styles.filterHeader}>
+                                <div className={styles.filterWrapper} ref={hazardDropdownRef}>
+                                    <button 
+                                        type="button"
+                                        className={styles.filterButton}
+                                        onClick={() => setShowHazardDropdown(!showHazardDropdown)}
+                                    >
+                                        위험 유형
+                                        {hazardFilter && <span className={styles.activeFilter}>({hazardFilter})</span>}
+                                        <span className={styles.dropdownIcon}>▼</span>
+                                    </button>
+                                    {showHazardDropdown && (
+                                        <div className={styles.dropdownMenu}>
+                                            <div className={styles.dropdownHeader}>
+                                                유형 선택
+                                                {hazardFilter && (
+                                                    <button 
+                                                        className={styles.resetButton}
+                                                        onClick={() => handleHazardFilter(hazardFilter)}
+                                                    >
+                                                        초기화
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className={styles.typeList}>
+                                                {hazardTypes.map(type => (
+                                                    <button
+                                                        key={type}
+                                                        type="button"
+                                                        className={`${styles.typeButton} ${hazardFilter === type ? styles.active : ''}`}
+                                                        onClick={() => handleHazardFilter(type)}
+                                                    >
+                                                        <span className={getHazardTypeBadgeClass(type)}></span>
+                                                        {type}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </th>
-                            <th onClick={() => handleSort('title')} className={styles.sortable}>
-                                제목 {renderSortIcon('title')}
-                            </th>
+                            <th>제목</th>
                             <th onClick={() => handleSort('publicationDate')} className={styles.sortable}>
                                 공표일 {renderSortIcon('publicationDate')}
                             </th>
@@ -168,7 +289,7 @@ const SafetyAlertList = () => {
                                         </span>
                                     </td>
                                     <td className={styles.titleCell}>
-                                        <Link to={`/safety/alert/detail/${alert.alertId}`}>
+                                        <Link to={`/board/safety/detail/${alert.alertId}`}>
                                             {alert.title}
                                         </Link>
                                     </td>
