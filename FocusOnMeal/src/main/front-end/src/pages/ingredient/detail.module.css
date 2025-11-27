@@ -586,6 +586,7 @@
 .loginButton:active {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+}
 /* 이미지 감싸는 박스 */
 .imageWrapper {
     width: 100%;
