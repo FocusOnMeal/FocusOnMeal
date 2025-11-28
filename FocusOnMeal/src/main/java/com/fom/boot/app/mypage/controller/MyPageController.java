@@ -382,7 +382,7 @@ public class MyPageController {
     }
     
     // 찜한 식재료 목록 조회 (마이페이지용)
-    @GetMapping("/ingredients/favorite")
+    @GetMapping("/favorites")
     public ResponseEntity<?> getFavoriteIngredients(Authentication authentication) {
         
         // 로그인 확인
