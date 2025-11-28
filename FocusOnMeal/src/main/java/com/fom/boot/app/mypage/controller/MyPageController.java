@@ -415,7 +415,7 @@ public class MyPageController {
         String memberId = authentication.getName();
         
         // 검색 조건 구성
-        Map<String, String> searchMap = new HashMap<>();
+        Map<String, Object> searchMap = new HashMap<>();
         searchMap.put("memberId", memberId);  
         searchMap.put("type", type);
         searchMap.put("keyword", keyword.trim());
