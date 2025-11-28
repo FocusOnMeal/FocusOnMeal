@@ -55,6 +55,20 @@ public class AlertServiceImpl implements AlertService {
     }
     
     @Override
+    @Transactional
+    public boolean deleteNotification(int notificationId, String memberId) {
+        try {
+            int result = alertMapper.deleteNotification(notificationId, memberId);
+            log.info("알림 삭제: notificationId={}, memberId={}, success={}", 
+                    notificationId, memberId, result > 0);
+            return result > 0;
+        } catch (Exception e) {
+            log.error("알림 삭제 실패: notificationId={}, memberId={}", notificationId, memberId, e);
+            throw new RuntimeException("알림 삭제에 실패했습니다.", e);
+        }
+    }
+    
+    @Override
     public int getUnreadNotificationCount(String memberId) {
         try {
             return alertMapper.selectUnreadNotificationCount(memberId);
@@ -127,11 +141,17 @@ public class AlertServiceImpl implements AlertService {
                     alert.getNation(),
                     alert.getHazardType(),
                     alert.getTitle());
-
-                alertMapper.insertNotificationLog(memberId, "위험공표", message, alertId);
                 
-                log.info("안전 알림 생성: memberId={}, alertId={}, ingredientId={}", 
-                        memberId, alertId, alert.getIngredientId());
+                // ✅ 형식: "메시지내용||alertId||ingredientId"
+                String messageWithMetadata = String.format("%s||%d||%d", 
+                    message, 
+                    alertId,  // 이게 제대로 전달되는지 확인
+                    alert.getIngredientId()
+                );
+
+                alertMapper.insertNotificationLog(memberId, "위험공표", messageWithMetadata, alertId);
+                
+                log.info("안전 알림 생성: memberId={}, message={}", memberId, messageWithMetadata);
             }
             
             log.info("안전 알림 발송 완료: alertId={}, ingredientId={}, 수신자 수={}", 
@@ -250,8 +270,23 @@ public class AlertServiceImpl implements AlertService {
 
                     // 5. 각 회원에게 알림 생성
                     for (String memberId : memberIds) {
-                        alertMapper.insertNotificationLog(memberId, "가격정보", message, null);
-                        totalNotifications++;
+                        	message = String.format("[%s] %s %s %.2f%% (현재가: %,d원)",
+                            ingredient.getName(),
+                            changeIcon,
+                            dailyChangeRate > 0 ? "상승" : "하락",
+                            Math.abs(dailyChangeRate),
+                            priceData.getChangeRate().getCurrentPrice()
+                        );
+                        
+                        // ✅ 형식: "메시지내용||ingredientId"
+                        String messageWithMetadata = String.format("%s||%d", 
+                            message, 
+                            ingredientId
+                        );
+                        
+                        alertMapper.insertNotificationLog(memberId, "가격정보", messageWithMetadata, null);
+                        
+                        log.info("가격 알림 생성: memberId={}, message={}", memberId, messageWithMetadata);
                     }
 
                     log.info("가격 알림 발송: ingredientId={}, name={}, 변동률={}%, 수신자={}",
@@ -345,6 +380,32 @@ public class AlertServiceImpl implements AlertService {
         } catch (Exception e) {
             log.error("알림 삭제 실패: notificationId={}, memberId={}", notificationId, memberId, e);
             throw new RuntimeException("알림 삭제에 실패했습니다.", e);
+        }
+    }
+    
+    @Override
+    @Transactional
+    public int markAllNotificationsAsRead(String memberId) {
+        try {
+            int count = alertMapper.updateAllNotificationsReadStatus(memberId);
+            log.info("모든 알림 읽음 처리: memberId={}, count={}", memberId, count);
+            return count;
+        } catch (Exception e) {
+            log.error("모든 알림 읽음 처리 실패: memberId={}", memberId, e);
+            throw new RuntimeException("모든 알림 읽음 처리에 실패했습니다.", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public int markAllNotificationsAsReadByType(String memberId, String type) {
+        try {
+            int count = alertMapper.updateAllNotificationsReadStatusByType(memberId, type);
+            log.info("특정 유형 알림 읽음 처리: memberId={}, type={}, count={}", memberId, type, count);
+            return count;
+        } catch (Exception e) {
+            log.error("특정 유형 알림 읽음 처리 실패: memberId={}, type={}", memberId, type, e);
+            throw new RuntimeException("특정 유형 알림 읽음 처리에 실패했습니다.", e);
         }
     }
 }

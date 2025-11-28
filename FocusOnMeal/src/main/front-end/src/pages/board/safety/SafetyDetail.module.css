@@ -76,12 +76,13 @@
 }
 
 /* 위험 유형 뱃지 */
-.badgeDanger, .badgeGlobal, .badgeDefault {
+.badgeDanger, .badgeGlobal, .badgeResearch, .badgeLaw {
     padding: 4px 10px;
     border-radius: 6px;
     font-size: 11px;
     font-weight: 600;
     margin-right: 10px;
+    white-space: nowrap;
 }
 
 .badgeDanger {
@@ -94,8 +95,13 @@
     color: #fff;
 }
 
-.badgeDefault {
-    background-color: #52c41a;
+.badgeResearch {
+    background-color: #9c27b0;
+    color: #fff;
+}
+
+.badgeLaw {
+    background-color: #ff9800;
     color: #fff;
 }
 
@@ -180,4 +186,163 @@
 .title:hover {
     text-decoration: underline;
     color: #224e85;
+}
+
+/* SafetyDetail.css */
+.description-content {
+    background: #f9f9f9;
+    padding: 24px;
+    border-radius: 8px;
+    margin-top: 24px;
+}
+
+.description-content p {
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+}
+
+/* 빈 p 태그 (&nbsp;) 처리 */
+.description-content p:empty,
+.description-content p:has(br:only-child) {
+    margin: 8px 0;
+    min-height: 8px;
+}
+
+/* 강조 텍스트 */
+.description-content p strong {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+/* 리스트 스타일 */
+.description-content ul,
+.description-content ol {
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.description-content li {
+    margin: 8px 0;
+}
+
+/* HTML 렌더링 스타일 */
+.alertContent p {
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.alertContent p:empty {
+    margin: 8px 0;
+    min-height: 8px;
+}
+
+.alertContent p:first-child {
+    font-weight: 600;
+    color: #d32f2f;
+    margin-bottom: 16px;
+}
+
+.alertContent strong {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+.alertContent ul,
+.alertContent ol {
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.alertContent li {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+/* 이전/다음 글 영역 */
+.actionButtons {
+    margin-top: 40px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.prevNextWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.prevRow,
+.nextRow {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s;
+    width: 100%; /* ✅ 전체 너비 고정 */
+    box-sizing: border-box; /* ✅ 패딩 포함 계산 */
+}
+
+.prevRow:hover:not(.disabled),
+.nextRow:hover:not(.disabled) {
+    background: #f0f0f0;
+}
+
+.prevRow.disabled,
+.nextRow.disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
+.label {
+    font-weight: 600;
+    color: #666;
+    min-width: 60px; /* ✅ 최소 너비 고정 */
+    flex-shrink: 0; /* ✅ 축소 방지 */
+}
+
+.separator {
+    margin: 0 12px;
+    color: #ccc;
+    flex-shrink: 0; /* ✅ 축소 방지 */
+}
+
+.title {
+    color: #333;
+    flex: 1; /* ✅ 남은 공간 차지 */
+    overflow: hidden; /* ✅ 넘치는 부분 숨김 */
+    text-overflow: ellipsis; /* ✅ ... 표시 */
+    white-space: nowrap; /* ✅ 한 줄로 유지 */
+    max-width: 100%; /* ✅ 최대 너비 제한 */
+}
+
+.prevRow:hover:not(.disabled) .title,
+.nextRow:hover:not(.disabled) .title {
+    color: #4CAF50;
+    text-decoration: underline;
+}
+
+/* 목록 버튼 영역 */
+.listButtonWrapper {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.listBtn {
+    padding: 12px 40px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.listBtn:hover {
+    background: #45a049;
 }

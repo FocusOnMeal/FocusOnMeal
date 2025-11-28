@@ -7,23 +7,40 @@
       <!-- 회원의 알림 목록 조회 (제목 포함) -->
     <select id="selectNotificationsByMemberId" resultType="map">
         SELECT 
+        "notificationId",
+        "memberId",
+        "type",
+        "message",
+        "isRead",
+        "sentAt",
+        "title",
+        "alertId",
+        "ingredientId"
+    FROM (
+        SELECT 
             nl.NOTIFICATION_ID AS "notificationId",
             nl.MEMBER_ID AS "memberId",
             nl.TYPE AS "type",
             nl.MESSAGE AS "message",
             nl.IS_READ AS "isRead",
             TO_CHAR(nl.SENT_AT, 'YYYY-MM-DD"T"HH24:MI:SS') AS "sentAt",
-            NVL(sam.TITLE, '알림') AS "title"
+            NVL(sam.TITLE, '알림') AS "title",
+            sam.ALERT_ID AS "alertId",
+            sam.INGREDIENT_ID AS "ingredientId",
+            ROW_NUMBER() OVER (PARTITION BY nl.NOTIFICATION_ID ORDER BY sam.ALERT_ID DESC NULLS LAST) AS rn
         FROM NOTIFICATION_LOG nl
         LEFT JOIN SAFETY_ALERT_MASTER sam 
-            ON nl.TYPE = '위험공표' 
-            AND sam.ALERT_ID = (
-                SELECT MAX(ALERT_ID) 
-                FROM SAFETY_ALERT_MASTER 
-                WHERE TITLE = SUBSTR(nl.MESSAGE, 1, 50)
+            ON nl.TYPE = '위험공표'
+            AND (
+                sam.TITLE = TRIM(SUBSTR(nl.MESSAGE, INSTR(nl.MESSAGE, ' - ') + 3))
+                OR
+                INSTR(nl.MESSAGE, sam.TITLE) > 0
             )
         WHERE nl.MEMBER_ID = #{memberId}
-        ORDER BY nl.SENT_AT DESC
+          AND nl.IS_READ = 'N'
+    )
+    WHERE rn = 1
+    ORDER BY "sentAt" DESC
     </select>
 
     <!-- 알림 읽음 상태 업데이트 -->
@@ -33,6 +50,13 @@
         WHERE NOTIFICATION_ID = #{notificationId}
           AND MEMBER_ID = #{memberId}
     </update>
+    
+    <!-- 알림 삭제 -->
+	<delete id="deleteNotification">
+	    DELETE FROM NOTIFICATION_LOG
+	    WHERE NOTIFICATION_ID = #{notificationId}
+	      AND MEMBER_ID = #{memberId}
+	</delete>
 
     <!-- 읽지 않은 알림 개수 조회 -->
     <select id="selectUnreadNotificationCount" resultType="int">
@@ -320,5 +344,21 @@
           AND MEMBER_ID = #{memberId}
     </delete>
 
+    <!-- 모든 읽지 않은 알림 읽음 처리 -->
+	<update id="updateAllNotificationsReadStatus">
+	    UPDATE NOTIFICATION_LOG
+	    SET IS_READ = 'Y'
+	    WHERE MEMBER_ID = #{memberId}
+	      AND IS_READ = 'N'
+	</update>
+	
+	<!-- 특정 유형 읽지 않은 알림 읽음 처리 -->
+	<update id="updateAllNotificationsReadStatusByType">
+	    UPDATE NOTIFICATION_LOG
+	    SET IS_READ = 'Y'
+	    WHERE MEMBER_ID = #{memberId}
+	      AND TYPE = #{type}
+	      AND IS_READ = 'N'
+	</update>
 
   </mapper>

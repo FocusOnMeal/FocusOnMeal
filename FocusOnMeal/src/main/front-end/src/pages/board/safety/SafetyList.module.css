@@ -1,3 +1,4 @@
+
 /* ============================= */
 /* 기본 레이아웃 */
 /* ============================= */
@@ -311,4 +312,225 @@
     background-color: #f0f7e8;
     border-color: #67932A;
     font-weight: 600;
+}
+
+/* HTML 렌더링 스타일 */
+.alertContent p {
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.alertContent p:empty {
+    margin: 8px 0;
+    min-height: 8px;
+}
+
+.alertContent p:first-child {
+    font-weight: 600;
+    color: #d32f2f;
+    margin-bottom: 16px;
+}
+
+.alertContent strong {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+.alertContent ul,
+.alertContent ol {
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.alertContent li {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+/* 알림 드롭다운 컨테이너 */
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 400px;
+    max-height: 500px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 8px;
+    overflow: hidden; /* ✅ 전체 드롭다운 overflow 숨김 */
+}
+
+/* 탭 헤더 */
+.notification-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f9f9f9;
+}
+
+.notification-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.notification-tab.active {
+    color: #4CAF50;
+    border-bottom: 2px solid #4CAF50;
+    background: white;
+}
+
+/* 알림 콘텐츠 영역 */
+.notification-content {
+    max-height: 450px;
+    overflow-y: auto;
+    overflow-x: hidden; /* ✅ 가로 스크롤 제거 */
+}
+
+/* 알림 아이템 */
+.notification-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    overflow: hidden; /* ✅ 넘치는 내용 숨김 */
+}
+
+.notification-item:hover,
+.notification-item.hover {
+    background-color: #f5f5f5;
+}
+
+.notification-item.unread {
+    background-color: #fff8e1;
+}
+
+/* 알림 헤더 (유형 + 시간) */
+.notification-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    gap: 8px; /* ✅ 간격 추가 */
+}
+
+/* 알림 유형 뱃지 */
+.notification-type {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap; /* ✅ 한 줄 유지 */
+    flex-shrink: 0; /* ✅ 축소 방지 */
+}
+
+.notification-type.danger {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.notification-type.normal {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+/* 알림 시간 */
+.notification-time {
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap; /* ✅ 한 줄 유지 */
+    flex-shrink: 0; /* ✅ 축소 방지 */
+}
+
+/* 알림 제목 */
+.notification-title {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 4px;
+    line-height: 1.4;
+    /* ✅ 말줄임 처리 (2줄) */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.notification-title.bold {
+    font-weight: 600;
+}
+
+/* 알림 메시지 */
+.notification-message {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+    /* ✅ 말줄임 처리 (3줄) */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+/* 빈 알림 */
+.notification-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+/* 로그인 필요 */
+.notification-login-required {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.notification-login-required p {
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.login-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.login-link:hover {
+    background: #45a049;
+}
+
+/* 스크롤바 스타일 (선택사항) */
+.notification-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.notification-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.notification-content::-webkit-scrollbar-thumb:hover {
+    background: #999;
 }

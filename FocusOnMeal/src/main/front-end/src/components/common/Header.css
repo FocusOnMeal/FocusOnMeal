@@ -311,3 +311,135 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.notification-dropdown {
+    overflow: hidden; /* 전체 드롭다운 overflow 숨김 */
+}
+
+.notification-content {
+    overflow-x: hidden; /* 가로 스크롤 제거 */
+    overflow-y: auto; /* 세로 스크롤만 허용 */
+}
+
+.notification-item {
+    overflow: hidden; /* 개별 아이템 넘침 방지 */
+}
+
+.notification-title {
+    display: -webkit-box;
+    line-clamp: 2;             /* ← 표준 속성 추가 */
+    -webkit-line-clamp: 2;     /* ← 기존 WebKit 속성 */
+    -webkit-line-clamp: 2; /* 2줄까지만 표시 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word; /* 긴 단어 줄바꿈 */
+}
+
+/* Header.css */
+
+/* 알림 아이템 */
+.notification-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    overflow: hidden;
+    position: relative; /* ✅ 액션 버튼 위치 기준 */
+}
+
+.notification-item:hover .notification-actions {
+    opacity: 1; /* ✅ 호버 시 버튼 표시 */
+}
+
+/* ✅ 개별 액션 버튼 영역 */
+.notification-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    opacity: 0; /* 기본적으로 숨김 */
+    transition: opacity 0.2s;
+}
+
+/* 읽지 않은 알림일 때는 항상 표시 */
+.notification-item.unread .notification-actions {
+    opacity: 1;
+}
+
+/* ✅ 개별 액션 버튼 */
+.notification-action-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.notification-action-btn.mark-read {
+    background: #e8f5e9;
+    color: #4CAF50;
+}
+
+.notification-action-btn.mark-read:hover {
+    background: #4CAF50;
+    color: white;
+}
+
+.notification-action-btn.delete {
+    background: #ffebee;
+    color: #f44336;
+}
+
+.notification-action-btn.delete:hover {
+    background: #f44336;
+    color: white;
+}
+
+/* 읽음 처리 버튼 영역 */
+.notification-action-bar {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fafafa;
+    text-align: right;
+}
+
+.mark-all-read-btn {
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    color: #4CAF50;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.mark-all-read-btn:hover {
+    color: #45a049;
+}
+
+/* Header.css */
+
+/* 읽음 처리 버튼 영역 */
+.notification-action-bar {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fafafa;
+    text-align: right;
+}
+
+.mark-all-read-btn {
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    color: #4CAF50;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.mark-all-read-btn:hover {
+    color: #45a049;
+}

@@ -96,30 +96,39 @@ public class SafetyController {
 					.body(Map.of("error", "안전 정보 목록을 불러오는 데 실패했습니다."));
 		}
 	}
-
-	// ... 나머지 getAlertDetail, getNavigateAlerts 메소드는 변경 없음
     
     // 안전 정보 상세 조회
 	@GetMapping("/detail/{alertId}")
 	public ResponseEntity<?> getAlertDetail(@PathVariable("alertId") int alertId) {
-		
-		log.info("안전 정보 상세 조회 - alertId: {}", alertId);
 
-		try {
-			SafetyAlert alert = safetyService.selectAlertDetail(alertId);
+	    log.info("안전 정보 상세 조회 - alertId: {}", alertId);
 
-			if (alert == null) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND)
-						.body(Map.of("error", "해당 안전 정보를 찾을 수 없습니다."));
-			}
+	    try {
+	        SafetyAlert alert = safetyService.selectAlertDetail(alertId);
 
-			return ResponseEntity.ok(alert);
+	        if (alert == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                    .body(Map.of("error", "해당 안전 정보를 찾을 수 없습니다."));
+	        }
 
-		} catch (Exception e) {
-			log.error("안전 정보 상세 조회 실패 - alertId: {}", alertId, e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(Map.of("error", "안전 정보를 불러오는 데 실패했습니다."));
-		}
+	        // 이전/다음 글 정보 조회
+	        SafetyAlert prevAlert = safetyService.getPreviousAlert(alertId);
+	        SafetyAlert nextAlert = safetyService.getNextAlert(alertId);
+
+	        // ✅ 응답 데이터 구성
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("alert", alert);
+	        response.put("prevAlert", prevAlert);
+	        response.put("nextAlert", nextAlert);
+
+	        // ✅ 수정: response만 반환
+	        return ResponseEntity.ok(response);
+
+	    } catch (Exception e) {
+	        log.error("안전 정보 상세 조회 실패 - alertId: {}", alertId, e);
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(Map.of("error", "안전 정보를 불러오는 데 실패했습니다."));
+	    }
 	}
 
 	// 이전/다음 글 조회

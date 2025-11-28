@@ -38,6 +38,8 @@ const Header = () => {
 
     // ✅ 수정: localStorage → sessionStorage
     const handleNotificationClick = async (notification) => {
+        console.log("📦 클릭한 알림 전체 데이터:", JSON.stringify(notification, null, 2));
+    
         try {
             const token = sessionStorage.getItem("token");
             
@@ -48,7 +50,25 @@ const Header = () => {
                 }
             });
 
-            navigate(`/board/safety/detail/${notification.notificationId}`);
+            if (notification.type === "위험공표") {
+                if (notification.alertId) {
+                    console.log("✅ 위험공표 페이지 이동:", notification.alertId);
+                    navigate(`/board/safety/detail/${notification.alertId}`);
+                } else {
+                    console.error("❌ alertId가 없습니다. 메시지:", notification.message);
+                    // ✅ alertId가 없어도 메시지로 검색 페이지로 이동 (임시 대응)
+                    alert("해당 알림의 상세 정보를 찾을 수 없습니다.");
+                }
+            } else if (notification.type === "가격정보") {
+                if (notification.ingredientId) {
+                    console.log("✅ 식재료 페이지 이동:", notification.ingredientId);
+                    navigate(`/ingredient/detail/${notification.ingredientId}`);
+                } else {
+                    console.error("❌ ingredientId가 없습니다. 메시지:", notification.message);
+                    alert("해당 식재료 정보를 찾을 수 없습니다.");
+                }
+            }
+            
             setShowNotifications(false);
         } catch (error) {
             console.error("알림 처리 실패:", error);
@@ -117,13 +137,108 @@ const Header = () => {
                 console.log("📦 받은 데이터:", data);
                 console.log("📦 데이터 길이:", data.length);
                 
-                setNotifications(data);
+                // ✅ 중복 체크
+                const uniqueIds = new Set(data.map(n => n.notificationId));
+                console.log("🔑 고유 ID 개수:", uniqueIds.size);
+                
+                if (uniqueIds.size !== data.length) {
+                    console.warn("⚠️ 중복된 notificationId가 있습니다!");
+                    
+                    // 중복 제거
+                    const uniqueNotifications = data.filter((notif, index, self) =>
+                        index === self.findIndex(n => n.notificationId === notif.notificationId)
+                    );
+                    
+                    console.log("✅ 중복 제거 후:", uniqueNotifications.length);
+                    setNotifications(uniqueNotifications);
+                } else {
+                    setNotifications(data);
+                }
+                
                 setHasUnread(data.some(n => n.isRead === 'N'));
             } else {
                 console.error("❌ 응답 실패:", response.status);
             }
         } catch (error) {
             console.error("❌ 알림 조회 실패:", error);
+        }
+    };
+
+    // ✅ 현재 탭의 알림 일괄 읽음 처리
+    const handleMarkAllAsRead = async () => {
+        try {
+            const token = sessionStorage.getItem("token");
+            
+            const response = await fetch(`/api/alert/notifications/mark-all-read/${activeTab}`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log(`✅ ${result.count}개 알림 읽음 처리 완료`);
+                
+                // 알림 목록 다시 조회
+                fetchNotifications();
+            }
+        } catch (error) {
+            console.error("일괄 읽음 처리 실패:", error);
+        }
+    };
+
+    // ✅ 개별 알림 읽음 처리 (페이지 이동 없이)
+    const handleMarkAsReadOnly = async (e, notificationId) => {
+        e.stopPropagation(); // 알림 클릭 이벤트 전파 방지
+        
+        try {
+            const token = sessionStorage.getItem("token");
+            
+            const response = await fetch(`/api/alert/notifications/${notificationId}/read`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                console.log("✅ 알림 읽음 처리 완료:", notificationId);
+                
+                // 알림 목록 다시 조회
+                fetchNotifications();
+            }
+        } catch (error) {
+            console.error("알림 읽음 처리 실패:", error);
+        }
+    };
+
+    // ✅ 알림 삭제 기능 (선택사항)
+    const handleDeleteNotification = async (e, notificationId) => {
+        e.stopPropagation(); // 알림 클릭 이벤트 전파 방지
+        
+        if (!confirm("이 알림을 삭제하시겠습니까?")) {
+            return;
+        }
+        
+        try {
+            const token = sessionStorage.getItem("token");
+            
+            const response = await fetch(`/api/alert/notifications/${notificationId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                console.log("✅ 알림 삭제 완료:", notificationId);
+                
+                // 알림 목록 다시 조회
+                fetchNotifications();
+            }
+        } catch (error) {
+            console.error("알림 삭제 실패:", error);
         }
     };
 
@@ -189,6 +304,18 @@ const Header = () => {
                                                     </button>
                                                 </div>
 
+                                                {/* 읽음 처리 버튼 */}
+                                                {notifications.filter(n => n.type === activeTab && n.isRead === 'N').length > 0 && (
+                                                    <div className="notification-action-bar">
+                                                        <button 
+                                                            className="mark-all-read-btn"
+                                                            onClick={handleMarkAllAsRead}
+                                                        >
+                                                            모두 읽음으로 처리
+                                                        </button>
+                                                    </div>
+                                                )}
+
                                                 {/* 탭 콘텐츠 */}
                                                 <div className="notification-content">
                                                     {notifications.filter(n => n.type === activeTab).length === 0 ? (
@@ -196,9 +323,9 @@ const Header = () => {
                                                     ) : (
                                                         notifications
                                                             .filter(n => n.type === activeTab)
-                                                            .map((notif) => (
+                                                            .map((notif, index) => (  // ✅ index 추가
                                                                 <div
-                                                                    key={notif.notificationId}
+                                                                    key={`${notif.notificationId}-${index}`}  // ✅ 복합 키 사용
                                                                     className={`notification-item ${notif.isRead === 'N' ? 'unread' : ''}`}
                                                                     onClick={() => handleNotificationClick(notif)}
                                                                     onMouseEnter={(e) => e.currentTarget.classList.add('hover')}
@@ -217,6 +344,24 @@ const Header = () => {
 
                                                                     <div className="notification-message">
                                                                         {notif.message}
+                                                                    </div>
+
+                                                                    {/* ✅ 개별 액션 버튼 추가 */}
+                                                                    <div className="notification-actions">
+                                                                        <button
+                                                                            className="notification-action-btn mark-read"
+                                                                            onClick={(e) => handleMarkAsReadOnly(e, notif.notificationId)}
+                                                                            title="읽음 처리"
+                                                                        >
+                                                                            읽음
+                                                                        </button>
+                                                                        <button
+                                                                            className="notification-action-btn delete"
+                                                                            onClick={(e) => handleDeleteNotification(e, notif.notificationId)}
+                                                                            title="알림 삭제"
+                                                                        >
+                                                                            삭제
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             ))

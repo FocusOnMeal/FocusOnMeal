@@ -21,4 +21,5 @@ public class NotificationLog {
     private String message;			// 알림 내용
     private String isRead;			// 사용자 확인 여부
     private Date sentAt;			// 알림 발송 시각
+    private int alertId;          	// 공표 정보 아이디 (FK)
 }
