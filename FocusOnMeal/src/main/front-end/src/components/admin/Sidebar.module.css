@@ -13,24 +13,26 @@
     margin: 0;
 }
 
+/* 리스트 아이템 기본 스타일 */
+.menuList li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 /* 큰 타이틀 버튼 공통 스타일 */
 .menuTitle {
     display: block;
     padding: 14px 18px;
     margin-bottom: 12px;
-    list-style: none;
     font-size: 20px;
     font-weight: 700;
     color: #333;
     border-radius: 10px;
     transition: background 0.2s ease, color 0.2s ease;
     text-decoration: none;
-}
-
-/* 기본 상태 */
-.menuTitle {
     background: transparent;
-    list-style: none;
+    cursor: pointer;
 }
 
 .menuTitle:hover {
@@ -43,29 +45,46 @@
     display: block;
     padding: 14px 18px;
     margin-bottom: 12px;
-    list-style: none;
     font-size: 20px;
     font-weight: 700;
     border-radius: 10px;
     text-decoration: none;
-
     transition: background 0.2s ease, color 0.2s ease;
     background: #d9e8c7;
     color: #4b6a1e;
 }
 
-/* 서브메뉴 */
+/* 서브메뉴 기본 */
 .subItem {
     font-size: 16px;
-    padding: 1px 0px 10px 20px;
+    padding: 8px 0px 8px 20px;
     color: #555;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     display: block;
     text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    border-radius: 8px;
 }
 
 .subItem:hover {
+    background: #f5f9ef;
     color: #67932A;
 }
 
+/* 서브메뉴 활성 상태 */
+.active {
+    font-size: 16px;
+    padding: 8px 0px 8px 20px;
+    color: #67932A;
+    margin-bottom: 4px;
+    display: block;
+    text-decoration: none;
+    background: #eef5e3;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s ease, color 0.2s ease;
+}
 
+.active:hover {
+    background: #e3f0d3;
+}

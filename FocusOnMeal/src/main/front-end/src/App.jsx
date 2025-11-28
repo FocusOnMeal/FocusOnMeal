@@ -48,6 +48,7 @@ import SafetyAlertDetail from './pages/board/safety/SafetyDetail';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import MemberInfo from './pages/admin/MemberInfo';
 import NoticeInfo from './pages/admin/NoticeInfo';
+import IngredientInfo from './pages/admin/IngredientInfo';
 
 function App() {
   
@@ -119,6 +120,8 @@ function App() {
         {/* 안전정보 게시판 관련 */}
         <Route path="/board/safety/list" element={<SafetyAlertList />} />
         <Route path="/board/safety/detail/:alertId" element={<SafetyAlertDetail />} />
+
+        <Route path="/admin/ingredientInfo" element={<IngredientInfo/>} />
       </Routes>
     </>
   );
