@@ -91,4 +91,24 @@ public class SafetyServiceImpl implements SafetyService {
 			|| sortColumn.equals("title")	
 			|| sortColumn.equals("publicationDate");
 	}
+	
+	@Override
+	public SafetyAlert getPreviousAlert(int currentAlertId) {
+	    try {
+	        return safetyMapper.getPreviousAlert(currentAlertId);
+	    } catch (Exception e) {
+	        log.error("이전 글 조회 실패: alertId={}", currentAlertId, e);
+	        return null;
+	    }
+	}
+
+	@Override
+	public SafetyAlert getNextAlert(int currentAlertId) {
+	    try {
+	        return safetyMapper.getNextAlert(currentAlertId);
+	    } catch (Exception e) {
+	        log.error("다음 글 조회 실패: alertId={}", currentAlertId, e);
+	        return null;
+	    }
+	}
 }

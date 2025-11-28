@@ -44,4 +44,14 @@ public interface SafetyService {
 	 * @return 다음 안전 정보
 	 */
 	SafetyAlert selectNextAlert(int alertId);
+	
+	/**
+	 * 상세페이지 이전 글 조회
+	 */
+	SafetyAlert getPreviousAlert(int currentAlertId);
+
+	/**
+	 * 상세페이지 다음 글 조회
+	 */
+	SafetyAlert getNextAlert(int currentAlertId);
 }

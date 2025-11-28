@@ -218,5 +218,41 @@
         ORDER BY ALERT_ID ASC
         FETCH FIRST 1 ROWS ONLY
     </select>
+    
+    <!-- 상세페이지 이전 글 조회 -->
+	<select id="getPreviousAlert" resultType="com.fom.boot.domain.alert.model.vo.SafetyAlert">
+	    SELECT 
+	        ALERT_ID AS alertId,
+	        TITLE AS title,
+	        PUBLICATION_DATE AS publicationDate
+	    FROM (
+	        SELECT 
+	            ALERT_ID,
+	            TITLE,
+	            PUBLICATION_DATE
+	        FROM SAFETY_ALERT_MASTER
+	        WHERE ALERT_ID <![CDATA[<]]> #{alertId}
+	        ORDER BY ALERT_ID DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
+	
+	<!-- 상세페이지 다음 글 조회 -->
+	<select id="getNextAlert" resultType="com.fom.boot.domain.alert.model.vo.SafetyAlert">
+	    SELECT 
+	        ALERT_ID AS alertId,
+	        TITLE AS title,
+	        PUBLICATION_DATE AS publicationDate
+	    FROM (
+	        SELECT 
+	            ALERT_ID,
+	            TITLE,
+	            PUBLICATION_DATE
+	        FROM SAFETY_ALERT_MASTER
+	        WHERE ALERT_ID <![CDATA[>]]> #{alertId}
+	        ORDER BY ALERT_ID ASC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
   
   </mapper>

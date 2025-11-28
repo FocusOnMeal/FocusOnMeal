@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 
@@ -47,4 +48,13 @@ public interface SafetyMapper {
 	 */
 	SafetyAlert selectNextAlert(int alertId);
 
+	/**
+	 * 상세페이지 이전 글 조회 (현재 글보다 ID가 작은 것 중 가장 큰 것)
+	 */
+	SafetyAlert getPreviousAlert(@Param("alertId") int alertId);
+
+	/**
+	 * 상세페이지 다음 글 조회 (현재 글보다 ID가 큰 것 중 가장 작은 것)
+	 */
+	SafetyAlert getNextAlert(@Param("alertId") int alertId);
 }
