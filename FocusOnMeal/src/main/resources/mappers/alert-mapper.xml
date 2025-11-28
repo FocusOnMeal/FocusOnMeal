@@ -337,13 +337,6 @@
 	) WHERE rn BETWEEN #{startRow} AND #{endRow}
 	</select>
 	
-	<!-- 마이페이지: 안전정보알림 삭제 -->
-	<delete id="deleteNotification">
-        DELETE FROM NOTIFICATION_LOG
-        WHERE NOTIFICATION_ID = #{notificationId}
-          AND MEMBER_ID = #{memberId}
-    </delete>
-
     <!-- 모든 읽지 않은 알림 읽음 처리 -->
 	<update id="updateAllNotificationsReadStatus">
 	    UPDATE NOTIFICATION_LOG
