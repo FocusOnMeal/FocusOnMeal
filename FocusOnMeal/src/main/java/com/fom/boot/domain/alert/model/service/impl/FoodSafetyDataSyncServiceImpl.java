@@ -42,7 +42,7 @@ public class FoodSafetyDataSyncServiceImpl implements FoodSafetyDataSyncService 
             log.info("최근 3일 전체 데이터 개수: {}", totalCount);
 
             if (totalCount == 0) {
-                log.info("동기화할 데이터가 없습니다.");
+                log.warn("동기화할 데이터가 없거나 API 호출에 실패했습니다. 서버는 정상적으로 시작됩니다.");
                 return 0;
             }
 
@@ -66,8 +66,10 @@ public class FoodSafetyDataSyncServiceImpl implements FoodSafetyDataSyncService 
             return totalSaved;
 
         } catch (Exception e) {
-            log.error("최근 식품안전정보 동기화 실패", e);
-            throw new RuntimeException("Recent alert sync failed", e);
+            log.error("최근 식품안전정보 동기화 실패 - 외부 API 일시적 장애 가능성", e);
+            log.warn("동기화 실패했지만 서버는 정상적으로 시작됩니다. API 복구 후 수동으로 동기화하거나 스케줄러가 자동으로 재시도합니다.");
+            // 동기화 실패해도 서버 시작을 막지 않음 (RuntimeException을 던지지 않음)
+            return 0;
         }
     }
     

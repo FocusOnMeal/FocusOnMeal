@@ -37,7 +37,7 @@ const MemberInfo = () => {
                 adminYn: newGrade
             },
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`
             }
         })
         .then((res) => {
@@ -66,7 +66,7 @@ const MemberInfo = () => {
                 statusYn: newStatus
             },
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`
             }
         })
         .then(() => {
@@ -108,7 +108,7 @@ const MemberInfo = () => {
     
     useEffect(() => {
         const fetchMemberInfo = () => {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             if (!token) {
                 console.error("JWT 토큰이 없습니다.");
                 return;

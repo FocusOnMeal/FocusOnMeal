@@ -197,7 +197,6 @@
 .listItem:hover {
     background-color: #f8f9fa;
     border-color: #4CAF50;
-    transform: translateY(-2px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -293,4 +292,55 @@
 
 .listContent::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+/* 가격 차이 표시 스타일 */
+.priceDiff {
+    font-size: 0.85em;
+    opacity: 0.8;
+    margin-left: 4px;
+}
+
+/* 차트 높이 조정 */
+.chartContainer {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 변동률 정보 개선 */
+.changeRateInfo {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.changeItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.changeItem .label {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.changeItem .value {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.value.up {
+    color: #d32f2f;
+}
+
+.value.down {
+    color: #1976d2;
+}
+
+.value.stable {
+    color: #757575;
 }

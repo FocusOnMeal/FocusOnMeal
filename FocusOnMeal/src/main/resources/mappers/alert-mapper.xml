@@ -101,9 +101,12 @@
 
     <!-- 특정 식재료에 대해 알림 수신이 활성화된 회원 목록 조회 (개인화) -->
     <select id="selectMembersWithIngredientAlertEnabled" resultType="string">
-        SELECT MEMBER_ID
-        FROM SAFETY_ALERT_SETTINGS
-        WHERE NOTIFICATION_ENABLED = 'Y'
+        SELECT DISTINCT mia.MEMBER_ID
+        FROM MEMBER_INGREDIENT_ALERT mia
+        INNER JOIN SAFETY_ALERT_SETTINGS sas
+            ON mia.MEMBER_ID = sas.MEMBER_ID
+        WHERE mia.INGREDIENT_ID = #{ingredientId}
+          AND sas.NOTIFICATION_ENABLED = 'Y'
     </select>
 
     <!-- 알림 로그 생성 -->
@@ -114,14 +117,16 @@
             TYPE,
             MESSAGE,
             IS_READ,
-            SENT_AT
+            SENT_AT,
+            ALERT_ID
         ) VALUES (
             SEQ_NOTIFICATION_LOG.NEXTVAL,
             #{memberId},
             #{type},
             #{message},
             'N',
-            SYSTIMESTAMP
+            SYSTIMESTAMP,
+            #{alertId, jdbcType=NUMERIC}
         )
     </insert>
     
@@ -129,7 +134,7 @@
     <select id="findIngredientIdByKeyword" resultType="int">
         SELECT INGREDIENT_ID
         FROM INGREDIENT_MASTER
-        WHERE NAME LIKE '%' || #{keyword} || '%' 
+        WHERE #{keyword} LIKE '%' || NAME || '%'
         AND ROWNUM = 1
     </select>
     
@@ -187,6 +192,39 @@
           AND NATION = #{nation}
           AND PUBLICATION_DATE = #{publicationDate, jdbcType=TIMESTAMP}
           AND ROWNUM = 1
+    </select>
+
+    <!-- 회원의 특정 식재료 알림 설정 확인 -->
+    <select id="countIngredientAlert" resultType="int">
+        SELECT COUNT(*)
+        FROM MEMBER_INGREDIENT_ALERT
+        WHERE MEMBER_ID = #{memberId}
+          AND INGREDIENT_ID = #{ingredientId}
+    </select>
+
+    <!-- 특정 식재료 알림 등록 -->
+    <insert id="insertIngredientAlert">
+        INSERT INTO MEMBER_INGREDIENT_ALERT (
+            MEMBER_ID,
+            INGREDIENT_ID
+        ) VALUES (
+            #{memberId},
+            #{ingredientId}
+        )
+    </insert>
+
+    <!-- 특정 식재료 알림 해제 -->
+    <delete id="deleteIngredientAlert">
+        DELETE FROM MEMBER_INGREDIENT_ALERT
+        WHERE MEMBER_ID = #{memberId}
+          AND INGREDIENT_ID = #{ingredientId}
+    </delete>
+
+    <!-- 알림이 설정된 모든 고유 식재료 ID 조회 -->
+    <select id="selectAllAlertIngredientIds" resultType="int">
+        SELECT DISTINCT INGREDIENT_ID
+        FROM MEMBER_INGREDIENT_ALERT
+        ORDER BY INGREDIENT_ID
     </select>
 
   </mapper>

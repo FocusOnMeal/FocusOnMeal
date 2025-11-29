@@ -31,7 +31,8 @@ public class SecurityConfig {
     	// === CORS 설정 추가 ===
         http.cors(cors -> cors.configurationSource(request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.addAllowedOrigin("http://localhost:5173");  // 프론트 주소
+            config.addAllowedOriginPattern("*");
+            // config.addAllowedOrigin("http://localhost:5173");  // 프론트 주소
             config.addAllowedHeader("*");
             config.addAllowedMethod("*");
             config.setAllowCredentials(true);

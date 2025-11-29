@@ -2,6 +2,7 @@ package com.fom.boot.domain.ingredient.model.mapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -52,4 +53,19 @@ public interface IngredientPriceHistoryMapper {
 			@Param("ingredientId") int ingredientId, 
 			@Param("startDate") LocalDateTime todayStart, 
 			@Param("endDate") LocalDateTime todayEnd);
+	
+    /**
+     * 날짜 범위로 가격 이력 조회
+     */
+    List<PriceHistory> selectByDateRange(Map<String, Object> params);
+    
+    /**
+     * 최신 가격 조회
+     */
+    PriceHistory selectLatestPrice(Map<String, Object> params);
+    
+    /**
+     * 특정 날짜에 가장 가까운 가격 조회
+     */
+    PriceHistory selectClosestPrice(Map<String, Object> params);
 }

@@ -55,4 +55,6 @@ public interface MemberService {
 	
 	void updateProfile(String memberId, ProfileUpdateRequest request);
 	
+	boolean deleteMember(String memberId, String password);
+	
 }

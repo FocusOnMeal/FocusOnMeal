@@ -28,14 +28,35 @@ function IngredientSearch() {
 
   const [wishlist, setWishlist] = useState(new Set()); 
   
-  const toggleWishlist = (ingredientId) => {
-    setWishlist(prev => {
-      const newSet = new Set(prev);
-      newSet.has(ingredientId) ? newSet.delete(ingredientId) : newSet.add(ingredientId);
-      return newSet;
-    });
+  // ✅ [수정] 찜 토글 기능: 실제 백엔드 API 호출로 변경
+const toggleWishlist = async (ingredientId) => {
+    try {
+        // Post 요청 시 Body가 비어있으면 400 에러가 날 수 있으므로 빈 객체 {}를 넣어줍니다.
+        const response = await axios.post(`/ingredient/detail/${ingredientId}/favorite`, {});
+        
+        if (response.data.success) {
+            setWishlist(prev => {
+                const newSet = new Set(prev);
+                // 백엔드 응답(isFavorite)에 따라 상태 동기화
+                if (response.data.isFavorite) {
+                    newSet.add(ingredientId);
+                } else {
+                    newSet.delete(ingredientId);
+                }
+                return newSet;
+            });
+        }
+    } catch (error) {
+        if (error.response?.status === 401) {
+            alert("로그인이 필요한 서비스입니다.");
+        } else {
+            console.error("찜하기 오류:", error);
+            alert("오류가 발생했습니다.");
+        }
+    }
   };
 
+  // 1. 식재료 전체 목록 조회
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -45,7 +66,13 @@ function IngredientSearch() {
             const processedData = response.data.map(item => ({
               ...item,
               pricePer100g: item.currentPrice ? Math.floor(item.currentPrice / 10) : 0,
-              // 실제 백엔드에서 받은 priceChangePercent 사용
+              
+              // [수정] 백엔드 데이터 매핑
+              priceChangePercent: item.priceChangePercent ?? 0, 
+              previousPrice: item.previousPrice || 0, 
+              // ✅ 직전 데이터 수집일 추가 (문자열로 올 수 있으니 확인 필요)
+              previousCollectedDate: item.previousCollectedDate || null,
+
               safetyStatus: ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)], // TODO: 실제 안전도 로직
               unit: item.unit || '1kg'
             }));
@@ -63,6 +90,29 @@ function IngredientSearch() {
       }
     };
     fetchData();
+  }, []);
+
+// 2. 내 찜 목록 불러오기 (초기화)
+  useEffect(() => {
+    // 1. 토큰이 있는지 먼저 확인
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    
+    // 🚨 [핵심] 토큰이 없으면(비로그인 상태면) 여기서 멈춤! 서버에 요청 안 보냄!
+    if (!token) return; 
+
+    const fetchMyFavorites = async () => {
+        try {
+            const response = await axios.get('/api/mypage/favorites');
+            if (response.data && Array.isArray(response.data)) {
+                const myFavoriteIds = response.data.map(item => item.ingredientId);
+                setWishlist(new Set(myFavoriteIds));
+            }
+        } catch{
+            // 토큰이 만료되었거나 오류가 나도, 리스트 페이지 보는 데는 지장 없으니 조용히 넘어감
+        }
+    };
+    
+    fetchMyFavorites();
   }, []);
   
   const filteredResults = (originalResults || []).filter(item => {
@@ -238,13 +288,29 @@ function IngredientSearch() {
                     </Link>
                     
                     <div className={styles.itemActions}>
-                        <button 
-                          onClick={() => toggleWishlist(item.ingredientId)}
-                          style={{color: isWished ? '#dc3545' : '#333', borderColor: isWished ? '#dc3545' : '#ddd'}}
-                        >
-                          {isWished ? '❤️ 찜하기' : '🤍 찜하기'}
-                        </button>
-                    </div>
+    <button 
+        onClick={() => toggleWishlist(item.ingredientId)}
+        // 찜 상태(isWished)일 때 styles.wished 클래스 추가
+        className={isWished ? styles.wished : ''}
+    >
+        {/* SVG 하트 아이콘 */}
+        <svg 
+            width="16" 
+            height="16" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path 
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
+                stroke="currentColor" 
+                strokeWidth="2"
+            />
+        </svg>
+        {/* 텍스트 */}
+        <span>{isWished ? '찜 완료' : '찜하기'}</span>
+    </button>
+</div>
                 </div>
 
                 <div className={styles.itemDetails}>
@@ -258,45 +324,45 @@ function IngredientSearch() {
                         }
                     </p>
                     
-                    {/* 🚨 가격 변동 정보를 별도 줄로 표시 */}
-                    {hasPriceChange && (
-                        <p style={{fontSize: '0.85em', color: '#666', marginTop: '4px', marginBottom: '4px'}}>
-                            {item.priceChangePercent === 0 ? (
-                                <>
-                                    <span>전일 대비 변동 없음</span>
-                                    {item.yesterdayPrice && item.yesterdayCollectedDate && (
-                                        <span style={{marginLeft: '8px', color: '#999'}}>
-                                            (전일: {item.yesterdayPrice.toLocaleString()}원, {new Date(item.yesterdayCollectedDate).toLocaleDateString('ko-KR', {
-                                                month: 'numeric',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })})
-                                        </span>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <span style={changeStyle}>
-                                        전일 대비 {changeIndicator}{Math.abs(item.priceChangePercent).toFixed(1)}%
-                                    </span>
-                                    {item.yesterdayPrice && item.yesterdayCollectedDate && (
-                                        <span style={{marginLeft: '8px', color: '#999'}}>
-                                            (전일 : {item.yesterdayPrice.toLocaleString()}원, {new Date(item.yesterdayCollectedDate).toLocaleDateString('ko-KR', {
-                                                month: 'numeric',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })})
-                                        </span>
-                                    )}
-                                </>
+                    {/* ✅ [수정] 가격 변동 정보 + 날짜 상세 표시 */}
+                    {item.currentPrice && item.previousPrice ? (
+                        <p style={{fontSize: '0.85em', marginTop: '4px', marginBottom: '4px'}}>
+                            
+                            {/* 1. 변동 없음 */}
+                            {item.priceChangePercent === 0 && (
+                                <span style={{color: '#666'}}>
+                                    - 전일 대비 변동 없음
+                                </span>
+                            )}
+
+                            {/* 2. 상승/하락 표시 (글자 + 화살표 + 수치 통일) */}
+                            {item.priceChangePercent !== 0 && (
+                                <span style={{
+                                    // 여기서 색상을 한 번에 지정합니다
+                                    color: item.priceChangePercent > 0 ? '#dc3545' : '#007aff', 
+                                    fontWeight: 'bold'
+                                }}>
+                                    전일 대비 {item.priceChangePercent > 0 ? '▲' : '▼'} {Math.abs(item.priceChangePercent).toFixed(1)}%
+                                </span>
+                            )}
+
+                            {/* ✅ [날짜/시간 추가] (전일 : 000원, 11.24 09:30) */}
+                            {item.previousCollectedDate && (
+                                <span style={{color: '#999', marginLeft: '6px'}}>
+                                    (전일 : {item.previousPrice.toLocaleString()}원, 
+                                    {' ' + new Date(item.previousCollectedDate).toLocaleDateString('ko-KR', {
+                                        month: 'numeric', 
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })})
+                                </span>
                             )}
                         </p>
-                    )}
-                    {!hasPriceChange && item.currentPrice && (
+                    ) : (
                         <p style={{fontSize: '0.85em', color: '#999', marginTop: '4px', marginBottom: '4px'}}>
-                            전일 가격 정보 없음
+                            <span style={{background:'#ffc107', color:'#fff', padding:'2px 6px', borderRadius:'4px', marginRight:'5px', fontSize:'0.9em'}}>NEW</span>
+                            최근 데이터 기준
                         </p>
                     )}
                     

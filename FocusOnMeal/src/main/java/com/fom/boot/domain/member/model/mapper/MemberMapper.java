@@ -57,6 +57,14 @@ public interface MemberMapper {
 	        @Param("keyword") String keyword
 	);
 
+	void deleteUserAllergies(String memberId);
+
+	void deleteUserMealPlans(String memberId);
+
+	void deleteUserFavorites(String memberId);
+
+	int deleteMember(String memberId);
+
 	
     /* ===================================================================== */
     /* ===================================================================== */

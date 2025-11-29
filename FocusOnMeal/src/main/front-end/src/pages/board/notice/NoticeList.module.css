@@ -1,3 +1,6 @@
+/* ============================= */
+/* 기본 레이아웃 */
+/* ============================= */
 .container {
     width: 100%;
     max-width: 900px;
@@ -17,6 +20,9 @@
     padding-bottom: 8px;
 }
 
+/* ============================= */
+/* 검색 박스 */
+/* ============================= */
 .searchBox {
     display: flex;
     justify-content: flex-end;
@@ -30,14 +36,89 @@
     border-radius: 4px;
 }
 
+/* ============================= */
+/* 테이블 기본 */
+/* ============================= */
 .noticeTable {
     width: 100%;
     border-collapse: collapse;
-    border-top: 1px solid #ccc;
+    border-top: 2px solid #444;
 }
 
-.noticeTable th, .noticeTable td {
+.noticeTable th, 
+.noticeTable td {
     padding: 12px 8px;
     border-bottom: 1px solid #eee;
     text-align: center;
+    vertical-align: middle;
+    font-size: 15px;
+}
+
+/* 행 hover */
+.noticeTable tbody tr:hover {
+    background-color: #fafafa;
+    transition: 0.15s ease-in-out;
+}
+
+/* ============================= */
+/* 정렬 가능한 th (hover + 아이콘 정렬) */
+/* ============================= */
+.noticeTable th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: 0.2s;
+}
+
+.noticeTable th.sortable:hover {
+    background-color: #f7f7f7;
+}
+
+/* ============================= */
+/* 제목 링크 */
+/* ============================= */
+.noticeTable td a {
+    text-decoration: none;
+    color: #333;
+}
+
+.noticeTable td a:hover {
+    color: #0796E5;
+    text-decoration: underline;
+}
+
+/* ============================= */
+/* 필독 / NEW 뱃지 */
+/* ============================= */
+.badgeImportant {
+    display: inline-block;
+    padding: 3px 6px;
+    margin-right: 6px;
+    background-color: #ff4d4f;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+.badgeNew {
+    display: inline-block;
+    padding: 3px 6px;
+    margin-right: 6px;
+    background-color: #0796E5;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+/* ============================= */
+/* 중요 공지 강조 행 */
+/* ============================= */
+.importantRow {
+    background-color: #fdf6f6 !important;
+}
+
+.importantRow td {
+    font-weight: 600;
 }

@@ -89,4 +89,73 @@
         WHERE ROWNUM = 1
     </select>
 
+	<!-- 날짜 범위로 가격 이력 조회 -->
+    <select id="selectByDateRange" resultMap="PriceHistory" parameterType="map">
+        SELECT 
+            PRICE_HISTORY_ID,
+            INGREDIENT_ID,
+            PRICE_VALUE,
+            PRICE_TYPE,
+            REGION,
+            COLLECTED_DATE
+        FROM PRICE_HISTORY
+        WHERE INGREDIENT_ID = #{ingredientId}
+          AND COLLECTED_DATE BETWEEN #{startDate} AND #{endDate}
+        <if test="priceType != null and priceType != ''">
+            AND PRICE_TYPE = #{priceType}
+        </if>
+        <if test="region != null and region != ''">
+            AND REGION = #{region}
+        </if>
+        ORDER BY COLLECTED_DATE ASC
+    </select>
+    
+    <!-- 최신 가격 조회 -->
+    <select id="selectLatestPrice" resultMap="PriceHistory" parameterType="map">
+        SELECT 
+            PRICE_HISTORY_ID,
+            INGREDIENT_ID,
+            PRICE_VALUE,
+            PRICE_TYPE,
+            REGION,
+            COLLECTED_DATE
+        FROM (
+            SELECT *
+            FROM PRICE_HISTORY
+            WHERE INGREDIENT_ID = #{ingredientId}
+            <if test="priceType != null and priceType != ''">
+                AND PRICE_TYPE = #{priceType}
+            </if>
+            <if test="region != null and region != ''">
+                AND REGION = #{region}
+            </if>
+            ORDER BY COLLECTED_DATE DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
+    
+	<!-- 특정 날짜에 가장 가까운 가격 조회 -->
+	<select id="selectClosestPrice" resultMap="PriceHistory" parameterType="map">
+	    SELECT *
+	    FROM (
+	        SELECT 
+	            PRICE_HISTORY_ID,
+	            INGREDIENT_ID,
+	            PRICE_VALUE,
+	            PRICE_TYPE,
+	            REGION,
+	            COLLECTED_DATE,
+	            ABS(TRUNC(COLLECTED_DATE) - TRUNC(#{targetDate})) AS date_diff
+	        FROM PRICE_HISTORY
+	        WHERE INGREDIENT_ID = #{ingredientId}
+	        <if test="priceType != null and priceType != ''">
+	            AND PRICE_TYPE = #{priceType}
+	        </if>
+	        <if test="region != null and region != ''">
+	            AND REGION = #{region}
+	        </if>
+	        ORDER BY date_diff ASC, COLLECTED_DATE DESC
+	    )
+	    WHERE ROWNUM = 1
+	</select>
 </mapper>

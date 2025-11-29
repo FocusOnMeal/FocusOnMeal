@@ -19,6 +19,7 @@ import com.fom.boot.app.pricehistory.dto.PriceChangeRate;
 import com.fom.boot.app.pricehistory.dto.PriceDataPoint;
 import com.fom.boot.app.pricehistory.dto.PriceTrendResponse;
 import com.fom.boot.domain.ingredient.model.mapper.IngredientMapper;
+import com.fom.boot.domain.ingredient.model.mapper.IngredientPriceHistoryMapper;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 import com.fom.boot.domain.pricehistory.model.mapper.PriceHistoryMapper;
@@ -35,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PriceHistoryServiceImpl implements PriceHistoryService {
 	
-	private final PriceHistoryMapper priceHistoryMapper;
+	private final IngredientPriceHistoryMapper priceHistoryMapper;
     private final IngredientMapper ingredientMapper;
     
     @Override
@@ -115,31 +116,47 @@ public class PriceHistoryServiceImpl implements PriceHistoryService {
             throw new RuntimeException("가격 정보가 없습니다. 식자재 ID: " + ingredientId);
         }
         
+        // 1일 전 가격 조회
+        LocalDateTime oneDayAgo = latestPrice.getCollectedDate().minusDays(1);
+        params.put("targetDate", oneDayAgo);
+        PriceHistory dayAgoPrice = priceHistoryMapper.selectClosestPrice(params);
+
+        params.put("priceType", latestPrice.getPriceType());
+        params.put("region", latestPrice.getRegion());
+        
         // 1주일 전 가격 조회
         LocalDateTime oneWeekAgo = latestPrice.getCollectedDate().minusWeeks(1);
         params.put("targetDate", oneWeekAgo);
         PriceHistory weekAgoPrice = priceHistoryMapper.selectClosestPrice(params);
-        
+
         // 1개월 전 가격 조회
         LocalDateTime oneMonthAgo = latestPrice.getCollectedDate().minusMonths(1);
         params.put("targetDate", oneMonthAgo);
         PriceHistory monthAgoPrice = priceHistoryMapper.selectClosestPrice(params);
-        
+
         // 등락률 계산
         PriceChangeRate changeRate = new PriceChangeRate();
         changeRate.setCurrentPrice(latestPrice.getPriceValue());
-        
+
+        if (dayAgoPrice != null) {
+            changeRate.setDailyChange(calculatePercentChange(
+                    dayAgoPrice.getPriceValue(),
+                    latestPrice.getPriceValue()
+            ));
+            changeRate.setDailyPriceDiff(latestPrice.getPriceValue() - dayAgoPrice.getPriceValue());
+        }
+
         if (weekAgoPrice != null) {
             changeRate.setWeeklyChange(calculatePercentChange(
-                    weekAgoPrice.getPriceValue(), 
+                    weekAgoPrice.getPriceValue(),
                     latestPrice.getPriceValue()
             ));
             changeRate.setWeeklyPriceDiff(latestPrice.getPriceValue() - weekAgoPrice.getPriceValue());
         }
-        
+
         if (monthAgoPrice != null) {
             changeRate.setMonthlyChange(calculatePercentChange(
-                    monthAgoPrice.getPriceValue(), 
+                    monthAgoPrice.getPriceValue(),
                     latestPrice.getPriceValue()
             ));
             changeRate.setMonthlyPriceDiff(latestPrice.getPriceValue() - monthAgoPrice.getPriceValue());

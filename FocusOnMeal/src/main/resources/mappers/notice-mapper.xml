@@ -6,11 +6,78 @@
   
 	<!-- 관리자: 전체 공지사항 목록 조회 -->
 	<select id="selectAllNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
-	    SELECT
-	        *
-	    FROM NOTICE
-	    ORDER BY NOTICE_CREATEAT DESC
+	    SELECT *
+	    FROM (
+	        SELECT ROWNUM AS RNUM, N.*
+	        FROM (
+	            SELECT
+	                NOTICE_NO,
+	                MEMBER_ID,
+	                NOTICE_SUBJECT,
+	                NOTICE_CONTENT,
+	                NOTICE_CREATEAT,
+	                NOTICE_ISNEW,
+	                NOTICE_IMPORTANT,
+	                VIEW_COUNT,
+	                IS_DELETED
+	            FROM NOTICE
+	            WHERE IS_DELETED = 'N'
+	            
+	            <!-- 검색 조건 -->
+	            <if test="type == 'all' and keyword != null and keyword != ''">
+	                AND (NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+	                     OR NOTICE_CONTENT LIKE '%' || #{keyword} || '%')
+	            </if>
+	            <if test="type == 'title' and keyword != null and keyword != ''">
+	                AND NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+	            </if>
+	            <if test="type == 'content' and keyword != null and keyword != ''">
+	                AND NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+	            </if>
+	
+	            <!-- ★ 필터 조건 (관리자용) -->
+	            <if test="filterType == 'NEW'">
+	                AND NOTICE_ISNEW = 'Y'
+	            </if>
+	            <if test="filterType == 'IMPORTANT'">
+	                AND NOTICE_IMPORTANT = 'Y'
+	            </if>
+	            
+	            <!-- filterType == 'ALL' 이면 아무 조건도 안 붙음 -->
+	
+	            <!-- 정렬 조건 -->
+	            <choose>
+	            	<when test="sortColumn == 'noticeNo'">
+	                    ORDER BY NOTICE_NO
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <when test="sortColumn == 'noticeSubject'">
+	                    ORDER BY NOTICE_SUBJECT
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <when test="sortColumn == 'noticeCreateAt'">
+	                    ORDER BY NOTICE_CREATEAT
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <when test="sortColumn == 'viewCount'">
+	                    ORDER BY VIEW_COUNT
+	                    <if test="sortOrder == 'asc'"> ASC</if>
+	                    <if test="sortOrder == 'desc'"> DESC</if>
+	                </when>
+	                <otherwise>
+	                    ORDER BY NOTICE_CREATEAT DESC
+	                </otherwise>
+	            </choose>
+	        ) N
+	        WHERE ROWNUM &lt;= #{endRow}
+	    )
+	    WHERE RNUM &gt;= #{startRow}
 	</select>
+
+
 	
 	<!-- 관리자 : 공지사항 수정  -->
 	<update id="modifyNotice" parameterType="com.fom.boot.domain.notice.model.vo.Notice">
@@ -23,4 +90,168 @@
 	        IS_DELETED = #{isDeleted}
 	    WHERE NOTICE_NO = #{noticeNo}
 	</update>	
+	
+	<!-- 관리자 : 공지사항 삭제 -->
+	<update id="deleteNotice" parameterType="int">
+	UPDATE NOTICE
+		SET IS_DELETED = 'Y'
+		WHERE NOTICE_NO = #{noticeNo}
+	</update>
+	
+	<!-- 일반회원 : 필독공지 조희 -->
+	<select id="selectImportantNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
+        SELECT 
+            NOTICE_NO, NOTICE_SUBJECT, NOTICE_CONTENT, NOTICE_CREATEAT, 
+            NOTICE_ISNEW, NOTICE_IMPORTANT, VIEW_COUNT, MEMBER_ID
+        FROM NOTICE
+        WHERE NOTICE_IMPORTANT = 'Y' 
+          AND IS_DELETED = 'N'
+        ORDER BY NOTICE_CREATEAT DESC
+    </select>
+	
+	<!-- 일반회원 : 공지사항 조회 -->
+	<select id="selectPublicNotices" resultType="com.fom.boot.domain.notice.model.vo.Notice">
+        SELECT *
+        FROM (
+            SELECT ROWNUM AS RNUM, N.*
+            FROM (
+                SELECT
+                    NOTICE_NO,
+                    MEMBER_ID,
+                    NOTICE_SUBJECT,
+                    NOTICE_CONTENT,
+                    NOTICE_CREATEAT,
+                    NOTICE_ISNEW,
+                    NOTICE_IMPORTANT,
+                    VIEW_COUNT
+                FROM NOTICE
+                WHERE IS_DELETED = 'N'
+                  AND NOTICE_IMPORTANT = 'N'  <if test="type == 'all' and keyword != null and keyword != ''">
+                    AND (NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                         OR NOTICE_CONTENT LIKE '%' || #{keyword} || '%')
+                </if>
+                <if test="type == 'title' and keyword != null and keyword != ''">
+                    AND NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test="type == 'content' and keyword != null and keyword != ''">
+                    AND NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+                </if>
+
+                <choose>
+                    <when test="sortColumn == 'noticeSubject'">
+                        ORDER BY NOTICE_SUBJECT 
+                        <if test="sortOrder == 'asc'">ASC</if>
+                        <if test="sortOrder == 'desc'">DESC</if>
+                    </when>
+                    
+                    <when test="sortColumn == 'noticeCreateAt'">
+                        ORDER BY NOTICE_CREATEAT 
+                        <if test="sortOrder == 'asc'">ASC</if>
+                        <if test="sortOrder == 'desc'">DESC</if>
+                    </when>
+                    
+                    <when test="sortColumn == 'viewCount'">
+                        ORDER BY VIEW_COUNT 
+                        <if test="sortOrder == 'asc'">ASC</if>
+                        <if test="sortOrder == 'desc'">DESC</if>
+                    </when>
+                    
+                    <otherwise>
+                        ORDER BY NOTICE_CREATEAT DESC
+                    </otherwise>
+                </choose>
+                
+            ) N
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE RNUM &gt;= #{startRow}
+    </select>
+
+	
+	<!-- 일반회원 : 공지사항 상세 조회 -->
+	<select id="selectNoticeDetail" parameterType="int"
+        resultType="com.fom.boot.domain.notice.model.vo.Notice">
+	    SELECT
+	        NOTICE_NO,
+	        MEMBER_ID,
+	        NOTICE_SUBJECT,
+	        NOTICE_CONTENT,
+	        NOTICE_CREATEAT,
+	        NOTICE_ISNEW,
+	        NOTICE_IMPORTANT,
+	        VIEW_COUNT
+	    FROM NOTICE
+	    WHERE NOTICE_NO = #{noticeNo}
+	      AND IS_DELETED = 'N'
+	</select>
+	
+	<!-- 일반회원 : 총 공지사항 수 -->
+	<select id="getTotalNoticesBySearch" resultType="int">
+    SELECT COUNT(*)
+        FROM NOTICE
+        WHERE IS_DELETED = 'N'
+          AND NOTICE_IMPORTANT = 'N' <if test="type == 'all' and keyword != null and keyword != ''">
+               AND ( NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                  OR NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+                )
+            </if>
+    
+            <if test="type != 'all' and keyword != null and keyword != ''">
+                <choose>
+                    <when test="type == 'title'">
+                       AND NOTICE_SUBJECT LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test="type == 'content'">
+                       AND NOTICE_CONTENT LIKE '%' || #{keyword} || '%'
+                    </when>
+                </choose>
+            </if>
+    </select>
+    
+    <!-- 조회수 증가 -->
+	<update id="increaseViewCount" parameterType="int">
+	    UPDATE NOTICE
+	    SET VIEW_COUNT = VIEW_COUNT + 1
+	    WHERE NOTICE_NO = #{noticeNo}
+	</update>
+
+	<!-- 상세 조회 + 조회수 증가 포함 -->
+	<select id="getNoticeForView" parameterType="int"
+	        resultType="com.fom.boot.domain.notice.model.vo.Notice">
+	    SELECT
+	        NOTICE_NO,
+	        MEMBER_ID,
+	        NOTICE_SUBJECT,
+	        NOTICE_CONTENT,
+	        NOTICE_CREATEAT,
+	        NOTICE_ISNEW,
+	        NOTICE_IMPORTANT,
+	        VIEW_COUNT
+	    FROM NOTICE
+	    WHERE NOTICE_NO = #{noticeNo}
+	      AND IS_DELETED = 'N'
+	</select>
+
+	
+	  <!-- 이전 글 -->
+	  <select id="selectPrevNotice" parameterType="int" resultType="map">
+		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    FROM NOTICE
+		    WHERE NOTICE_NO &lt; #{noticeNo}
+		      AND IS_DELETED = 'N'
+		    ORDER BY NOTICE_NO DESC
+		    FETCH FIRST 1 ROWS ONLY
+		</select>
+		
+		
+		<!-- 다음 글 -->
+		<select id="selectNextNotice" parameterType="int" resultType="map">
+		    SELECT NOTICE_NO AS noticeNo, NOTICE_SUBJECT AS noticeTitle
+		    FROM NOTICE
+		    WHERE NOTICE_NO &gt; #{noticeNo}
+		      AND IS_DELETED = 'N'
+		    ORDER BY NOTICE_NO ASC
+		    FETCH FIRST 1 ROWS ONLY
+		</select>
+    
   </mapper>

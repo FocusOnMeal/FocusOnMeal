@@ -31,7 +31,7 @@ const MyMeal = () => {
     // 식단 목록 조회
     useEffect(() => {
         const fetchMealPlans = async () => {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             if (!token) {
                 console.error("JWT 토큰이 없습니다.");
                 setLoading(false);
@@ -81,7 +81,7 @@ const MyMeal = () => {
     const handleDelete = async (planId) => {
         if (!window.confirm("휴지통으로 이동하시겠습니까?\n(30일 이내 복원 가능)")) return;
 
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         try {
             await axios.put(`/api/mypage/mealDelete/${planId}`, null, {
@@ -144,7 +144,7 @@ const MyMeal = () => {
 
     // 휴지통 열기
     const openTrashModal = async () => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         setTrashLoading(true);
         try {
             const response = await axios.get("/api/mypage/trash", {
@@ -168,7 +168,7 @@ const MyMeal = () => {
 
     // 식단 복원
     const handleRestore = async (planId) => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         try {
             await axios.put(`/api/mypage/trash/restore/${planId}`, null, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -196,7 +196,7 @@ const MyMeal = () => {
     // 영구 삭제
     const handlePermanentDelete = async (planId) => {
         if (!window.confirm("영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         try {
             await axios.delete(`/api/mypage/trash/${planId}`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -217,7 +217,7 @@ const MyMeal = () => {
     // 휴지통 비우기
     const handleEmptyTrash = async () => {
         if (!window.confirm("휴지통을 비우시겠습니까? 모든 식단이 영구 삭제됩니다.")) return;
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         try {
             const response = await axios.delete("/api/mypage/trash/empty", {
                 headers: { Authorization: `Bearer ${token}` }

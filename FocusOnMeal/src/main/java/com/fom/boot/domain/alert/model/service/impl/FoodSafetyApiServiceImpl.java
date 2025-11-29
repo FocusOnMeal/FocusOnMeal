@@ -118,77 +118,152 @@ public class FoodSafetyApiServiceImpl implements FoodSafetyApiService {
     
     @Override
     public int getTotalCount(int days) {
-        try {
-            LocalDate endDate = LocalDate.now();
-            LocalDate startDate = endDate.minusDays(days);
+        int maxRetries = 3;
+        int retryDelayMs = 2000;
 
-            String bgnde = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String endde = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                LocalDate endDate = LocalDate.now();
+                LocalDate startDate = endDate.minusDays(days);
 
-            String url = UriComponentsBuilder.fromUriString(apiUrl + "/" + responseType)
-                    .queryParam("apiKey", apiKey)
-                    .queryParam("bgnde", bgnde)
-                    .queryParam("endde", endde)
-                    .queryParam("startIndex", 1)
-                    .queryParam("endIndex", 1)  // 최소 요청으로 totalCount만 확인
-                    .build()
-                    .toUriString();
+                String bgnde = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                String endde = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-            log.info("식품안전정보원 totalCount 조회 - days: {}, bgnde: {}, endde: {}", days, bgnde, endde);
+                String url = UriComponentsBuilder.fromUriString(apiUrl + "/" + responseType)
+                        .queryParam("apiKey", apiKey)
+                        .queryParam("bgnde", bgnde)
+                        .queryParam("endde", endde)
+                        .queryParam("startIndex", 1)
+                        .queryParam("endIndex", 1)  // 최소 요청으로 totalCount만 확인
+                        .build()
+                        .toUriString();
 
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+                log.info("식품안전정보원 totalCount 조회 (시도 {}/{}) - days: {}, bgnde: {}, endde: {}",
+                        attempt, maxRetries, days, bgnde, endde);
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-                String responseBody = response.getBody();
-                return extractTotalCount(responseBody);
+                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+                if (response.getStatusCode().is2xxSuccessful()) {
+                    String responseBody = response.getBody();
+                    int count = extractTotalCount(responseBody);
+                    log.info("totalCount 조회 성공 (시도 {}): {} 건", attempt, count);
+                    return count;
+                }
+
+                log.warn("totalCount 조회 실패 - Status: {}", response.getStatusCode());
+                return 0;
+
+            } catch (org.springframework.web.client.HttpServerErrorException e) {
+                log.warn("totalCount 조회 실패 (시도 {}/{}) - 서버 에러: {} {}",
+                        attempt, maxRetries, e.getStatusCode(), e.getMessage());
+
+                if (attempt < maxRetries) {
+                    try {
+                        log.info("{} ms 후 재시도합니다...", retryDelayMs);
+                        Thread.sleep(retryDelayMs);
+                        retryDelayMs *= 2; // 지수 백오프
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("재시도 대기 중 인터럽트 발생", ie);
+                        return 0;
+                    }
+                } else {
+                    log.error("totalCount 조회 최종 실패 - 모든 재시도 소진", e);
+                    return 0;
+                }
+            } catch (Exception e) {
+                log.error("totalCount 조회 중 예외 발생 (시도 {}/{})", attempt, maxRetries, e);
+
+                if (attempt < maxRetries) {
+                    try {
+                        Thread.sleep(retryDelayMs);
+                        retryDelayMs *= 2;
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
             }
-
-            return 0;
-
-        } catch (Exception e) {
-            log.error("totalCount 조회 실패", e);
-            return 0;
         }
+
+        return 0;
     }
 
     @Override
     public List<SafetyAlert> fetchSafetyAlerts(int days, int startIdx, int endIdx) {
-        List<SafetyAlert> alerts = new ArrayList<>();
+        int maxRetries = 3;
+        int retryDelayMs = 2000;
 
-        try {
-            LocalDate endDate = LocalDate.now();
-            LocalDate startDate = endDate.minusDays(days);
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                LocalDate endDate = LocalDate.now();
+                LocalDate startDate = endDate.minusDays(days);
 
-            String bgnde = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String endde = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                String bgnde = startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                String endde = endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-            String url = UriComponentsBuilder.fromUriString(apiUrl + "/" + responseType)
-                    .queryParam("apiKey", apiKey)
-                    .queryParam("bgnde", bgnde)
-                    .queryParam("endde", endde)
-                    .queryParam("startIndex", startIdx)
-                    .queryParam("endIndex", endIdx)
-                    .build()
-                    .toUriString();
+                String url = UriComponentsBuilder.fromUriString(apiUrl + "/" + responseType)
+                        .queryParam("apiKey", apiKey)
+                        .queryParam("bgnde", bgnde)
+                        .queryParam("endde", endde)
+                        .queryParam("startIndex", startIdx)
+                        .queryParam("endIndex", endIdx)
+                        .build()
+                        .toUriString();
 
-            log.info("식품안전정보원 API 호출: days={}, bgnde={}, endde={}, startIdx={}, endIdx={}",
-                    days, bgnde, endde, startIdx, endIdx);
-            log.debug("요청 URL: {}", url);
+                log.info("식품안전정보원 API 호출 (시도 {}/{}): days={}, bgnde={}, endde={}, startIdx={}, endIdx={}",
+                        attempt, maxRetries, days, bgnde, endde, startIdx, endIdx);
+                log.debug("요청 URL: {}", url);
 
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-                String responseBody = response.getBody();
-                alerts = parseResponse(responseBody);
+                if (response.getStatusCode().is2xxSuccessful()) {
+                    String responseBody = response.getBody();
+                    List<SafetyAlert> alerts = parseResponse(responseBody);
 
-                log.info("식품안전정보원 API 조회 완료: {} 건", alerts.size());
+                    log.info("식품안전정보원 API 조회 성공 (시도 {}): {} 건", attempt, alerts.size());
+                    return alerts;
+                }
+
+                log.warn("API 호출 실패 - Status: {}", response.getStatusCode());
+
+            } catch (org.springframework.web.client.HttpServerErrorException e) {
+                log.warn("API 호출 실패 (시도 {}/{}) - 서버 에러: {} {}",
+                        attempt, maxRetries, e.getStatusCode(), e.getMessage());
+
+                if (attempt < maxRetries) {
+                    try {
+                        log.info("{} ms 후 재시도합니다...", retryDelayMs);
+                        Thread.sleep(retryDelayMs);
+                        retryDelayMs *= 2; // 지수 백오프
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("재시도 대기 중 인터럽트 발생", ie);
+                        return new ArrayList<>();
+                    }
+                } else {
+                    log.error("API 호출 최종 실패 - 모든 재시도 소진", e);
+                }
+            } catch (Exception e) {
+                log.error("API 호출 중 예외 발생 (시도 {}/{})", attempt, maxRetries, e);
+
+                if (attempt < maxRetries) {
+                    try {
+                        Thread.sleep(retryDelayMs);
+                        retryDelayMs *= 2;
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        return new ArrayList<>();
+                    }
+                } else {
+                    log.error("API 호출 최종 실패", e);
+                }
             }
-
-        } catch (Exception e) {
-            log.error("식품안전정보원 API 호출 실패", e);
         }
 
-        return alerts;
+        return new ArrayList<>();
     }
     
     @Override

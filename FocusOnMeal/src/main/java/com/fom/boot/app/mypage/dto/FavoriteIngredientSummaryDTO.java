@@ -19,6 +19,6 @@ public class FavoriteIngredientSummaryDTO {
     
     private String ingredientName;
     private String category;
-    private BigDecimal currentPrice; 	// 최신 가격 (int로 변경)
+    private Integer currentPrice;
     private String standardUnit;
 }

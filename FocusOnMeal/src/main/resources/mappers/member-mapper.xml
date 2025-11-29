@@ -122,11 +122,30 @@
     <!-- 프로필 수정 -->
 	<update id="updateProfile" parameterType="Member">
 	    UPDATE member
-	    SET nickname = #{nickname},
+	    SET member_nickname = #{memberNickname},
 	        phone = #{phone},
-	        password = #{password}
+	        member_pw = #{memberPw}
 	    WHERE member_id = #{memberId}
 	</update>
+	
+	<!-- 회원 관련 데이터 삭제 -->
+	<delete id="deleteUserAllergies" parameterType="String">
+	    DELETE FROM member_allergy WHERE member_id = #{memberId}
+	</delete>
+	
+	<delete id="deleteUserMealPlans" parameterType="String">
+	    DELETE FROM meal_plan WHERE member_id = #{memberId}
+	</delete>
+	
+	<delete id="deleteUserFavorites" parameterType="string">
+	    DELETE FROM FAVORITE
+	    WHERE MEMBER_ID = #{memberId}
+	</delete>
+	
+	<!-- 회원 삭제 -->
+	<delete id="deleteMember" parameterType="String">
+	    DELETE FROM member WHERE member_id = #{memberId}
+	</delete>
     
     <!-- 관리자 영역 시작 -->
 	<!-- ************************************************************************ -->

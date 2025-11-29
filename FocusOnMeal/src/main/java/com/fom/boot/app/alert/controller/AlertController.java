@@ -176,9 +176,32 @@ public class AlertController {
 	    // 실제 구현:
 	    // String cleanToken = token.replace("Bearer ", "");
 	    // return jwtUtil.extractMemberId(cleanToken);
-	    
+
 	    // 임시 구현 (실제로는 JWT 파싱 필요)
 	    return "tempMemberId";
 	}
-	
+
+	/**
+	 * 🔧 테스트용: 가격 알림 수동 생성
+	 * 실제 배포 시에는 삭제하거나 관리자 권한 체크 필요
+	 */
+	@GetMapping("/test/generate-price-alerts")
+	public ResponseEntity<?> generatePriceAlerts() {
+	    try {
+	        System.out.println("🔔 수동 가격 알림 생성 시작");
+	        alertService.createPriceChangeNotifications();
+
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("success", true);
+	        response.put("message", "가격 알림 생성 완료");
+
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        Map<String, String> error = new HashMap<>();
+	        error.put("message", "가격 알림 생성 실패: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+	    }
+	}
+
 }

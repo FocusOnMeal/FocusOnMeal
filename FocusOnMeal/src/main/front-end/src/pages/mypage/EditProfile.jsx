@@ -9,6 +9,8 @@ const EditProfile = () => {
         phone: ''
     });
     
+    const [originalPhone, setOriginalPhone] = useState(''); // ✅ 추가: 원본 전화번호 저장
+    
     const [formData, setFormData] = useState({
         nickname: '',
         currentPassword: '',
@@ -34,7 +36,7 @@ const EditProfile = () => {
 
     const loadUserData = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 alert('로그인이 필요합니다.');
                 return;
@@ -45,6 +47,7 @@ const EditProfile = () => {
             });
 
             setUserData(res.data);
+            setOriginalPhone(res.data.phone || ''); // ✅ 추가: 원본 전화번호 저장
             setFormData({
                 nickname: res.data.nickname || '',
                 currentPassword: '',
@@ -63,13 +66,34 @@ const EditProfile = () => {
     const generateRandomNickname = async () => {
         setNicknameSpinning(true);
         
-        // 애니메이션 효과를 위한 여러 번 변경
+        const adjectives = [
+            '따뜻한', '포근한', '신비한', '강한', '귀여운', '용감한', '슬기로운', 
+            '활발한', '조용한', '차분한', '빛나는', '달콤한', '상냥한', '깜찍한', 
+            '발랄한', '몽환적인', '환상적인', '강렬한', '냉정한', '우아한', '화려한', 
+            '영롱한', '전설적인', '매혹적인', '냉혹한', '영원한', '불멸의'
+        ];
+        
+        const animals = [
+            '고양이', '강아지', '토끼', '햄스터', '판다', '호랑이', '사자', '늑대', 
+            '여우', '용', '유니콘', '펭귄', '코알라', '돌고래', '독수리', '불사조', 
+            '드래곤', '피닉스', '사슴', '곰', '수달', '너구리', '그리핀', '페가수스'
+        ];
+        
+        const suffixes = [
+            '왕', '여왕', '공주', '요정', '천사', '기사', '마법사', '전사', '영웅', 
+            '용사', '별', '달', '꽃', '구름', '바람', '하늘', '전설', '신화', 
+            '마스터', '선생', '박사', '소울', '빛', '어둠', '정령', '수호자'
+        ];
+        
         const spinCount = 10;
         const spinInterval = 100;
         
         for (let i = 0; i < spinCount; i++) {
             await new Promise(resolve => setTimeout(resolve, spinInterval));
-            const tempNickname = `임시닉네임${Math.floor(Math.random() * 1000)}`;
+            const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+            const randomSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+            const tempNickname = `${randomAdj}${randomAnimal}${randomSuffix}`;
             setFormData(prev => ({ ...prev, nickname: tempNickname }));
         }
         
@@ -210,13 +234,15 @@ const EditProfile = () => {
             }
         }
 
-        if (formData.phone && !validations.phone.valid) {
+        // ✅ 수정: 전화번호가 변경되었을 때만 유효성 검사
+        const phoneChanged = formData.phone !== originalPhone;
+        if (phoneChanged && formData.phone && !validations.phone.valid) {
             alert('올바른 휴대폰 번호를 입력해주세요.');
             return;
         }
 
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             const updateData = {
                 nickname: formData.nickname,
                 phone: formData.phone
@@ -227,9 +253,17 @@ const EditProfile = () => {
                 updateData.newPassword = formData.newPassword;
             }
 
-            await axios.put(`${API_BASE_URL}/api/mypage/profile`, updateData, {
+            const response = await axios.put(`${API_BASE_URL}/api/mypage/profile`, updateData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            // ✅ sessionStorage에 닉네임 업데이트
+            // 백엔드 응답에 닉네임이 있으면 그것을 사용, 없으면 formData의 닉네임 사용
+            const updatedNickname = response.data.nickname || formData.nickname;
+            sessionStorage.setItem('memberNickname', updatedNickname);
+            
+            // ✅ 헤더 업데이트를 위한 이벤트 발생
+            window.dispatchEvent(new Event("loginStateChange"));
 
             alert('회원정보가 수정되었습니다!');
             
@@ -563,7 +597,8 @@ const EditProfile = () => {
                         }}
                         placeholder="010-0000-0000"
                     />
-                    {validations.phone.message && (
+                    {/* ✅ 수정: 전화번호가 변경되었을 때만 에러 메시지 표시 */}
+                    {formData.phone !== originalPhone && validations.phone.message && (
                         <p style={{
                             fontSize: '13px',
                             color: validations.phone.valid ? '#10b981' : '#ef4444',
@@ -577,26 +612,47 @@ const EditProfile = () => {
                     </p>
                 </div>
 
-                {/* 수정 버튼 */}
-                <button
-                    onClick={handleSubmit}
-                    style={{
-                        width: '100%',
-                        padding: '14px',
-                        backgroundColor: '#3b82f6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
-                >
-                    수정하기
-                </button>
+                {/* 수정/탈퇴 버튼 */}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                        onClick={() => window.location.href = '/member/delete'}
+                        style={{
+                            flex: 1,
+                            padding: '14px',
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
+                    >
+                        회원 탈퇴
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        style={{
+                            flex: 2,
+                            padding: '14px',
+                            backgroundColor: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                    >
+                        수정하기
+                    </button>
+                </div>
             </div>
         </div>
     );

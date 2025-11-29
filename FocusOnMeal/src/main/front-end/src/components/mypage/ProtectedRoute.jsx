@@ -3,12 +3,13 @@ import { Navigate } from "react-router-dom";
 let alertShown = false;
 
 const ProtectedRoute = ({ children }) => {
-    const token = localStorage.getItem("token");
+    // ✅ 수정: localStorage → sessionStorage
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
         if (!alertShown) {
             alert("로그인이 필요한 서비스입니다.");
-            alertShown = true;       // 한 번만 실행
+            alertShown = true;
         }
         return <Navigate to="/member/login" replace />;
     }

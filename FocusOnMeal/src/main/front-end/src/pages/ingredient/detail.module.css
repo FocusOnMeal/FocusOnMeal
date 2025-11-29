@@ -75,7 +75,7 @@
 }
 
 .nutritionSection {
-    margin-top: 30px;
+    margin-top: 70px;
 }
 
 .sectionTitle {
@@ -180,19 +180,60 @@
     align-items: center;
 }
 
+/* 찜하기 버튼 */
 .wishButton {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
+    /* 레이아웃 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 20px; /* 슬림한 사이즈 */
+    min-width: 110px;
+    
+    /* 기본 스타일 (회색 톤) */
+    background-color: white;
     border: 1px solid #ddd;
-    background-color: #f0f2f5;
-    transition: all 0.2s;
+    border-radius: 50px; /* 알약 모양 */
+    color: #888;         /* 글씨 및 하트 테두리 회색 */
+    
+    /* 폰트 */
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    
+    /* 부드러운 전환 효과 */
+    transition: all 0.2s ease;
 }
 
+/* 하트 아이콘 설정 */
+.wishButton svg {
+    transition: fill 0.2s ease, stroke 0.2s ease;
+    fill: transparent; /* 기본은 속이 빈 하트 */
+}
+
+/* 마우스 올렸을 때 (Hover) - 살짝 진해짐 */
+.wishButton:hover {
+    border-color: #bbb;
+    color: #555;
+    background-color: #fafafa; /* 아주 연한 회색 배경만 */
+}
+
+/* ❤️ 찜 완료 상태 (.wished) - 빨간색으로 변신 */
 .wishButton.wished {
-    background-color: #dc3545;
-    color: white;
+    border-color: #ff4757; /* 테두리 빨강 */
+    color: #ff4757;        /* 글씨 빨강 */
+    background-color: white; /* 배경은 그대로 */
+}
+
+/* ❤️ 찜 완료 상태에서 하트 채우기 */
+.wishButton.wished svg {
+    fill: #ff4757; /* 하트 속을 빨강으로 채움 */
+    stroke: #ff4757; /* 테두리도 빨강 */
+}
+
+/* 찜 완료 상태에서 마우스 올렸을 때 */
+.wishButton.wished:hover {
+    background-color: #fff5f5; /* 아주 연한 붉은 틴트 */
 }
 
 .safetyBadge {
@@ -203,8 +244,47 @@
     font-weight: 500;
     color: #666;
     border: 1px solid #ddd;
-    display: flex; 
+    display: flex;
     align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.safetyBadge:hover {
+    background-color: #e0e0e0;
+}
+
+.safetyBadge.alertEnabled {
+    background-color: #ff9800;
+    color: white;
+    border-color: #ff9800;
+    font-weight: 600;
+}
+
+/* 가격 알림 버튼 스타일 (초록색 계열) */
+.priceAlertBadge {
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.priceAlertBadge:hover {
+    background-color: #e0e0e0;
+}
+
+.priceAlertBadge.priceAlertEnabled {
+    background-color: #10b981;
+    color: white;
+    border-color: #10b981;
+    font-weight: 600;
 }
 
 /* 🚨 안전 위험도 아이콘 (list.jsx 스타일 반영) */
@@ -340,9 +420,7 @@
 
 .chartArea {
     width: 100%;
-    height: 150px; 
-    background-color: #ffffff;
-    border: 1px solid #eee;
+    height: 300px; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -378,4 +456,162 @@
     color: #333;
     width: 140px; 
     flex-shrink: 0;
+}
+
+/* 가격 변동 정보 표시 */
+.priceChangeInfo {
+    display: flex;
+    gap: 20px;
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.changeBox {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.changeLabel {
+    font-size: 0.85em;
+    color: #666;
+    font-weight: 500;
+}
+
+.changeValue {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.priceUp {
+    color: #dc3545;
+}
+
+.priceDown {
+    color: #007aff;
+}
+
+.priceStable {
+    color: #757575;
+}
+
+.priceDiffSmall {
+    font-size: 0.85em;
+    opacity: 0.8;
+    margin-left: 4px;
+}
+
+/* 차트 영역 개선 */
+.chartArea {
+    margin-top: 20px;
+}
+
+/* === 가격 예측 모자이크 오버레이 === */
+.chartWrapper {
+    position: relative;
+}
+
+.predictionOverlay {
+    position: absolute;
+    top: 0;
+    left: 75%;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.blurLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+}
+
+.loginPrompt {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    pointer-events: auto;
+    backdrop-filter: blur(10px);
+}
+
+.lockIcon {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.loginPrompt p {
+    font-size: 11px;
+    font-weight: 500;
+    color: #555;
+    margin: 0 0 8px 0;
+}
+
+.loginButton {
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+    white-space: nowrap;
+}
+
+.loginButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.35);
+    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+.loginButton:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+}
+/* 이미지 감싸는 박스 */
+.imageWrapper {
+    width: 100%;
+    margin-bottom: 20px; /* 영양성분표와 간격 */
+    background-color: #fff;
+    border-radius: 12px; /* 둥근 모서리 */
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 살짝 그림자 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 4 / 3; /* 가로:세로 비율 4:3 고정 (원하는대로 조절 가능) */
+    border: 1px solid #eee;
+}
+
+/* 실제 이미지 */
+.ingredientImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 영역에 꽉 차게 (비율 유지하며 잘림) */
+    object-position: center; /* 중앙 정렬 */
+    transition: transform 0.3s ease;
+}
+
+/* 마우스 올렸을 때 효과 */
+.ingredientImage:hover {
+    transform: scale(1.05); /* 살짝 확대 */
 }

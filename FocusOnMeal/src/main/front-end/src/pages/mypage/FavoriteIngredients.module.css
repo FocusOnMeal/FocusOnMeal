@@ -1,11 +1,169 @@
 .container {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 5px;
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f6f8;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
-h2 {
+.main {
+    flex: 1;
+    padding: 30px 40px;
+    margin: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    margin-bottom: 30px;
+}
+
+.header h1 {
     font-size: 24px;
-    margin-bottom: 10px;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #888;
+    font-size: 14px;
+}
+
+/* 카테고리 탭 */
+.categoryTab {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    overflow-x: auto; /* 모바일 대응 */
+}
+
+.tabBtn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: #fff;
+    color: #555;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.tabBtn:hover {
+    background: #f8f9fa;
+    border-color: #ccc;
+}
+
+.tabBtn.active {
+    background: #67932A; /* 브랜드 컬러 */
+    color: #fff;
+    border-color: #67932A;
+    font-weight: 600;
+}
+
+/* 그리드 레이아웃 */
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* 카드 스타일 */
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px 20px;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-color: #67932A;
+}
+
+/* 카드 아이콘 (이미지 대체) */
+.cardIcon {
+    width: 60px;
+    height: 60px;
+    background-color: #f1f3f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #67932A;
+    margin-bottom: 15px;
+}
+
+.cardInfo {
+    width: 100%;
+}
+
+.categoryBadge {
+    display: inline-block;
+    font-size: 11px;
+    color: #868e96;
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.cardTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 5px 0;
+}
+
+.cardUnit {
+    font-size: 13px;
+    color: #adb5bd;
+}
+
+/* 찜 삭제 버튼 (하트) */
+.deleteBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #ff6b6b; /* 빨간 하트 */
+    font-size: 30px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.deleteBtn:hover {
+    transform: scale(1.2);
+}
+
+/* 데이터 없음 상태 */
+.emptyState {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 0;
+    color: #999;
+}
+
+.goLink {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #67932A;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
 }

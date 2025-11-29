@@ -11,12 +11,13 @@ const Header = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [hasUnread, setHasUnread] = useState(false);
+    const [activeTab, setActiveTab] = useState("위험공표"); // 탭 상태 추가
 
-    // 로그인 상태 확인
+    // ✅ 수정: localStorage → sessionStorage
     useEffect(() => {
         const checkLogin = () => {
-            const token = localStorage.getItem("token");
-            const nickname = localStorage.getItem("memberNickname");
+            const token = sessionStorage.getItem("token");
+            const nickname = sessionStorage.getItem("memberNickname");
 
             if (token) {
                 setIsLoggedIn(true);
@@ -35,12 +36,11 @@ const Header = () => {
         };
     }, []);
 
-    // 알림 클릭 시
+    // ✅ 수정: localStorage → sessionStorage
     const handleNotificationClick = async (notification) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             
-            // 읽음 상태로 변경
             await fetch(`/api/alert/notifications/${notification.notificationId}/read`, {
                 method: "PUT",
                 headers: {
@@ -48,7 +48,6 @@ const Header = () => {
                 }
             });
 
-            // 상세 페이지로 이동
             navigate(`/board/safety/detail/${notification.notificationId}`);
             setShowNotifications(false);
         } catch (error) {
@@ -56,7 +55,6 @@ const Header = () => {
         }
     };
 
-    // 알림 벨 클릭
     const handleBellClick = () => {
         if (!isLoggedIn) {
             setShowNotifications(true);
@@ -68,25 +66,22 @@ const Header = () => {
         }
     };
 
-    // 로그아웃 기능
+    // ✅ 수정: localStorage → sessionStorage
     const handleLogout = () => {
-        // localStorage 삭제
-        localStorage.removeItem("token");
-        localStorage.removeItem("memberId");
-        localStorage.removeItem("memberName");
-        localStorage.removeItem("memberNickname");
-        localStorage.removeItem("adminYn");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("memberId");
+        sessionStorage.removeItem("memberName");
+        sessionStorage.removeItem("memberNickname");
+        sessionStorage.removeItem("adminYn");
 
         setIsLoggedIn(false);
         navigate("/");
     };
 
-    // 알림 타입별 라벨
     const getTypeLabel = (type) => {
         return type === "위험공표" ? "위험공표" : "가격정보";
     };
 
-    // 시간 포맷팅
     const formatTime = (sentAt) => {
         const date = new Date(sentAt);
         const now = new Date();
@@ -103,11 +98,11 @@ const Header = () => {
         return `${diffDays}일 전`;
     };
 
-    // 알림 목록 가져오기
-const fetchNotifications = async () => {
+    // ✅ 수정: localStorage → sessionStorage
+    const fetchNotifications = async () => {
         try {
-            const token = localStorage.getItem("token");
-            console.log("🔍 Token:", token); // 토큰 확인
+            const token = sessionStorage.getItem("token");
+            console.log("🔍 Token:", token);
             
             const response = await fetch("/api/alert/notifications", {
                 headers: {
@@ -115,12 +110,12 @@ const fetchNotifications = async () => {
                 }
             });
 
-            console.log("📡 Response status:", response.status); // 상태 확인
+            console.log("📡 Response status:", response.status);
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("📦 받은 데이터:", data); // 데이터 확인
-                console.log("📦 데이터 길이:", data.length); // 배열 길이 확인
+                console.log("📦 받은 데이터:", data);
+                console.log("📦 데이터 길이:", data.length);
                 
                 setNotifications(data);
                 setHasUnread(data.some(n => n.isRead === 'N'));
@@ -135,14 +130,12 @@ const fetchNotifications = async () => {
     return (
         <header className="header">
             <div className="header-inner">
-                {/* 로고 */}
                 <div className="logo-area">
                     <Link to="/">
                         <img src={logo} alt="FocusOnMeal" className="logo-img" />
                     </Link>
                 </div>
 
-                {/* 메뉴 */}
                 <nav className="nav">
                     <ul className="nav-menu">
                         <li className="dropdown">
@@ -158,12 +151,10 @@ const fetchNotifications = async () => {
                     </ul>
                 </nav>
 
-                {/* 로그인 상태에 따라 헤더 변경 */}
                 <div className="user-area">
                     {isLoggedIn ? (
                         <>
                             <span className="welcome">{memberNickname}님</span>
-                            {/* 알림 벨 */}
                             <div className="notification-bell-wrapper">
                                 <button 
                                     className="notification-bell-button"
@@ -173,7 +164,6 @@ const fetchNotifications = async () => {
                                     {hasUnread && <span className="notification-unread-dot"></span>}
                                 </button>
 
-                                {/* 알림 드롭다운 */}
                                 {showNotifications && (
                                     <div className="notification-dropdown">
                                         {!isLoggedIn ? (
@@ -181,35 +171,58 @@ const fetchNotifications = async () => {
                                                 <p>로그인이 필요합니다.</p>
                                                 <Link to="/member/login" className="login-link">로그인하기</Link>
                                             </div>
-                                        ) : notifications.length === 0 ? (
-                                            <div className="notification-empty">알림이 없습니다.</div>
                                         ) : (
-                                            <div>
-                                                {notifications.map((notif) => (
-                                                    <div
-                                                        key={notif.notificationId}
-                                                        className={`notification-item ${notif.isRead === 'N' ? 'unread' : ''}`}
-                                                        onClick={() => handleNotificationClick(notif)}
-                                                        onMouseEnter={(e) => e.currentTarget.classList.add('hover')}
-                                                        onMouseLeave={(e) => e.currentTarget.classList.remove('hover')}
+                                            <>
+                                                {/* 탭 헤더 */}
+                                                <div className="notification-tabs">
+                                                    <button
+                                                        className={`notification-tab ${activeTab === '위험공표' ? 'active' : ''}`}
+                                                        onClick={() => setActiveTab('위험공표')}
                                                     >
-                                                        <div className="notification-item-header">
-                                                            <span className={`notification-type ${notif.type === '위험공표' ? 'danger' : 'normal'}`}>
-                                                                {getTypeLabel(notif.type)}
-                                                            </span>
-                                                            <span className="notification-time">{formatTime(notif.sentAt)}</span>
-                                                        </div>
+                                                        위험공표
+                                                    </button>
+                                                    <button
+                                                        className={`notification-tab ${activeTab === '가격정보' ? 'active' : ''}`}
+                                                        onClick={() => setActiveTab('가격정보')}
+                                                    >
+                                                        가격정보
+                                                    </button>
+                                                </div>
 
-                                                        <div className={`notification-title ${notif.isRead === 'N' ? 'bold' : ''}`}>
-                                                            {notif.title}
-                                                        </div>
+                                                {/* 탭 콘텐츠 */}
+                                                <div className="notification-content">
+                                                    {notifications.filter(n => n.type === activeTab).length === 0 ? (
+                                                        <div className="notification-empty">알림이 없습니다.</div>
+                                                    ) : (
+                                                        notifications
+                                                            .filter(n => n.type === activeTab)
+                                                            .map((notif) => (
+                                                                <div
+                                                                    key={notif.notificationId}
+                                                                    className={`notification-item ${notif.isRead === 'N' ? 'unread' : ''}`}
+                                                                    onClick={() => handleNotificationClick(notif)}
+                                                                    onMouseEnter={(e) => e.currentTarget.classList.add('hover')}
+                                                                    onMouseLeave={(e) => e.currentTarget.classList.remove('hover')}
+                                                                >
+                                                                    <div className="notification-item-header">
+                                                                        <span className={`notification-type ${notif.type === '위험공표' ? 'danger' : 'normal'}`}>
+                                                                            {getTypeLabel(notif.type)}
+                                                                        </span>
+                                                                        <span className="notification-time">{formatTime(notif.sentAt)}</span>
+                                                                    </div>
 
-                                                        <div className="notification-message">
-                                                            {notif.message}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                                                    <div className={`notification-title ${notif.isRead === 'N' ? 'bold' : ''}`}>
+                                                                        {notif.title}
+                                                                    </div>
+
+                                                                    <div className="notification-message">
+                                                                        {notif.message}
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                    )}
+                                                </div>
+                                            </>
                                         )}
                                     </div>
                                 )}

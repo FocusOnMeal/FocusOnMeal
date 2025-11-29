@@ -418,4 +418,36 @@ public class MemberServiceImpl implements MemberService {
         log.info("프로필 수정 완료: memberId={}", memberId);
     }
 
+	@Override
+	@Transactional
+	public boolean deleteMember(String memberId, String password) {
+	    // 1. 회원 정보 조회
+	    Member member = memberMapper.selectOneById(memberId);
+	    
+	    if (member == null) {
+	        throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+	    }
+
+	    // 2. 비밀번호 확인
+	    if (!bcrypt.matches(password, member.getMemberPw())) {
+	        return false;
+	    }
+
+	    // 3. 관련 데이터 삭제 (CASCADE 설정이 안 되어 있는 경우)
+	    // 알레르기 정보 삭제
+	    memberMapper.deleteUserAllergies(memberId);
+	    
+	    // 식단 삭제
+	    memberMapper.deleteUserMealPlans(memberId);
+	    
+	    // 찜한 식재료 삭제
+	    memberMapper.deleteUserFavorites(memberId);
+	    
+	    // 4. 회원 삭제
+	    int result = memberMapper.deleteMember(memberId);
+	    
+	    log.info("회원 탈퇴 완료: memberId={}", memberId);
+	    return result > 0;
+	}
+
 }

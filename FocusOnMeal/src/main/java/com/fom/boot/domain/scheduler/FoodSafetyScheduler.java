@@ -3,6 +3,7 @@ package com.fom.boot.domain.scheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.fom.boot.domain.alert.model.service.AlertService;
 import com.fom.boot.domain.alert.model.service.FoodSafetyDataSyncService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FoodSafetyScheduler {
 
 	private final FoodSafetyDataSyncService foodSafetyDataSyncService;
+    private final AlertService alertService;
     
     /**
      * 매일 오전 9시에 자동 실행 (현재 비활성화 - 서버 시작 시 동기화로 대체)
@@ -42,5 +44,23 @@ public class FoodSafetyScheduler {
     public void periodicFetchSafetyAlerts() {
         log.info("식품안전정보 주기적 배치 실행 (6시간마다)");
         foodSafetyDataSyncService.syncRecentAlerts();
+    }
+
+    /**
+     * 매일 오전 10시에 가격 변동 알림 생성
+     * cron: 초 분 시 일 월 요일
+     *
+     * 스케줄러를 활성화하려면 주석을 해제하세요.
+     */
+    // @Scheduled(cron = "${price.alert.cron:0 0 10 * * ?}")
+    public void scheduledPriceChangeAlerts() {
+        log.info("=== 가격 변동 알림 자동 배치 시작 ===");
+
+        try {
+            alertService.createPriceChangeNotifications();
+            log.info("=== 가격 변동 알림 자동 배치 완료 ===");
+        } catch (Exception e) {
+            log.error("=== 가격 변동 알림 자동 배치 실패 ===", e);
+        }
     }
 }

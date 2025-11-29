@@ -26,7 +26,7 @@ const Allergies = () => {
         try {
             console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergy/list`);
             
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             const res = await axios.get(`${API_BASE_URL}/api/mypage/allergy/list`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {}
             });
@@ -44,7 +44,7 @@ const Allergies = () => {
         try {
             console.log(`📤 요청: ${API_BASE_URL}/api/mypage/allergies`);
             
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 console.warn("⚠️ 토큰 없음");
                 setChecked([]);
@@ -52,7 +52,8 @@ const Allergies = () => {
             }
             
             const res = await axios.get(`${API_BASE_URL}/api/mypage/allergies`, {
-                headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true
             });
             
             console.log("📥 사용자 알레르기 응답:", res.data);
@@ -104,7 +105,7 @@ const Allergies = () => {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 alert("로그인이 필요합니다.");
                 return;
@@ -112,9 +113,13 @@ const Allergies = () => {
             
             console.log("📤 저장 요청:", checked);
             
-            await axios.post(`${API_BASE_URL}/api/mypage/allergies`, 
-                { allergyIds: checked },
-                { headers: { Authorization: `Bearer ${token}` } }
+            await axios.post(
+            "http://localhost:8080/api/mypage/allergies",
+            { allergyIds: checked },
+            {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
+            }
             );
             
             alert("알레르기 정보가 저장되었습니다!");

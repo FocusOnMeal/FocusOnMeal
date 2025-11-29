@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from './Login.module.css';
 
 const Login = () => {
@@ -7,13 +7,17 @@ const Login = () => {
     const [memberPw, setMemberPw] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // 이전 페이지 정보 가져오기
+    const from = location.state?.from || '/';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         try {
-            const response = await fetch('/member/login', {
+            const response = await fetch('/api/member/login', {  // ✅ /api 추가
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,25 +30,25 @@ const Login = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                const data = result.data; // ApiResponse 구조에서 실제 데이터 추출
+                const data = result.data;
 
-                // JWT 토큰 및 사용자 정보 저장 (localStorage)
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('memberId', data.memberId);
-                localStorage.setItem('memberName', data.memberName);
-                localStorage.setItem('memberNickname', data.memberNickname);
-                localStorage.setItem('adminYn', data.adminYn);
+                // ✅ 수정: localStorage → sessionStorage (브라우저 닫으면 자동 로그아웃)
+                sessionStorage.setItem('token', data.token);
+                sessionStorage.setItem('memberId', data.memberId);
+                sessionStorage.setItem('memberName', data.memberName);
+                sessionStorage.setItem('memberNickname', data.memberNickname);
+                sessionStorage.setItem('adminYn', data.adminYn);
 
-                // 로그인 상태 변경 이벤트 발생 (로그인 시 바로 변경된 상태를 확인해 헤더 상태를 변경할 수 있게 함)
                 window.dispatchEvent(new Event("loginStateChange"));
 
-                // 관리자 여부에 따라 페이지 이동
                 if (data.adminYn === 'Y') {
                     navigate('/admin');
                 } else {
-                    navigate('/');
+                    // 이전 페이지로 리다이렉트 (저장된 위치가 없으면 홈으로)
+                    navigate(from, { replace: true });
                     console.log("로그인 응답:", result);
                     console.log("닉네임:", result.data.memberNickname);
+                    console.log("리다이렉트:", from);
                 }
             } else {
                 const errorText = await response.text();

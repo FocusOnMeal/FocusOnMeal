@@ -10,7 +10,7 @@ const menuItems = [
         // href가 없고 subMenu가 있으면 '부모 메뉴'로 처리
         subMenu: [
             { label: "나만의 식재료", href: "/mypage/ingredients/custom" },
-            { label: "즐겨찾는 식재료", href: "/mypage/ingredient/favorite" } // 예시 경로
+            { label: "즐겨찾는 식재료", href: "/mypage/ingredients/favorite" }
         ]
     },
     { 
