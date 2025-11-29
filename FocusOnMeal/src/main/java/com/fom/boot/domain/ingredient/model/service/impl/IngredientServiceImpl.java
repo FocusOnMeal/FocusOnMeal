@@ -6,13 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fom.boot.app.admin.dto.AdminIngredientDTO;
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
+import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.domain.ingredient.model.mapper.IngredientMapper;
 import com.fom.boot.domain.ingredient.model.mapper.IngredientPriceHistoryMapper;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
+import com.fom.boot.domain.ingredient.model.vo.NutritionMaster;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 
 @Service
@@ -79,5 +82,36 @@ public class IngredientServiceImpl implements IngredientService {
 	@Override
 	public List<FavoriteIngredientSummaryDTO> getFavoritesByMemberId(String memberId) {
 		return iMapper.selectFavoritesByMemberId(memberId);
+	}
+
+	@Override
+	public int getTotalIngredientsBySearch(String type, String keyword) {
+		return iMapper.selectAdminTotalCount(type, keyword);
+	}
+
+	@Override
+	public List<AdminIngredientDTO> selectAdminIngredients(PageInfo pageInfo, String type, String keyword,
+			String sortColumn, String sortOrder) {
+		
+		// 페이징 계산: 시작 위치(offset) 계산
+		// 예: 1페이지 -> 0, 2페이지 -> 10 (limit이 10일 경우)
+		int offset = (pageInfo.getCurrentPage() - 1) * pageInfo.getBoardLimit();
+		int limit = pageInfo.getBoardLimit();
+		
+		return iMapper.selectAdminList(type, keyword, sortColumn, sortOrder, offset, limit);
+	}
+
+	@Override
+	@Transactional // 데이터 변경이 일어나므로 readOnly=false (기본값) 적용
+	public int updateNutrition(NutritionMaster nutrition) {
+		// 1. nutritionId가 존재하면(0보다 크면) -> 이미 있는 데이터 수정 (UPDATE)
+		if (nutrition.getNutritionId() > 0) {
+			return iMapper.updateNutrition(nutrition);
+		} 
+		// 2. nutritionId가 없으면 -> 새로운 데이터 등록 (INSERT)
+		else {
+			// (단, ingredientId는 필수)
+			return iMapper.insertNutrition(nutrition);
+		}
 	}
 }

@@ -5,10 +5,12 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.fom.boot.app.admin.dto.AdminIngredientDTO;
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
+import com.fom.boot.domain.ingredient.model.vo.NutritionMaster;
 
 @Mapper
 public interface IngredientMapper {
@@ -47,5 +49,10 @@ public interface IngredientMapper {
 	
 	List<FavoriteIngredientSummaryDTO> selectFavoritesByMemberId(String memberId);
 	List<IngredientDTO> getIngredientList();
+	int selectAdminTotalCount(String type, String keyword);
+	List<AdminIngredientDTO> selectAdminList(String type, String keyword, String sortColumn, String sortOrder,
+			int offset, int limit);
+	int updateNutrition(NutritionMaster nutrition);
+	int insertNutrition(NutritionMaster nutrition);
 	
 }

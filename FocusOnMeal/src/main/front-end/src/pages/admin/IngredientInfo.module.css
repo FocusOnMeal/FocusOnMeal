@@ -1,0 +1,342 @@
+/* IngredientInfo.module.css */
+
+/* 전체 레이아웃 */
+.container {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    background: #f7f7f7;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 링크 스타일 초기화 */
+.container a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* 메인 영역 */
+.main {
+    flex: 1;
+    padding: 30px 40px;
+    background: #fafafa;
+    overflow-x: auto;
+}
+
+/* 제목 */
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 검색 박스 */
+.searchBox {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.selectBox {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.searchInput {
+    width: 250px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+.searchInput:focus {
+    border-color: #67932A;
+}
+
+.searchBtn {
+    background-color: #67932A;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+.searchBtn:hover {
+    background-color: #557a22;
+}
+
+/* 테이블 스타일 */
+.memberTable {
+    width: 100%;
+    min-width: 1400px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 테이블 헤더 */
+.memberTable thead th {
+    background-color: #f4f6f1;
+    color: #444;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 16px 10px;
+    border-bottom: 2px solid #e1e1e1;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 테이블 바디 */
+.memberTable tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+}
+.memberTable tbody tr:last-child {
+    border-bottom: none;
+}
+.memberTable tbody tr:hover {
+    background-color: #f9fbf7;
+}
+
+/* 테이블 셀 기본 스타일 */
+.memberTable td {
+    padding: 15px 10px;
+    font-size: 15px;
+    color: #333;
+    vertical-align: middle;
+    text-align: center;
+    line-height: 1.6;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 빈 결과 셀 */
+.emptyCell {
+    text-align: center !important;
+    padding: 40px !important;
+    color: #999 !important;
+    font-size: 14px !important;
+    font-family: 'Noto Sans KR', sans-serif !important;
+}
+
+/* --- 컬럼별 너비 설정 --- */
+
+/* 1. No */
+.noCol {
+    width: 80px;
+}
+
+/* 2. 이미지 */
+.imageCol {
+    width: 200px;
+}
+
+.imageWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.ingredientImage {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.imageChangeLabel {
+    font-size: 12px;
+    color: #67932A;
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.imageChangeLabel:hover {
+    color: #557a22;
+}
+
+.fileInput {
+    display: none;
+}
+
+/* 3. 카테고리 */
+.categoryCol {
+    width: 140px;
+}
+
+/* 4. 재료명 */
+.ingredientNameCol {
+    width: 180px;
+}
+
+.nameCell {
+    text-align: center !important;
+    padding-left: 10px !important;
+    font-family: 'Noto Sans KR', sans-serif !important;
+}
+
+/* 5. 기준단위 */
+.unitCol {
+    width: 100px;
+}
+
+/* 6. 현재가격 */
+.priceCol {
+    width: 120px;
+}
+
+/* 7. 어제가격 */
+/* priceCol 재사용 */
+
+/* 8. 최근 수집일 */
+.dateCol {
+    width: 130px;
+}
+
+/* 9. 영양성분 */
+.nutritionCol {
+    width: 100px;
+}
+
+/* 10. 활성 상태 */
+.statusCol {
+    width: 100px;
+}
+
+/* --- 텍스트 오버플로우 처리 --- */
+
+.textWrapper {
+    position: relative;
+    width: 100%;
+    display: inline-block;
+}
+
+.truncatedText {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    margin-top: 5px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    z-index: 100;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    font-family: 'Noto Sans KR', sans-serif;
+}
+.textWrapper:hover .tooltip {
+    display: block;
+}
+
+/* 정렬 화살표 */
+.sortArrow {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 11px;
+    color: #ccc;
+    vertical-align: middle;
+    transition: color 0.2s;
+}
+.activeSort {
+    color: #67932A;
+    font-weight: bold;
+}
+
+/* 토글 스위치 */
+.toggleSwitch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    display: inline-block;
+}
+.toggleSwitch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.toggleSwitch input:checked + .slider {
+    background-color: #67932A;
+}
+.toggleSwitch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+/* 영양성분 수정 버튼 */
+.editBtn {
+    background: transparent;
+    border: none;
+    color: #67932A;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.editBtn:hover {
+    background: #f0f7e8;
+    color: #557a22;
+}

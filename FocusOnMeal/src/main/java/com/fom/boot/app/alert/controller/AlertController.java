@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -83,6 +84,37 @@ public class AlertController {
 	        String memberId = authentication.getName();
 	        
 	        boolean success = alertService.markNotificationAsRead(notificationId, memberId);
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("success", success);
+	        
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+	
+	/**
+	 * 알림 삭제
+	 * @param notificationId 알림 ID
+	 * @param authentication JWT 토큰에서 추출된 인증 정보
+	 * @return 처리 결과
+	 */
+	@DeleteMapping("/notifications/{notificationId}")
+	public ResponseEntity<?> deleteNotification(
+	        @PathVariable int notificationId,
+	        Authentication authentication) {
+	    try {
+	        if (authentication == null || !authentication.isAuthenticated()) {
+	            Map<String, String> error = new HashMap<>();
+	            error.put("message", "로그인이 필요합니다.");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+	        }
+	        
+	        String memberId = authentication.getName();
+	        
+	        boolean success = alertService.deleteNotification(notificationId, memberId);
 	        
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("success", success);
@@ -204,4 +236,64 @@ public class AlertController {
 	    }
 	}
 
+	/**
+	 * 읽지 않은 알림 일괄 읽음 처리
+	 * @param authentication JWT 토큰에서 추출된 인증 정보
+	 * @return 처리 결과
+	 */
+	@PutMapping("/notifications/mark-all-read")
+	public ResponseEntity<?> markAllAsRead(Authentication authentication) {
+	    try {
+	        if (authentication == null || !authentication.isAuthenticated()) {
+	            Map<String, String> error = new HashMap<>();
+	            error.put("message", "로그인이 필요합니다.");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+	        }
+	        
+	        String memberId = authentication.getName();
+	        
+	        int count = alertService.markAllNotificationsAsRead(memberId);
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("success", true);
+	        response.put("count", count);
+	        
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+
+	/**
+	 * 특정 유형의 읽지 않은 알림 일괄 읽음 처리
+	 * @param type 알림 유형 (위험공표, 가격정보)
+	 * @param authentication JWT 토큰에서 추출된 인증 정보
+	 * @return 처리 결과
+	 */
+	@PutMapping("/notifications/mark-all-read/{type}")
+	public ResponseEntity<?> markAllAsReadByType(
+	        @PathVariable String type,
+	        Authentication authentication) {
+	    try {
+	        if (authentication == null || !authentication.isAuthenticated()) {
+	            Map<String, String> error = new HashMap<>();
+	            error.put("message", "로그인이 필요합니다.");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+	        }
+	        
+	        String memberId = authentication.getName();
+	        
+	        int count = alertService.markAllNotificationsAsReadByType(memberId, type);
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("success", true);
+	        response.put("count", count);
+	        
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
 }

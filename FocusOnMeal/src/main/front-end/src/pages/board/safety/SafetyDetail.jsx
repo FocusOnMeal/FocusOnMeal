@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import DOMPurify from 'dompurify';
 import styles from "./SafetyDetail.module.css";
 
 const SafetyDetail = () => {
@@ -10,6 +11,9 @@ const SafetyDetail = () => {
     const [alert, setAlert] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [prevAlert, setPrevAlert] = useState(null);
+    const [nextAlert, setNextAlert] = useState(null);
 
     useEffect(() => {
         // 번호 validation
@@ -27,7 +31,16 @@ const SafetyDetail = () => {
                     `/api/board/safety/detail/${alertId}`
                 );
 
-                setAlert(response.data);
+                const { alert, prevAlert, nextAlert } = response.data;
+
+                console.log("📦 받은 데이터:", response.data);
+                console.log("📄 alert:", alert);
+                console.log("⬅️ prevAlert:", prevAlert);
+                console.log("➡️ nextAlert:", nextAlert);
+
+                setAlert(alert);
+                setPrevAlert(prevAlert);
+                setNextAlert(nextAlert);
                 setLoading(false);
 
             } catch (err) {
@@ -39,6 +52,19 @@ const SafetyDetail = () => {
 
         fetchAlertDetail();
     }, [alertId]);
+
+        // ✅ 이전/다음 글 이동
+    const handlePrevClick = () => {
+        if (prevAlert) {
+            navigate(`/board/safety/detail/${prevAlert.alertId}`);
+        }
+    };
+
+    const handleNextClick = () => {
+        if (nextAlert) {
+            navigate(`/board/safety/detail/${nextAlert.alertId}`);
+        }
+    };
 
     if (loading) {
         return <div className={styles.loading}>안전 정보를 불러오는 중...</div>;
@@ -56,8 +82,16 @@ const SafetyDetail = () => {
     const getHazardTypeBadgeClass = (hazardType) => {
         if (hazardType === '위해식품정보') return styles.badgeDanger;
         if (hazardType === '글로벌 동향정보') return styles.badgeGlobal;
+        if (hazardType === '연구평가정보') return styles.badgeResearch;
+        if (hazardType === '법제도정보') return styles.badgeLaw;
         return styles.badgeDefault;
     };
+
+    // ✅ HTML을 안전하게 정제
+    const sanitizedDescription = DOMPurify.sanitize(alert.description, {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
+        ALLOWED_ATTR: ['class', 'style']
+    });
 
     return (
         <div className={styles.container}>
@@ -85,22 +119,39 @@ const SafetyDetail = () => {
                     </div>
                 </div>
 
-                <div className={styles.alertContent}>
-                    <p>{alert.description}</p>
-                </div>
+                {/* ✅ HTML 렌더링 적용 */}
+                <div 
+                    className={styles.alertContent}
+                    dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+                />
 
-                {/* 이전/다음 글 영역 */}
+                {/* ✅ 이전/다음 글 영역 */}
                 <div className={styles.actionButtons}>
                     <div className={styles.prevNextWrapper}>
-                        <div className={styles.prevRow}>
+                        {/* 이전글 */}
+                        <div 
+                            className={`${styles.prevRow} ${!prevAlert ? styles.disabled : ''}`}
+                            onClick={handlePrevClick}
+                            style={{ cursor: prevAlert ? 'pointer' : 'default' }}
+                        >
                             <span className={styles.label}>이전글</span>
                             <span className={styles.separator}>|</span>
-                            <span className={styles.title}>이전글 제목</span>
+                            <span className={styles.title}>
+                                {prevAlert ? prevAlert.title : '이전글이 없습니다.'}
+                            </span>
                         </div>
-                        <div className={styles.nextRow}>
+                        
+                        {/* 다음글 */}
+                        <div 
+                            className={`${styles.nextRow} ${!nextAlert ? styles.disabled : ''}`}
+                            onClick={handleNextClick}
+                            style={{ cursor: nextAlert ? 'pointer' : 'default' }}
+                        >
                             <span className={styles.label}>다음글</span>
                             <span className={styles.separator}>|</span>
-                            <span className={styles.title}>다음글 제목</span>
+                            <span className={styles.title}>
+                                {nextAlert ? nextAlert.title : '다음글이 없습니다.'}
+                            </span>
                         </div>
                     </div>
                 </div>

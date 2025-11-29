@@ -1,3 +1,4 @@
+/* === 레이아웃 공통 === */
 .container {
     display: flex;
     min-height: 100vh;
@@ -14,13 +15,13 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* --- 🟢 설정 카드 영역 --- */
+/* === 설정 카드 영역 === */
 .settingsCard {
     background-color: #f8f9fa;
     border: 1px solid #e9ecef;
     border-radius: 10px;
     padding: 25px;
-    margin-bottom: 40px;
+    margin-bottom: 30px; /* 툴바와의 간격 조정 */
 }
 
 .settingHeader {
@@ -42,7 +43,7 @@
     margin: 0;
 }
 
-/* 토글 스위치 디자인 */
+/* 토글 스위치 */
 .toggleWrapper {
     display: flex;
     align-items: center;
@@ -83,10 +84,10 @@
     border-radius: 50%;
 }
 
-input:checked + .slider { background-color: #67932A; } /* 녹색 */
+input:checked + .slider { background-color: #67932A; }
 input:checked + .slider:before { transform: translateX(24px); }
 
-/* --- 🟠 구독 식재료 박스 --- */
+/* 구독 식재료 박스 */
 .subscriptionBox {
     margin-top: 20px;
     padding-top: 20px;
@@ -142,47 +143,187 @@ input:checked + .slider:before { transform: translateX(24px); }
     color: #999;
 }
 
-/* --- 🔍 리스트 영역 --- */
-.contentHeader {
+.toolbar {
+    height: 60px; /* 높이 고정 */
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    border-bottom: 1px solid #eee; /* 평소에는 하단 선 */
+}
+
+/* Mode 1: 활성화(선택) 모드 */
+.activeToolbar {
+    background-color: #e9f2e8; 
+    color: #52c41a; 
+    border-bottom: none; /* 활성 상태에선 선 제거 */
+}
+
+.actionHeader {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
 }
 
-.listTitle {
-    font-size: 18px;
+.selectionInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.selectionCount {
+    font-size: 16px;
     font-weight: 600;
-    color: #333;
-    margin: 0;
+    color: #52c41a;
 }
 
-.searchBox {
+.clearSelectionBtn {
+    background: none;
+    border: none;
+    color: #52c41a;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.clearSelectionBtn:hover { text-decoration: underline; }
+
+.actionButtons {
     display: flex;
     gap: 8px;
 }
 
-.selectBox, .searchInput {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.searchInput { width: 220px; }
-
-.searchBtn {
-    padding: 8px 16px;
-    background-color: #67932A;
-    color: white;
-    border: none;
+.contextBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border: 1px solid rgba(0,0,0,0.1); /* 미세한 테두리 */
     border-radius: 4px;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    background-color: white; 
+    color: #444;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s;
 }
 
-.searchBtn:hover { background-color: #587b24; }
+.contextBtn:hover { background-color: #f8f9fa; }
 
-/* --- 📋 테이블 스타일 (기존 유지) --- */
+/* 툴바 내부 삭제 버튼 */
+.toolbar .deleteBtn {
+    color: #d93025;
+}
+.toolbar .deleteBtn:hover {
+    background-color: #fce8e6;
+    border-color: #fce8e6;
+}
+
+/* ⚪ Mode 2: 평상시(검색) 모드 */
+.defaultHeader {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 탭 스타일 */
+.tabGroup {
+    display: flex;
+    gap: 24px;
+    height: 60px; /* 툴바 높이와 일치시켜 밑줄 위치 잡기 */
+}
+
+.tabGroup button {
+    background: none;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    color: #5f6368;
+    padding: 0;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%; /* 부모 높이 상속 */
+}
+
+.tabGroup .activeTab {
+    color: #52c41a;
+    font-weight: 700;
+}
+
+/* 활성 탭 밑줄 */
+.tabGroup .activeTab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #52c41a;
+    border-radius: 3px 3px 0 0;
+}
+
+/* 검색창 영역 (캡슐 형태) */
+.searchBox {
+    display: flex;
+    align-items: center;
+    background-color: #f1f3f4;
+    border-radius: 24px; /* 둥근 캡슐 */
+    padding: 5px 15px;
+    width: 400px;
+    transition: background-color 0.2s;
+}
+
+.searchBox:focus-within {
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+/* JSX의 selectBox, searchInput 클래스를 툴바에 맞게 재정의 */
+.selectBox {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    color: #5f6368;
+    outline: none;
+    margin-right: 8px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.searchInput {
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 8px;
+    font-size: 15px;
+    flex: 1; /* 남은 공간 모두 차지 */
+    color: #333;
+}
+
+.searchBtn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    color: #5f6368;
+    font-weight: 600;
+    padding: 5px 10px;
+}
+
+.searchBtn:hover {
+    color: #333;
+    background: none; /* 기존 녹색 배경 제거 */
+}
+
+/* === 📋 테이블 스타일 (기존 디자인 유지 및 보완) === */
 .alertTable {
     width: 100%;
     border-collapse: collapse;
@@ -190,34 +331,78 @@ input:checked + .slider:before { transform: translateX(24px); }
     table-layout: fixed;
 }
 
+.alertTable tr {
+    transition: background-color 0.2s, color 0.2s;
+}
+
 .alertTable th {
-    background-color: #f1f3f5;
+    background-color: #fff; /* 헤더를 흰색으로 변경하여 깔끔함 강조 */
     padding: 12px;
-    color: #333;
+    color: #5f6368;
     border-bottom: 1px solid #dcdcdc;
+    font-weight: 600;
     cursor: pointer;
+    font-size: 13px;
 }
 
 .alertTable td {
-    padding: 12px;
+    padding: 14px 12px;
     border-bottom: 1px solid #eee;
     text-align: center;
-    color: #555;
+    vertical-align: middle;
 }
 
-.emptyRow { padding: 40px; color: #999; }
-
+/* 정렬 화살표 */
 .sortArrow { font-size: 10px; margin-left: 4px; color: #adb5bd; }
 
-/* 컬럼 너비 */
-.idCol { width: 60px; }
+/* 1. 안 읽은 알림 (Unread) - 진하게 */
+.unreadRow {
+    background-color: #ffffff;
+    color: #202124;
+    font-weight: 600;
+}
+
+.unreadRow td {
+    border-bottom: 1px solid #dadce0; /* 구분선 조금 더 진하게 */
+}
+
+/* 2. 읽은 알림 (Read) - 연하게 */
+.readRow {
+    background-color: #f8f9fa; /* 아주 연한 회색 */
+    color: #80868b;
+}
+
+/* 읽은 행의 링크 등 요소들도 연하게 처리 */
+.readRow a {
+    color: #80868b !important;
+    font-weight: 400;
+}
+
+.readRow .badgeHazard {
+    opacity: 0.6; /* 뱃지도 흐릿하게 */
+    border: 1px solid #eee;
+}
+
+/* 컬럼 너비 최적화 */
+.checkCol { width: 40px; } /* 체크박스 열 넓힘 */
+.idCol { width: 70px; }
 .nationCol { width: 100px; }
 .hazardCol { width: 120px; }
-.titleCol { width: auto; }
+.titleCol { width: auto; text-align: left; padding-left: 20px !important;}
 .dateCol { width: 110px; }
-.linkCol { width: 70px; }
 
-/* 뱃지 및 버튼 */
+/* 요소 스타일 */
+.titleLink {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px; /* 제목 길어지면 자르기 */
+}
+.titleLink:hover { text-decoration: underline; }
+
 .badgeHazard {
     background-color: #fff5f5;
     color: #e03131;
@@ -227,21 +412,8 @@ input:checked + .slider:before { transform: translateX(24px); }
     font-weight: 600;
 }
 
-.alignLeft {
-    text-align: left !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.linkBtn {
-    padding: 4px 8px;
-    border: 1px solid #67932A;
-    border-radius: 4px;
+.emptyRow {
+    padding: 60px 0;
+    color: #999;
     background-color: #fff;
-    color: #666;
-    text-decoration: none;
-    font-size: 12px;
 }
-
-.linkBtn:hover { background-color: #f8f9fa; color: #333; }

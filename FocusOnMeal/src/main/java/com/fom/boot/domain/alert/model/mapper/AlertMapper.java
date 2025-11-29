@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.fom.boot.domain.alert.model.vo.NotificationLog;
 import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 
 @Mapper
@@ -27,6 +26,15 @@ public interface AlertMapper {
      */
     int updateNotificationReadStatus(@Param("notificationId") int notificationId, 
                                      @Param("memberId") String memberId);
+    
+    /**
+     * 알림 삭제
+     * @param notificationId 알림 ID
+     * @param memberId 회원 ID
+     * @return 삭제된 행 수
+     */
+    int deleteNotification(@Param("notificationId") int notificationId, 
+                           @Param("memberId") String memberId);
     
     /**
      * 읽지 않은 알림 개수 조회
@@ -168,4 +176,36 @@ public interface AlertMapper {
      * @return 식재료 ID 목록
      */
     List<Integer> selectAllAlertIngredientIds();
+    
+    /**
+     * 마이페이지: 검색 조건에 맞는 회원의 안전 알림 개수 조회
+     *
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 개수
+     */
+    int selectUserSafetyNotiCount(Map<String, Object> searchMap);
+    
+    /**
+     * 마이페이지: 검색 조건에 맞는 회원의 안전 알림 목록 조회
+     *
+     * @param searchMap 검색 조건(Map)
+     * @return 알림 목록 리스트
+     */
+    List<Map<String, Object>> selectUserSafetyNotiList(Map<String, Object> searchMap);
+    
+    /**
+     * 회원의 모든 읽지 않은 알림 읽음 처리
+     * @param memberId 회원 ID
+     * @return 업데이트된 행 수
+     */
+    int updateAllNotificationsReadStatus(@Param("memberId") String memberId);
+
+    /**
+     * 회원의 특정 유형 읽지 않은 알림 읽음 처리
+     * @param memberId 회원 ID
+     * @param type 알림 유형
+     * @return 업데이트된 행 수
+     */
+    int updateAllNotificationsReadStatusByType(@Param("memberId") String memberId, 
+                                               @Param("type") String type);
 }

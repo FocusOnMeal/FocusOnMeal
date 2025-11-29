@@ -1,8 +1,13 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 
 const Sidebar = () => {
+    const location = useLocation();
+    const isDataManagementActive = 
+        location.pathname === "/admin/safetyInfo" || 
+        location.pathname === "/admin/ingredientInfo";
+
     return (
         <aside className={styles.sidebar}>
             <ul className={styles.menuList}>
@@ -32,26 +37,13 @@ const Sidebar = () => {
                     </NavLink>
                 </li>
 
-                {/* 데이터 관리 */}
+                {/* 데이터 관리 - 식재료 관리로 이동 */}
                 <li>
                     <NavLink
-                        to="/admin/safetyInfo"
-                        className={({ isActive }) =>
-                            isActive ? styles.activeTitle : styles.menuTitle
-                        }
+                        to="/admin/ingredientInfo"
+                        className={isDataManagementActive ? styles.activeTitle : styles.menuTitle}
                     >
                         데이터 관리
-                    </NavLink>
-                </li>
-
-                <li>
-                    <NavLink
-                        to="/admin/safetyInfo"
-                        className={({ isActive }) =>
-                            isActive ? styles.active : styles.subItem
-                        }
-                    >
-                        안전 정보 관리
                     </NavLink>
                 </li>
 
@@ -65,6 +57,18 @@ const Sidebar = () => {
                         식재료 관리
                     </NavLink>
                 </li>
+                
+                <li>
+                    <NavLink
+                        to="/admin/safetyInfo"
+                        className={({ isActive }) =>
+                            isActive ? styles.active : styles.subItem
+                        }
+                    >
+                        안전 정보 관리
+                    </NavLink>
+                </li>
+
 
                 {/* 공지사항 관리 */}
                 <li>

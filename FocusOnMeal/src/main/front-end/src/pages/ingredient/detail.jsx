@@ -737,9 +737,9 @@ function IngredientDetail() {
                         )}
                     </div>
                     
-                    {/* 식자재 정보 (변동 없음) */}
+                    {/* 식재료 정보 (변동 없음) */}
                     <div className={styles.infoBox}>
-                        <h3 className={styles.boxTitle}>식자재 정보</h3>
+                        <h3 className={styles.boxTitle}>식재료 정보</h3>
                         <div className={styles.specInfo}>
                             <div className={styles.specRow}>
                                 <span>카테고리:</span> {itemInfo.category || '-'}

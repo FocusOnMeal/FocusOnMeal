@@ -2,10 +2,13 @@ package com.fom.boot.domain.ingredient.model.service;
 
 import java.util.List;
 
+import com.fom.boot.app.admin.dto.AdminIngredientDTO;
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
 import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
+import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
+import com.fom.boot.domain.ingredient.model.vo.NutritionMaster;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 
 public interface IngredientService {
@@ -22,5 +25,8 @@ public interface IngredientService {
 	// 상세 페이지 : 특정 식재료 가격 이력 조회
 	List<PriceHistory> getPriceHistory(int id);
 	List<FavoriteIngredientSummaryDTO> getFavoritesByMemberId(String memberId);
+	int getTotalIngredientsBySearch(String type, String keyword);
+	List<AdminIngredientDTO> selectAdminIngredients(PageInfo pageInfo, String type, String keyword, String sortColumn, String sortOrder);
+	int updateNutrition(NutritionMaster nutrition);
 
 }

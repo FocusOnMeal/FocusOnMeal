@@ -382,7 +382,7 @@ public class MyPageController {
     }
     
     // 찜한 식재료 목록 조회 (마이페이지용)
-    @GetMapping("/ingredients/favorite")
+    @GetMapping("/favorites")
     public ResponseEntity<?> getFavoriteIngredients(Authentication authentication) {
         
         // 로그인 확인
@@ -400,11 +400,13 @@ public class MyPageController {
     
     // 마이페이지 안전정보알림
     @GetMapping("/settings/safetyAlert")
-    public ResponseEntity<?> getSafetyAlerts(@RequestParam(defaultValue = "1") int page,
+    public ResponseEntity<?> getSafetyAlerts(
+    		@RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "all") String type,
             @RequestParam(defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "alertId") String sortColumn,
+            @RequestParam(defaultValue = "sentAt") String sortColumn, // 기본 정렬을 수신일(sentAt)로 변경
             @RequestParam(defaultValue = "desc") String sortOrder,
+            @RequestParam(defaultValue = "all") String readStatus,
             Authentication authentication) {
     	// 로그인 확인
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -421,16 +423,17 @@ public class MyPageController {
         searchMap.put("keyword", keyword.trim());
         searchMap.put("sortColumn", sortColumn);
         searchMap.put("sortOrder", sortOrder);
+        searchMap.put("readStatus", readStatus);
 
         // 전체 개수 조회
-        int total = sService.selectAlertListCount(searchMap);
+        int total = aService.getUserSafetyNotiCount(searchMap);
 
         // 페이징 생성
         PageInfo pi = Pagination.getPageInfo(page, total);
 
         // 목록 조회
-        List<SafetyAlert> list = sService.selectAlertList(pi, searchMap);
-
+        List<Map<String, Object>> list = aService.getUserSafetyNotiList(pi, searchMap);
+        
         // 유저 알림
         Map<String, Object> setting = aService.getSafetyAlertSettings(memberId);
         
@@ -469,6 +472,42 @@ public class MyPageController {
         response.put("notificationEnabled", notificationEnabled);
     	
     	return ResponseEntity.ok(response);
+    }
+    
+    // 마이페이지 안전 알림 삭제
+    @DeleteMapping("/settings/safetyAlert/{notificationId}")
+    public ResponseEntity<?> deleteNotification(
+            @PathVariable int notificationId,
+            Authentication authentication) {
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String memberId = authentication.getName();
+
+        boolean result = aService.deleteSafetyAlert(notificationId, memberId);
+        
+        if(result) {
+            return ResponseEntity.ok(Map.of("message", "삭제되었습니다."));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "삭제 실패"));
+        }
+    }
+    
+    // 마이페이지 안전 알림 읽음 처리
+    @PatchMapping("/settings/safetyAlert/{notificationId}/read")
+    public ResponseEntity<?> readNotification(
+            @PathVariable int notificationId,
+            Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String memberId = authentication.getName();
+
+        boolean result = aService.markNotificationAsRead(notificationId, memberId);
+        return ResponseEntity.ok(Map.of("success", result));
     }
     
 }
