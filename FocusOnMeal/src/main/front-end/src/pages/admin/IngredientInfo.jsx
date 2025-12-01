@@ -253,7 +253,7 @@ const IngredientInfo = () => {
                                         </div>
                                     </td>
 
-                                    <td>{item.standardUnit || '1kg'}</td>
+                                    <td>1{item.standardUnit || '1kg'}</td>
                                     
                                     <td>{item.currentPrice ? `${item.currentPrice.toLocaleString()}원` : '-'}</td>
                                     
