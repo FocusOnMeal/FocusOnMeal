@@ -66,7 +66,7 @@ const FavoriteIngredients = () => {
     try {
         const token = sessionStorage.getItem("token");
 
-        await axios.delete(`/api/favorite/${ingredientId}`, {
+        await axios.delete(`/api/ingredients/favorite/${ingredientId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

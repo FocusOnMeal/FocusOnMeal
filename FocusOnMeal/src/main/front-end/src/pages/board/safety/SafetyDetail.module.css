@@ -282,7 +282,7 @@
     background: #f9f9f9;
     border-bottom: 1px solid #e0e0e0;
     transition: background-color 0.2s;
-    width: 100%; /* ✅ 전체 너비 고정 */
+    width: 1120px; /* ✅ 전체 너비 고정 */
     box-sizing: border-box; /* ✅ 패딩 포함 계산 */
 }
 
