@@ -347,8 +347,8 @@ const ParallaxPage = () => {
                         zIndex: 10,
                     }}
                     >
-                    <h1 style={{ fontSize: "64px", marginBottom: "20px" }}>{section.title}</h1>
-                    <p style={{ fontSize: "28px" }}>{section.subtitle}</p>
+                    <h1 style={{ fontSize: "40px", marginBottom: "20px" }}>{section.title}</h1>
+                    <p style={{ fontSize: "16px" }}>{section.subtitle}</p>
                     </div>
                 )}
 

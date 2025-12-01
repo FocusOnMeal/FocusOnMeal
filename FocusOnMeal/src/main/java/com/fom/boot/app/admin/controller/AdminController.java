@@ -228,6 +228,9 @@ public class AdminController {
 		data.put("noticeList", nList);
 		return ResponseEntity.ok(data);
 	}
+	
+	// 관리자 공지사항 추가
+	//@GetMapping("")
 		
 	// 관리자 공지사항 수정
 	@PatchMapping("/noticeInfo/modify")
