@@ -55,7 +55,7 @@ const FavoriteIngredients = () => {
     };
 
     // 4. 찜 해제 핸들러
-    const handleRemoveFavorite = async (e, favoriteId, ingredientId, name) => {
+const handleRemoveFavorite = async (e, favoriteId, ingredientId, name) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -66,7 +66,8 @@ const FavoriteIngredients = () => {
     try {
         const token = sessionStorage.getItem("token");
 
-        await axios.delete(`/api/ingredients/favorite/${ingredientId}`, {
+        // DELETE 대신 POST로 변경, URL도 수정
+        await axios.post(`/ingredient/detail/${ingredientId}/favorite`, {}, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -132,7 +133,7 @@ const FavoriteIngredients = () => {
                                 </div>
                                 <button 
                                     className={styles.deleteBtn}
-                                    onClick={(e) => handleRemoveFavorite(e, item.favoriteId, item.name)}
+                                    onClick={(e) => handleRemoveFavorite(e, item.favoriteId, item.ingredientId, item.ingredientName)}
                                     title="찜 해제"
                                 >
                                     ♥

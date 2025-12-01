@@ -196,7 +196,7 @@ function IngredientDetail() {
                 if (token) {
                     // 찜 상태 확인
                     try {
-                        const favoriteResponse = await axios.get('/api/mypage/favorites');
+                        const favoriteResponse = await axios.get('/api/mypage/ingredients/favorite');
                         if (favoriteResponse.data && Array.isArray(favoriteResponse.data)) {
                             const isFavorited = favoriteResponse.data.some(fav => fav.ingredientId === parseInt(id));
                             setIsWished(isFavorited);
