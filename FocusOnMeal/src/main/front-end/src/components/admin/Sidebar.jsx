@@ -90,7 +90,7 @@ const Sidebar = () => {
                             isActive ? styles.activeTitle : styles.menuTitle
                         }
                     >
-                        배치 / 로그
+                        API 관리
                     </NavLink>
                 </li>
             </ul>

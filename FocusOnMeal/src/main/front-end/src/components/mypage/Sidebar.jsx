@@ -5,14 +5,7 @@ import styles from "./Sidebar.module.css";
 const menuItems = [
     { label: "홈", href: "/mypage" },
     { label: "내 식단 관리", href: "/mypage/myMeal" },
-    { 
-        label: "식재료 관리", 
-        // href가 없고 subMenu가 있으면 '부모 메뉴'로 처리
-        subMenu: [
-            { label: "나만의 식재료", href: "/mypage/ingredients/custom" },
-            { label: "즐겨찾는 식재료", href: "/mypage/ingredients/favorite" }
-        ]
-    },
+    { label: "즐겨찾는 식재료", href: "/mypage/ingredients/favorite" },
     { 
         label: "알림 설정", 
         subMenu: [
