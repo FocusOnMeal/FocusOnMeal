@@ -51,8 +51,6 @@ public class MyPageController {
 	
 	private final IngredientService iService;
 	
-	private final SafetyService sService;
-	
 	private final AlertService aService;
 
 	private final PriceAlertService pService;

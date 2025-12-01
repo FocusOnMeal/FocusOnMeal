@@ -64,7 +64,7 @@ const SafetyAlert = () => {
     };
 
     const handleToggleNotification = async () => {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const newValue = !isNotificationEnabled;
 
         try {
