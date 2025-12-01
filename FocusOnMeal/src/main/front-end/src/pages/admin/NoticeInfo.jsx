@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./NoticeInfo.module.css";
 import Sidebar from "../../components/admin/Sidebar";
@@ -34,6 +34,8 @@ const NoticeInfo = () => {
     // 모달 선택 + 선택된 공지
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedNotice, setSelectedNotice] = useState(null);
+
+    const navigate = useNavigate();
 
     // 제목 클릭 시 모달 열기
     const openModal = (notice) => {
@@ -315,7 +317,7 @@ const NoticeInfo = () => {
 
                                         <span 
                                             className={styles.subjectLink}
-                                            onClick={() => openModal(notice)}
+                                            onClick={() => navigate(`/board/notice/detail/${notice.noticeNo}`)}
                                         >
                                             {notice.noticeSubject}
                                         </span>
