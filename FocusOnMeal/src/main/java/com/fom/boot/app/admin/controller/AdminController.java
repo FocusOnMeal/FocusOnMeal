@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -43,6 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
+
+    private final BCryptPasswordEncoder getPasswordEncoder;
 	
 	private final MemberService mService;
 	private final NoticeService nService;
@@ -52,6 +55,7 @@ public class AdminController {
 	// application.properties에 설정된 파일 저장 경로 주입
 	@Value("${file.upload-dir}")
 	private String uploadDir;
+
 	
 	//회원 목록 조회
 	@GetMapping("/memberInfo")
@@ -234,7 +238,45 @@ public class AdminController {
 	}
 	
 	// 관리자 공지사항 추가
-	//@GetMapping("")
+	@PostMapping("/noticeInfo/insert")
+	public ResponseEntity<?> insertNotice(
+			@RequestBody Notice notice,
+			Authentication authentication){
+		
+		// 1. 토큰 인증 체크
+		if(authentication == null || !authentication.isAuthenticated()) {
+			Map<String, String> error = new HashMap<>();
+			error.put("message", "로그인이 필요합니다.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+		}
+		System.out.println("Auth name = " + authentication.getName());
+		System.out.println("Auth authorities = " + authentication.getAuthorities());
+		
+		// 2. 토큰에서 관리자 여부 확인
+		String memberId = authentication.getName();
+		Member member = mService.findByMemberId(memberId);
+		
+		if (member == null) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 아님");
+	    }
+		if(!"Y".equals(member.getAdminYn())) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자만 접근 가능합니다.");
+		}
+		
+		System.out.println("=== 받은 Notice JSON ===");
+		System.out.println(notice);
+		
+		// 4. 공지사항 등록
+		int result = nService.insertNotice(notice);
+		
+		if(result > 0) {
+			return ResponseEntity.ok("success");
+		} else {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("공지사항 등록 실패");
+	    }
+	}
+	
+	
 		
 	// 관리자 공지사항 수정
 	@PatchMapping("/noticeInfo/modify")

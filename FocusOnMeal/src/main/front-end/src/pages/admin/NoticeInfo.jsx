@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./NoticeInfo.module.css";
 import Sidebar from "../../components/admin/Sidebar";
@@ -7,6 +7,9 @@ import Pagination from "../../components/common/Pagination";
 
 
 const NoticeInfo = () => {
+
+    // 페이지 이동용
+    const navigate = useNavigate();
 
     const [noticeInfo, setNoticeInfo] = useState([]);
 
@@ -357,7 +360,8 @@ const NoticeInfo = () => {
                     </tbody>
                 </table>
                 <div className={styles.addBtnContainer}>
-                    <button className={styles.addBtn}>
+                    <button className={styles.addBtn}
+                    onClick={() => navigate('/admin/noticeInfo/insert')}>
                         공지사항 추가 +
                     </button>
                 </div>

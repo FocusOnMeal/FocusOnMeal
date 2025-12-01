@@ -77,7 +77,31 @@
 	    WHERE RNUM &gt;= #{startRow}
 	</select>
 
-
+	<!-- 관리자 : 공지사항 추가 -->
+	<insert id="insertNotice" parameterType="com.fom.boot.domain.notice.model.vo.Notice">
+	    INSERT INTO NOTICE (
+		    NOTICE_NO,
+		    MEMBER_ID,
+		    NOTICE_SUBJECT,
+		    NOTICE_CONTENT,
+		    NOTICE_CREATEAT,
+		    VIEW_COUNT,
+		    NOTICE_ISNEW,
+		    NOTICE_IMPORTANT,
+		    IS_DELETED
+		)
+		VALUES (
+		    SEQ_NOTICE.NEXTVAL,
+		    #{memberId},
+		    #{noticeSubject},
+		    #{noticeContent},
+		    SYSTIMESTAMP,
+		    0,
+		    #{noticeIsNew},
+		    #{noticeImportant},
+		    #{isDeleted}
+		)
+	</insert>
 	
 	<!-- 관리자 : 공지사항 수정  -->
 	<update id="modifyNotice" parameterType="com.fom.boot.domain.notice.model.vo.Notice">

@@ -51,6 +51,7 @@ import NoticeInfo from './pages/admin/NoticeInfo';
 import IngredientInfo from './pages/admin/IngredientInfo';
 import AdminSafetyList from './pages/admin/SafetyInfo';
 import AdminSafetyForm from './pages/admin/SafetyForm';
+import NoticeInsert from './pages/admin/NoticeInsert';
 
 function App() {
   
@@ -114,6 +115,8 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/memberInfo" element={<MemberInfo />} />
         <Route path="/admin/noticeInfo" element={<NoticeInfo/>} />
+        <Route path="/admin/noticeInfo/insert" element={<NoticeInsert />} />
+
         {/* 관리자 안전정보 관리 */}
         <Route path="/admin/safetyInfo" element={<AdminSafetyList />} />
         <Route path="/admin/safetyInfo/register" element={<AdminSafetyForm />} />

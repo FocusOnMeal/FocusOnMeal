@@ -118,6 +118,12 @@ public class NoticeServiceImpl implements NoticeService {
 
 	    return notice;
 	}
+	
+	// 공지사항 추가
+	@Override
+	public int insertNotice(Notice notice) {
+		return mapper.insertNotice(notice);
+	}
 
 
 	

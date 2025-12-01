@@ -1,5 +1,0 @@
-const NoticeInsert = () => {
-    return(
-        
-    )
-}
