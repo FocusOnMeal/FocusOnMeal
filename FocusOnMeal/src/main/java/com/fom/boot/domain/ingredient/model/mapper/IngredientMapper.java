@@ -48,11 +48,24 @@ public interface IngredientMapper {
 	List<IngredientDTO> selectListWithLatestPrice();
 	
 	List<FavoriteIngredientSummaryDTO> selectFavoritesByMemberId(String memberId);
+	
 	List<IngredientDTO> getIngredientList();
-	int selectAdminTotalCount(String type, String keyword);
-	List<AdminIngredientDTO> selectAdminList(String type, String keyword, String sortColumn, String sortOrder,
-			int offset, int limit);
+	
+	// [관리자] 검색 카운트 (@Param 추가)
+	int selectAdminTotalCount(@Param("type") String type, 
+							  @Param("keyword") String keyword);
+	
+	// [관리자] 목록 조회 (Offset, Limit 방식)
+	List<AdminIngredientDTO> selectAdminList(
+			@Param("type") String type, 
+			@Param("keyword") String keyword, 
+			@Param("sortColumn") String sortColumn, 
+			@Param("sortOrder") String sortOrder,
+			@Param("offset") int offset, 
+			@Param("limit") int limit);
+			
 	int updateNutrition(NutritionMaster nutrition);
+	
 	int insertNutrition(NutritionMaster nutrition);
 	
 }

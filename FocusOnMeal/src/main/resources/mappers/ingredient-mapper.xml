@@ -195,20 +195,23 @@
 	    ORDER BY M.NAME ASC
 	</select>
 
-    <!-- 관리자(Admin) 전용 매핑 및 쿼리 -->
+    <!-- =========================== [관리자(Admin) 전용] =========================== -->
 
-    <!-- 관리자 DTO 매핑 (영양성분 필드 포함, 추후 조인 시 사용 대비) -->
-    <resultMap id="AdminIngredientMap" type="com.fom.boot.app.admin.dto.AdminIngredientDTO">
-        <!-- INGREDIENT_MASTER 테이블 -->
+        <resultMap id="AdminIngredientMap" type="com.fom.boot.app.admin.dto.AdminIngredientDTO">
         <id property="ingredientId" column="INGREDIENT_ID"/>
         <result property="name" column="NAME"/>
         <result property="category" column="CATEGORY"/>
         <result property="standardUnit" column="STANDARD_UNIT"/>
         <result property="kamisItemCode" column="KAMIS_ITEM_CODE"/>
         <result property="kamisKindCode" column="KAMIS_KIND_CODE"/>
-        <!-- 등록일 컬럼이 있다면 추가 (예: ENROLL_DATE) -->
         
-        <!-- NUTRITION_MASTER 테이블 (현재는 JOIN 안하므로 null로 매핑됨) -->
+        <result property="statusYn" column="STATUS_YN"/>
+        
+        <result property="currentPrice" column="CURRENT_PRICE"/>
+        <result property="previousPrice" column="PREVIOUS_PRICE"/>
+        <result property="collectedDate" column="COLLECTED_DATE"/>
+        <result property="previousCollectedDate" column="PREVIOUS_COLLECTED_DATE"/>
+        
         <result property="nutritionId" column="NUTRITION_ID"/>
         <result property="calories" column="CALORIES"/>
         <result property="carbsG" column="CARBS_G"/>
@@ -217,58 +220,112 @@
         <result property="sugarG" column="SUGAR_G"/>
     </resultMap>
 
-    <!-- 관리자 검색 조건 (SQL Fragment) -->
     <sql id="searchFrag">
         <where>
             <if test="keyword != null and keyword != ''">
                 <choose>
                     <when test="type == 'ingredientName'">
-                        AND NAME LIKE CONCAT('%', #{keyword}, '%')
+                        AND I.NAME LIKE '%' || #{keyword} || '%'
                     </when>
                     <when test="type == 'categoryName'">
-                        AND CATEGORY LIKE CONCAT('%', #{keyword}, '%')
+                        AND I.CATEGORY LIKE '%' || #{keyword} || '%'
                     </when>
                     <otherwise>
-                        AND (NAME LIKE CONCAT('%', #{keyword}, '%')
-                             OR CATEGORY LIKE CONCAT('%', #{keyword}, '%'))
+                        AND (I.NAME LIKE '%' || #{keyword} || '%' OR I.CATEGORY LIKE '%' || #{keyword} || '%')
                     </otherwise>
                 </choose>
             </if>
         </where>
     </sql>
 
-    <!-- [관리자] 식재료 총 개수 조회 -->
     <select id="selectAdminTotalCount" resultType="int">
         SELECT COUNT(*)
-        FROM INGREDIENT_MASTER
+        FROM INGREDIENT_MASTER I
         <include refid="searchFrag"/>
     </select>
 
-    <!-- [관리자] 식재료 목록 조회 (Oracle 12c+ Paging) -->
+    <!-- [관리자] 식재료 목록 조회 -->
     <select id="selectAdminList" resultMap="AdminIngredientMap">
-        SELECT 
-            INGREDIENT_ID,
-            NAME,
-            CATEGORY,
-            STANDARD_UNIT,
-            KAMIS_ITEM_CODE,
-            KAMIS_KIND_CODE
-            <!-- , ENROLL_DATE -->
-        FROM INGREDIENT_MASTER
-        <include refid="searchFrag"/>
-        <choose>
-            <when test="sortColumn != null and sortColumn != ''">
-                ORDER BY ${sortColumn} ${sortOrder}
-            </when>
-            <otherwise>
-                ORDER BY INGREDIENT_ID DESC
-            </otherwise>
-        </choose>
-        <!-- 오라클 12c 이상 페이징 문법 -->
-        OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
-    </select>
+        SELECT * FROM (
+            SELECT A.*, ROWNUM RNUM FROM (
+                SELECT 
+                    I.INGREDIENT_ID,
+                    I.NAME,
+                    I.CATEGORY,
+                    I.STANDARD_UNIT,
+                    I.KAMIS_ITEM_CODE,
+                    I.KAMIS_KIND_CODE,
+                    
+                    /* 상태 */
+                    'Y' AS STATUS_YN,
+                    
+                    /* 영양성분 */
+                    0 AS NUTRITION_ID, 0 AS CALORIES, 0 AS CARBS_G, 0 AS PROTEIN_G, 0 AS FAT_G, 0 AS SUGAR_G,
+                    
+                    /* 가격 (최신) */
+                    (SELECT PRICE_VALUE FROM (
+                        SELECT PRICE_VALUE FROM PRICE_HISTORY PH 
+                        WHERE PH.INGREDIENT_ID = I.INGREDIENT_ID 
+                        ORDER BY PH.COLLECTED_DATE DESC
+                    ) WHERE ROWNUM = 1) AS CURRENT_PRICE,
+                    
+                    (SELECT COLLECTED_DATE FROM (
+                        SELECT COLLECTED_DATE FROM PRICE_HISTORY PH 
+                        WHERE PH.INGREDIENT_ID = I.INGREDIENT_ID 
+                        ORDER BY PH.COLLECTED_DATE DESC
+                    ) WHERE ROWNUM = 1) AS COLLECTED_DATE,
+                    
+                    /* 가격 (이전) */
+                    (SELECT PRICE_VALUE FROM (
+                        SELECT PRICE_VALUE, ROW_NUMBER() OVER(ORDER BY COLLECTED_DATE DESC) as RN 
+                        FROM PRICE_HISTORY PH WHERE PH.INGREDIENT_ID = I.INGREDIENT_ID
+                    ) WHERE RN = 2) AS PREVIOUS_PRICE,
 
-    <!-- [관리자] 영양성분 수정 -->
+                    (SELECT COLLECTED_DATE FROM (
+                        SELECT COLLECTED_DATE, ROW_NUMBER() OVER(ORDER BY COLLECTED_DATE DESC) as RN 
+                        FROM PRICE_HISTORY PH WHERE PH.INGREDIENT_ID = I.INGREDIENT_ID
+                    ) WHERE RN = 2) AS PREVIOUS_COLLECTED_DATE
+
+                FROM INGREDIENT_MASTER I
+                
+                <include refid="searchFrag"/>
+                
+                <choose>
+                    <when test="sortColumn != null and sortColumn != ''">
+                         <!-- [수정] 프론트엔드 정렬 컬럼명 매핑 -->
+                         <choose>
+                            <when test="sortColumn == 'ingredientId'">ORDER BY I.INGREDIENT_ID</when>
+                            <when test="sortColumn == 'category'">ORDER BY I.CATEGORY</when>
+                            <when test="sortColumn == 'name'">ORDER BY I.NAME</when>
+                            <when test="sortColumn == 'standardUnit'">ORDER BY I.STANDARD_UNIT</when>
+                            <when test="sortColumn == 'currentPrice'">ORDER BY CURRENT_PRICE</when>
+                            <when test="sortColumn == 'previousPrice'">ORDER BY PREVIOUS_PRICE</when>
+                            <when test="sortColumn == 'collectedDate'">ORDER BY COLLECTED_DATE</when>
+                            <when test="sortColumn == 'statusYn'">ORDER BY STATUS_YN</when>
+                            <otherwise>ORDER BY I.${sortColumn}</otherwise>
+                         </choose>
+                         <if test="sortOrder != null and sortOrder != ''">
+                            ${sortOrder}
+                         </if>
+                    </when>
+                    <otherwise>
+                        ORDER BY I.INGREDIENT_ID DESC
+                    </otherwise>
+                </choose>
+
+            ) A
+        )
+        WHERE RNUM BETWEEN (#{offset} + 1) AND (#{offset} + #{limit})
+    </select>
+    
+    <update id="updateIngredientStatus">
+        BEGIN
+            DELETE FROM FAVORITE WHERE INGREDIENT_ID = #{ingredientId};
+            DELETE FROM PRICE_HISTORY WHERE INGREDIENT_ID = #{ingredientId};
+            DELETE FROM INGREDIENT_MASTER WHERE INGREDIENT_ID = #{ingredientId};
+        END;
+    </update>
+
     <update id="updateNutrition">
         UPDATE NUTRITION_MASTER
         SET 
@@ -280,9 +337,12 @@
         WHERE NUTRITION_ID = #{nutritionId}
     </update>
 
-    <!-- [관리자] 영양성분 등록 -->
     <insert id="insertNutrition">
+        <selectKey keyProperty="nutritionId" resultType="int" order="BEFORE">
+            SELECT SEQ_NUTRITION.NEXTVAL FROM DUAL
+        </selectKey>
         INSERT INTO NUTRITION_MASTER (
+            NUTRITION_ID,
             INGREDIENT_ID,
             MEASURE_UNIT,
             CALORIES,
@@ -291,6 +351,7 @@
             FAT_G,
             SUGAR_G
         ) VALUES (
+            #{nutritionId},
             #{ingredientId},
             '100g',
             #{calories},
