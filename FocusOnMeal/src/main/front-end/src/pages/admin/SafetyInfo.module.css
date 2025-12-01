@@ -1,0 +1,114 @@
+.container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+    font-family: "Noto Sans KR", sans-serif;
+}
+
+.formWrapper {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.formWrapper h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #67932A;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.required {
+    color: #ff4d4f;
+    margin-left: 4px;
+}
+
+.input,
+.select,
+.textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: "Noto Sans KR", sans-serif;
+    transition: border-color 0.2s;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+    outline: none;
+    border-color: #67932A;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 300px;
+    line-height: 1.6;
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.submitBtn,
+.cancelBtn {
+    padding: 12px 32px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.submitBtn {
+    background-color: #67932A;
+    color: white;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background-color: #587b24;
+}
+
+.submitBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.cancelBtn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancelBtn:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+.cancelBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

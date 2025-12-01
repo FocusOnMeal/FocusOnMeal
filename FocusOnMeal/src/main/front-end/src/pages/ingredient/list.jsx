@@ -102,7 +102,7 @@ const toggleWishlist = async (ingredientId) => {
 
     const fetchMyFavorites = async () => {
         try {
-            const response = await axios.get('/api/mypage/favorites');
+            const response = await axios.get('/api/mypage/ingredients/favorite');
             if (response.data && Array.isArray(response.data)) {
                 const myFavoriteIds = response.data.map(item => item.ingredientId);
                 setWishlist(new Set(myFavoriteIds));

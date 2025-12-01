@@ -254,5 +254,49 @@
 	    )
 	    WHERE ROWNUM = 1
 	</select>
+	
+	<!-- 안전 정보 등록 -->
+    <insert id="insertAlert">
+        <selectKey keyProperty="alertId" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(ALERT_ID), 0) + 1 FROM SAFETY_ALERT_MASTER
+        </selectKey>
+        INSERT INTO SAFETY_ALERT_MASTER (
+            ALERT_ID,
+            INGREDIENT_ID,
+            NATION,
+            HAZARD_TYPE,
+            TITLE,
+            DESCRIPTION,
+            PUBLICATION_DATE
+        ) VALUES (
+            #{alertId},
+            #{ingredientId},
+            #{nation},
+            #{hazardType},
+            #{title},
+            #{description},
+            SYSTIMESTAMP
+        )
+    </insert>
+
+    <!-- 안전 정보 수정 -->
+    <update id="updateAlert">
+        UPDATE SAFETY_ALERT_MASTER
+        SET 
+            NATION = #{nation},
+            HAZARD_TYPE = #{hazardType},
+            TITLE = #{title},
+            DESCRIPTION = #{description}
+        WHERE ALERT_ID = #{alertId}
+    </update>
+
+    <!-- 안전 정보 삭제 (다중 삭제) -->
+    <delete id="deleteAlerts">
+        DELETE FROM SAFETY_ALERT_MASTER
+        WHERE ALERT_ID IN
+        <foreach collection="list" item="alertId" open="(" separator="," close=")">
+            #{alertId}
+        </foreach>
+    </delete>
   
   </mapper>

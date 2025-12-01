@@ -57,4 +57,27 @@ public interface SafetyMapper {
 	 * 상세페이지 다음 글 조회 (현재 글보다 ID가 큰 것 중 가장 작은 것)
 	 */
 	SafetyAlert getNextAlert(@Param("alertId") int alertId);
+	
+	// ========== 관리자 기능 추가 ==========
+	
+	/**
+	 * 안전 정보 등록 (관리자)
+	 * @param alert 안전 정보 객체
+	 * @return 등록 성공 여부
+	 */
+	int insertAlert(SafetyAlert alert);
+	
+	/**
+	 * 안전 정보 수정 (관리자)
+	 * @param alert 안전 정보 객체
+	 * @return 수정 성공 여부
+	 */
+	int updateAlert(SafetyAlert alert);
+	
+	/**
+	 * 안전 정보 삭제 - 다중 삭제 (관리자)
+	 * @param alertIds 삭제할 ID 목록
+	 * @return 삭제된 개수
+	 */
+	int deleteAlerts(List<Integer> alertIds);
 }

@@ -111,4 +111,24 @@ public class SafetyServiceImpl implements SafetyService {
 	        return null;
 	    }
 	}
+	
+	// ========== 관리자 기능 추가 ==========
+	
+	@Override
+	public int insertAlert(SafetyAlert alert) {
+		log.debug("안전 정보 등록 - alert: {}", alert);
+		return safetyMapper.insertAlert(alert);
+	}
+	
+	@Override
+	public int updateAlert(SafetyAlert alert) {
+		log.debug("안전 정보 수정 - alert: {}", alert);
+		return safetyMapper.updateAlert(alert);
+	}
+	
+	@Override
+	public int deleteAlerts(List<Integer> alertIds) {
+		log.debug("안전 정보 삭제 - alertIds: {}", alertIds);
+		return safetyMapper.deleteAlerts(alertIds);
+	}
 }

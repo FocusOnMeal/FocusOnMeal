@@ -1,0 +1,220 @@
+/* 전체 컨테이너 */
+.container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+    font-family: "Noto Sans KR", sans-serif;
+}
+
+/* 폼 래퍼 */
+.formWrapper {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 페이지 제목 */
+.pageTitle {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 30px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #67932A;
+    color: #333;
+}
+
+/* 폼 */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 폼 그룹 */
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* 라벨 */
+.label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.required {
+    color: #ff4d4f;
+    margin-left: 4px;
+    font-size: 16px;
+}
+
+/* 입력 필드 공통 */
+.input,
+.select,
+.textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: "Noto Sans KR", sans-serif;
+    transition: all 0.2s;
+    background-color: white;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+    outline: none;
+    border-color: #67932A;
+    box-shadow: 0 0 0 3px rgba(103, 147, 42, 0.1);
+}
+
+/* 입력 필드 호버 */
+.input:hover:not(:focus),
+.select:hover:not(:focus),
+.textarea:hover:not(:focus) {
+    border-color: #aaa;
+}
+
+/* Select 스타일 */
+.select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+/* Textarea */
+.textarea {
+    resize: vertical;
+    min-height: 300px;
+    line-height: 1.6;
+}
+
+/* 에러 상태 */
+.inputError {
+    border-color: #ff4d4f !important;
+    background-color: #fff5f5;
+}
+
+.inputError:focus {
+    box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+}
+
+/* 에러 메시지 */
+.errorMessage {
+    color: #ff4d4f;
+    font-size: 13px;
+    margin-top: 6px;
+    display: block;
+}
+
+/* 글자 수 카운터 */
+.charCount {
+    text-align: right;
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+}
+
+/* 버튼 그룹 */
+.buttonGroup {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* 버튼 공통 */
+.submitBtn,
+.cancelBtn {
+    padding: 12px 32px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+/* 제출 버튼 */
+.submitBtn {
+    background-color: #67932A;
+    color: white;
+    box-shadow: 0 2px 4px rgba(103, 147, 42, 0.2);
+}
+
+.submitBtn:hover:not(:disabled) {
+    background-color: #587b24;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(103, 147, 42, 0.3);
+}
+
+.submitBtn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submitBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 취소 버튼 */
+.cancelBtn {
+    background-color: #6c757d;
+    color: white;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+}
+
+.cancelBtn:hover:not(:disabled) {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+.cancelBtn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.cancelBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px auto;
+        padding: 10px;
+    }
+
+    .formWrapper {
+        padding: 20px;
+    }
+
+    .pageTitle {
+        font-size: 24px;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+
+    .submitBtn,
+    .cancelBtn {
+        width: 100%;
+    }
+}

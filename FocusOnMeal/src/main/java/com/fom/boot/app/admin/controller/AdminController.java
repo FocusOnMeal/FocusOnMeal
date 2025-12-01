@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,12 +26,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fom.boot.app.admin.dto.AdminIngredientDTO;
 import com.fom.boot.common.pagination.PageInfo;
 import com.fom.boot.common.pagination.Pagination;
+import com.fom.boot.domain.alert.model.vo.SafetyAlert;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.ingredient.model.vo.NutritionMaster;
 import com.fom.boot.domain.member.model.service.MemberService;
 import com.fom.boot.domain.member.model.vo.Member;
 import com.fom.boot.domain.notice.model.service.NoticeService;
 import com.fom.boot.domain.notice.model.vo.Notice;
+import com.fom.boot.domain.safety.model.service.SafetyService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +46,8 @@ public class AdminController {
 	
 	private final MemberService mService;
 	private final NoticeService nService;
-	private final IngredientService iService; // 추가된 서비스
+	private final IngredientService iService;
+	private final SafetyService safetyService;
 	
 	// application.properties에 설정된 파일 저장 경로 주입
 	@Value("${file.upload-dir}")
@@ -411,4 +415,148 @@ public class AdminController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 저장 중 오류가 발생했습니다.");
 		}
 	}
+	
+	/**
+     * 관리자 - 안전 정보 목록 조회
+     */
+    @GetMapping("/safetyInfo")
+    public ResponseEntity<Map<String, Object>> getAlertList(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sortColumn", defaultValue = "alertId") String sortColumn,
+            @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder) {
+
+        log.info("[관리자] 안전 정보 목록 조회 - page: {}", page);
+
+        try {
+            Map<String, Object> searchMap = new HashMap<>();
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                searchMap.put("type", type);
+                searchMap.put("keyword", keyword);
+            }
+            searchMap.put("sortColumn", sortColumn);
+            searchMap.put("sortOrder", sortOrder);
+
+            int totalCount = safetyService.selectAlertListCount(searchMap);
+            PageInfo pi = Pagination.getPageInfo(page, totalCount);
+            List<SafetyAlert> list = safetyService.selectAlertList(pi, searchMap);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("list", list);
+            response.put("pi", pi);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("[관리자] 안전 정보 목록 조회 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "목록을 불러오는 데 실패했습니다."));
+        }
+    }
+
+    /**
+     * 관리자 - 안전 정보 상세 조회
+     */
+    @GetMapping("/safetyInfo/detail/{alertId}")
+    public ResponseEntity<?> getAlertDetail(@PathVariable("alertId") int alertId) {
+        
+        log.info("[관리자] 안전 정보 상세 조회 - alertId: {}", alertId);
+
+        try {
+            SafetyAlert alert = safetyService.selectAlertDetail(alertId);
+
+            if (alert == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "해당 안전 정보를 찾을 수 없습니다."));
+            }
+
+            return ResponseEntity.ok(alert);
+
+        } catch (Exception e) {
+            log.error("[관리자] 안전 정보 상세 조회 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "데이터를 불러오는 데 실패했습니다."));
+        }
+    }
+
+    /**
+     * 관리자 - 안전 정보 등록
+     */
+    @PostMapping("/safetyInfo/register")
+    public ResponseEntity<?> registerAlert(@RequestBody SafetyAlert alert) {
+        
+        log.info("[관리자] 안전 정보 등록 - title: {}", alert.getTitle());
+
+        try {
+            int result = safetyService.insertAlert(alert);
+
+            if (result > 0) {
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(Map.of("message", "등록되었습니다."));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "등록에 실패했습니다."));
+            }
+
+        } catch (Exception e) {
+            log.error("[관리자] 안전 정보 등록 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "등록 중 오류가 발생했습니다."));
+        }
+    }
+
+    /**
+     * 관리자 - 안전 정보 수정
+     */
+    @PutMapping("/safetyInfo/update/{alertId}")
+    public ResponseEntity<?> updateAlert(
+            @PathVariable("alertId") int alertId,
+            @RequestBody SafetyAlert alert) {
+        
+        log.info("[관리자] 안전 정보 수정 - alertId: {}", alertId);
+
+        try {
+            alert.setAlertId(alertId);
+            int result = safetyService.updateAlert(alert);
+
+            if (result > 0) {
+                return ResponseEntity.ok(Map.of("message", "수정되었습니다."));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "수정에 실패했습니다."));
+            }
+
+        } catch (Exception e) {
+            log.error("[관리자] 안전 정보 수정 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "수정 중 오류가 발생했습니다."));
+        }
+    }
+
+    /**
+     * 관리자 - 안전 정보 삭제 (다중 삭제)
+     */
+    @DeleteMapping("/safetyInfo/delete")
+    public ResponseEntity<?> deleteAlerts(@RequestBody Map<String, List<Integer>> request) {
+        
+        List<Integer> alertIds = request.get("alertIds");
+        log.info("[관리자] 안전 정보 삭제 - alertIds: {}", alertIds);
+
+        try {
+            int result = safetyService.deleteAlerts(alertIds);
+
+            if (result > 0) {
+                return ResponseEntity.ok(Map.of("message", result + "건이 삭제되었습니다."));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "삭제에 실패했습니다."));
+            }
+
+        } catch (Exception e) {
+            log.error("[관리자] 안전 정보 삭제 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "삭제 중 오류가 발생했습니다."));
+        }
+    }
 }

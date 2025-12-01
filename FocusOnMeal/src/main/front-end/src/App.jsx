@@ -49,6 +49,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import MemberInfo from './pages/admin/MemberInfo';
 import NoticeInfo from './pages/admin/NoticeInfo';
 import IngredientInfo from './pages/admin/IngredientInfo';
+import AdminSafetyList from './pages/admin/SafetyInfo';
+import AdminSafetyForm from './pages/admin/SafetyForm';
 
 function App() {
   
@@ -112,6 +114,11 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/memberInfo" element={<MemberInfo />} />
         <Route path="/admin/noticeInfo" element={<NoticeInfo/>} />
+        {/* 관리자 안전정보 관리 */}
+        <Route path="/admin/safetyInfo" element={<AdminSafetyList />} />
+        <Route path="/admin/safetyInfo/register" element={<AdminSafetyForm />} />
+        <Route path="/admin/safetyInfo/update/:alertId" element={<AdminSafetyForm />} />
+        <Route path="/admin/safetyInfo/detail/:alertId" element={<AdminSafetyForm />} />
 
         {/* 공지사항 게시판 관련 */}
         <Route path="/board/notice/list" element={<NoticeList /> }/>
