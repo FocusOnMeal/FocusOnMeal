@@ -9,7 +9,7 @@
 .main {
     flex: 1;
     padding: 40px;
-    margin-left: 250px; /* Sidebar 너비만큼 */
+    margin-left: 50px; /* Sidebar 너비만큼 */
 }
 
 /* 페이지 제목 */
