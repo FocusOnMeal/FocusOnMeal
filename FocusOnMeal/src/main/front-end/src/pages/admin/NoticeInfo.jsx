@@ -38,8 +38,6 @@ const NoticeInfo = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedNotice, setSelectedNotice] = useState(null);
 
-    const navigate = useNavigate();
-
     // 제목 클릭 시 모달 열기
     const openModal = (notice) => {
         setSelectedNotice({...notice});
