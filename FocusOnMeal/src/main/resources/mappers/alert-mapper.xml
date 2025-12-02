@@ -6,7 +6,7 @@
   
       <!-- 회원의 알림 목록 조회 (제목 포함) -->
     <select id="selectNotificationsByMemberId" resultType="map">
-        SELECT 
+        SELECT
         "notificationId",
         "memberId",
         "type",
@@ -17,7 +17,7 @@
         "alertId",
         "ingredientId"
     FROM (
-        SELECT 
+        SELECT
             nl.NOTIFICATION_ID AS "notificationId",
             nl.MEMBER_ID AS "memberId",
             nl.TYPE AS "type",
@@ -26,10 +26,14 @@
             TO_CHAR(nl.SENT_AT, 'YYYY-MM-DD"T"HH24:MI:SS') AS "sentAt",
             NVL(sam.TITLE, '알림') AS "title",
             sam.ALERT_ID AS "alertId",
-            sam.INGREDIENT_ID AS "ingredientId",
+            CASE
+                WHEN nl.TYPE IN ('가격정보', '가격변동') AND nl.MESSAGE LIKE '%||%' THEN
+                    TO_NUMBER(SUBSTR(nl.MESSAGE, INSTR(nl.MESSAGE, '||') + 2))
+                ELSE sam.INGREDIENT_ID
+            END AS "ingredientId",
             ROW_NUMBER() OVER (PARTITION BY nl.NOTIFICATION_ID ORDER BY sam.ALERT_ID DESC NULLS LAST) AS rn
         FROM NOTIFICATION_LOG nl
-        LEFT JOIN SAFETY_ALERT_MASTER sam 
+        LEFT JOIN SAFETY_ALERT_MASTER sam
             ON nl.TYPE = '위험공표'
             AND (
                 sam.TITLE = TRIM(SUBSTR(nl.MESSAGE, INSTR(nl.MESSAGE, ' - ') + 3))

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Header.css";
 import logo from "../../../../webapp/resources/images/headerLogo.png";
@@ -6,12 +6,18 @@ import { Bell } from "lucide-react";
 
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [memberNickname, setMemberNickname] = useState("");
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [hasUnread, setHasUnread] = useState(false);
     const [activeTab, setActiveTab] = useState("위험공표"); // 탭 상태 추가
+
+    // 페이지 이동 시 알림탭 닫기
+    useEffect(() => {
+        setShowNotifications(false);
+    }, [location.pathname]);
 
     // ✅ 수정: localStorage → sessionStorage
     useEffect(() => {
@@ -112,6 +118,12 @@ const Header = () => {
             // "가격정보" 탭: 가격정보 + 가격변동 (지정가 도달)
             return notification.type === "가격정보" || notification.type === "가격변동";
         }
+    };
+
+    // 메시지에서 ||ingredientId 부분 제거
+    const formatMessage = (message) => {
+        if (!message) return '';
+        return message.replace(/\|\|\d+$/, '').trim();
     };
 
     const formatTime = (sentAt) => {
@@ -355,7 +367,7 @@ const Header = () => {
                                                                     </div>
 
                                                                     <div className="notification-message">
-                                                                        {notif.message}
+                                                                        {formatMessage(notif.message)}
                                                                     </div>
 
                                                                     {/* ✅ 개별 액션 버튼 추가 */}

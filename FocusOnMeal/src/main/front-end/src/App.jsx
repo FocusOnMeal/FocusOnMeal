@@ -45,6 +45,7 @@ import SafetyAlertList from './pages/board/safety/SafetyList';
 import SafetyAlertDetail from './pages/board/safety/SafetyDetail';
 
 //관리자
+import AdminRoute from './components/admin/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import MemberInfo from './pages/admin/MemberInfo';
 import NoticeInfo from './pages/admin/NoticeInfo';
@@ -106,19 +107,39 @@ function App() {
         <Route path="/ingredient/list" element={<IngredientSearch />} />
 
         {/* 식단 관련 */}
-        <Route path="/meal/mealAI" element={<MealPlan />} />
+        <Route path="/meal/mealAI" element={
+          <ProtectedRoute>
+            <MealPlan />
+          </ProtectedRoute>
+        } />
 
         <Route path="/ingredient/detail/:id" element={<IngredientDetail />} />
       
-        {/* 관리자 홈 (대시보드) */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/memberInfo" element={<MemberInfo />} />
-        <Route path="/admin/noticeInfo" element={<NoticeInfo/>} />
-        {/* 관리자 안전정보 관리 */}
-        <Route path="/admin/safetyInfo" element={<AdminSafetyList />} />
-        <Route path="/admin/safetyInfo/register" element={<AdminSafetyForm />} />
-        <Route path="/admin/safetyInfo/update/:alertId" element={<AdminSafetyForm />} />
-        <Route path="/admin/safetyInfo/detail/:alertId" element={<AdminSafetyForm />} />
+        {/* 관리자 페이지 */}
+        <Route path="/admin" element={
+          <AdminRoute><AdminDashboard /></AdminRoute>
+        } />
+        <Route path="/admin/memberInfo" element={
+          <AdminRoute><MemberInfo /></AdminRoute>
+        } />
+        <Route path="/admin/noticeInfo" element={
+          <AdminRoute><NoticeInfo /></AdminRoute>
+        } />
+        <Route path="/admin/safetyInfo" element={
+          <AdminRoute><AdminSafetyList /></AdminRoute>
+        } />
+        <Route path="/admin/safetyInfo/register" element={
+          <AdminRoute><AdminSafetyForm /></AdminRoute>
+        } />
+        <Route path="/admin/safetyInfo/update/:alertId" element={
+          <AdminRoute><AdminSafetyForm /></AdminRoute>
+        } />
+        <Route path="/admin/safetyInfo/detail/:alertId" element={
+          <AdminRoute><AdminSafetyForm /></AdminRoute>
+        } />
+        <Route path="/admin/ingredientInfo" element={
+          <AdminRoute><IngredientInfo /></AdminRoute>
+        } />
 
         {/* 공지사항 게시판 관련 */}
         <Route path="/board/notice/list" element={<NoticeList /> }/>
@@ -127,8 +148,6 @@ function App() {
         {/* 안전정보 게시판 관련 */}
         <Route path="/board/safety/list" element={<SafetyAlertList />} />
         <Route path="/board/safety/detail/:alertId" element={<SafetyAlertDetail />} />
-
-        <Route path="/admin/ingredientInfo" element={<IngredientInfo/>} />
       </Routes>
     </>
   );
