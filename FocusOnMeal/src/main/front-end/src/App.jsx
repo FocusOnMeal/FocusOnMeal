@@ -52,6 +52,7 @@ import NoticeInfo from './pages/admin/NoticeInfo';
 import IngredientInfo from './pages/admin/IngredientInfo';
 import AdminSafetyList from './pages/admin/SafetyInfo';
 import AdminSafetyForm from './pages/admin/SafetyForm';
+import NoticeInsert from './pages/admin/NoticeInsert';
 
 function App() {
   
@@ -124,6 +125,9 @@ function App() {
         } />
         <Route path="/admin/noticeInfo" element={
           <AdminRoute><NoticeInfo /></AdminRoute>
+        } />
+        <Route path="/admin/noticeInfo/insert" element={
+          <AdminRoute><NoticeInsert /></AdminRoute>
         } />
         <Route path="/admin/safetyInfo" element={
           <AdminRoute><AdminSafetyList /></AdminRoute>

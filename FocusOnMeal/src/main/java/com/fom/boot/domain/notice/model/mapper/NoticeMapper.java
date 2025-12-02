@@ -51,5 +51,8 @@ public interface NoticeMapper {
 	void increaseViewCount(int noticeNo);
 
 	Notice getNoticeForView(int noticeNo);
+
+	// 공지사항 추가
+	int insertNotice(Notice notice);
 	
 }
