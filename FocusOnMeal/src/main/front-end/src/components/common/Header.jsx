@@ -13,6 +13,12 @@ const Header = () => {
     const [notifications, setNotifications] = useState([]);
     const [hasUnread, setHasUnread] = useState(false);
     const [activeTab, setActiveTab] = useState("위험공표"); // 탭 상태 추가
+    const [adminYn, setadminYn] = useState(false);
+
+    useEffect(() => {
+        const adminYn = sessionStorage.getItem("adminYn");
+        setadminYn(adminYn === "Y");
+    }, []);
 
     // 페이지 이동 시 알림탭 닫기
     useEffect(() => {
@@ -266,8 +272,15 @@ const Header = () => {
         }
     };
 
+    const isMain = location.pathname === "/";
+
+    // ✅ 추가 권장: 페이지 이동(location 변경) 시 스크롤 최상단 이동
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
     return (
-        <header className="header">
+        <header className={`header ${isMain ? "transparent" : ""}`}>
             <div className="header-inner">
                 <div className="logo-area">
                     <Link to="/">
@@ -287,7 +300,14 @@ const Header = () => {
                 <div className="user-area">
                     {isLoggedIn ? (
                         <>
-                            <span className="welcome">{memberNickname}님</span>
+                            <span
+                                className={`welcome ${adminYn ? "admin-clickable" : ""}`}
+                                onClick={() => {
+                                    if (adminYn) navigate("/admin");   // 관리자만 페이지 이동
+                                }}
+                            >
+                                {memberNickname}님
+                            </span>
                             <div className="notification-bell-wrapper">
                                 <button 
                                     className="notification-bell-button"

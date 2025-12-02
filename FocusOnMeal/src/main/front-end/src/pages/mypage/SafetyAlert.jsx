@@ -383,19 +383,13 @@ const SafetyAlert = () => {
                                     <td>{alert.nation}</td>
                                     <td><span className={styles.badgeHazard}>{alert.hazardType}</span></td>
                                     <td>
-                                        {alert.originalUrl ? (
-                                            <a 
-                                                href={alert.originalUrl} 
-                                                target="_blank" 
-                                                rel="noopener noreferrer"
+                                            <Link 
+                                                to={`/board/safety/detail/${alert.alertId}`} 
                                                 className={styles.titleLink}
                                             >
                                                 {alert.title}
-                                            </a>
-                                        ) : (
-                                            <span>{alert.title}</span>
-                                        )}
-                                    </td>
+                                            </Link>
+                                        </td>
                                     <td>
                                         {alert.publicationDate 
                                             ? new Date(alert.publicationDate).toLocaleDateString("ko-KR") 
