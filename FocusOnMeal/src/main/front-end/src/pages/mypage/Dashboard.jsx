@@ -296,7 +296,7 @@ const Dashboard = () => {
                                             </p>
                                         </div>
                                         <Link 
-                                            to="/mypage/favoriteMeals" 
+                                            to="/mypage/myMeal" 
                                             className={styles.detailBtn}
                                         >
                                             상세보기
