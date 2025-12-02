@@ -218,3 +218,24 @@
         width: 100%;
     }
 }
+
+/* Quill 에디터 스타일 커스터마이징 */
+:global(.ql-container) {
+    font-size: 15px;
+    font-family: inherit;
+}
+
+:global(.ql-editor) {
+    min-height: 400px;
+    line-height: 1.8;
+}
+
+:global(.ql-editor p) {
+    margin-bottom: 1em;
+}
+
+:global(.ql-toolbar) {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd !important;
+    border-bottom: none !important;
+}

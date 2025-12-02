@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import styles from './SafetyForm.module.css';
 
 const AdminSafetyForm = () => {
     const { alertId } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!alertId;
+    const editorRef = useRef(null);
 
     const [formData, setFormData] = useState({
         nation: '',
         hazardType: '',
         title: '',
         description: '',
-        ingredientId: 1 // 기본값
+        ingredientId: 1
     });
 
     const [loading, setLoading] = useState(false);
@@ -24,6 +26,19 @@ const AdminSafetyForm = () => {
             fetchAlertDetail();
         }
     }, [alertId]);
+
+    const [isComposing, setIsComposing] = useState(false); // 한글 입력 중인지 체크
+
+    useEffect(() => {
+        // description이 변경되면 contentEditable div에 반영 (최초 로드 시에만)
+        if (editorRef.current && formData.description && !editorRef.current.innerHTML) {
+            const sanitized = DOMPurify.sanitize(formData.description, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div', 'a'],
+                ALLOWED_ATTR: ['class', 'style', 'href', 'target', 'title']
+            });
+            editorRef.current.innerHTML = sanitized;
+        }
+    }, [formData.description]);
 
     const fetchAlertDetail = async () => {
         const token = sessionStorage.getItem("token");
@@ -59,13 +74,53 @@ const AdminSafetyForm = () => {
             ...prev,
             [name]: value
         }));
-        // 에러 메시지 제거
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
                 [name]: ''
             }));
         }
+    };
+
+    // ✅ ContentEditable 내용 변경 핸들러 (한글 입력 완료 후에만 실행)
+    const handleEditorInput = () => {
+        if (editorRef.current && !isComposing) {
+            const content = editorRef.current.innerHTML;
+            setFormData(prev => ({
+                ...prev,
+                description: content
+            }));
+            if (errors.description) {
+                setErrors(prev => ({
+                    ...prev,
+                    description: ''
+                }));
+            }
+        }
+    };
+
+    // ✅ 한글 입력 시작
+    const handleCompositionStart = () => {
+        setIsComposing(true);
+    };
+
+    // ✅ 한글 입력 완료
+    const handleCompositionEnd = () => {
+        setIsComposing(false);
+        // 한글 입력이 완료된 후 내용 업데이트
+        if (editorRef.current) {
+            const content = editorRef.current.innerHTML;
+            setFormData(prev => ({
+                ...prev,
+                description: content
+            }));
+        }
+    };
+
+    // ✅ 서식 적용 함수들
+    const applyFormat = (command, value = null) => {
+        document.execCommand(command, false, value);
+        editorRef.current.focus();
     };
 
     const validateForm = () => {
@@ -85,7 +140,8 @@ const AdminSafetyForm = () => {
             newErrors.title = '제목은 500자 이내로 입력해주세요.';
         }
 
-        if (!formData.description.trim()) {
+        const textContent = editorRef.current?.textContent || '';
+        if (!textContent.trim()) {
             newErrors.description = '상세 내용을 입력해주세요.';
         }
 
@@ -223,16 +279,70 @@ const AdminSafetyForm = () => {
                         <label className={styles.label}>
                             상세 내용 <span className={styles.required}>*</span>
                         </label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            placeholder="안전정보 상세 내용을 입력하세요"
-                            className={`${styles.textarea} ${errors.description ? styles.inputError : ''}`}
-                            rows="15"
+                        
+                        {/* ✅ 간단한 툴바 */}
+                        <div style={{
+                            display: 'flex',
+                            gap: '5px',
+                            padding: '10px',
+                            backgroundColor: '#f8f9fa',
+                            border: '1px solid #ddd',
+                            borderBottom: 'none',
+                            borderRadius: '4px 4px 0 0'
+                        }}>
+                            <button type="button" onClick={() => applyFormat('bold')} 
+                                style={toolbarButtonStyle} title="굵게">
+                                <strong>B</strong>
+                            </button>
+                            <button type="button" onClick={() => applyFormat('italic')} 
+                                style={toolbarButtonStyle} title="기울임">
+                                <em>I</em>
+                            </button>
+                            <button type="button" onClick={() => applyFormat('underline')} 
+                                style={toolbarButtonStyle} title="밑줄">
+                                <u>U</u>
+                            </button>
+                            <div style={{ width: '1px', backgroundColor: '#ddd', margin: '0 5px' }}></div>
+                            <button type="button" onClick={() => applyFormat('insertUnorderedList')} 
+                                style={toolbarButtonStyle} title="글머리 기호">
+                                ●
+                            </button>
+                            <button type="button" onClick={() => applyFormat('insertOrderedList')} 
+                                style={toolbarButtonStyle} title="번호 매기기">
+                                1.
+                            </button>
+                            <div style={{ width: '1px', backgroundColor: '#ddd', margin: '0 5px' }}></div>
+                            <button type="button" onClick={() => applyFormat('removeFormat')} 
+                                style={toolbarButtonStyle} title="서식 지우기">
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* ✅ ContentEditable 편집기 */}
+                        <div
+                            ref={editorRef}
+                            contentEditable
+                            onInput={handleEditorInput}
+                            onCompositionStart={handleCompositionStart}
+                            onCompositionEnd={handleCompositionEnd}
+                            style={{
+                                minHeight: '400px',
+                                padding: '16px',
+                                border: errors.description ? '1px solid #dc3545' : '1px solid #ddd',
+                                borderTop: 'none',
+                                borderRadius: '0 0 4px 4px',
+                                backgroundColor: 'white',
+                                lineHeight: '1.8',
+                                fontSize: '15px',
+                                outline: 'none'
+                            }}
+                            suppressContentEditableWarning
                         />
+                        
                         {errors.description && (
-                            <span className={styles.errorMessage}>{errors.description}</span>
+                            <span className={styles.errorMessage} style={{ marginTop: '5px', display: 'block' }}>
+                                {errors.description}
+                            </span>
                         )}
                     </div>
 
@@ -257,6 +367,17 @@ const AdminSafetyForm = () => {
             </div>
         </div>
     );
+};
+
+// 툴바 버튼 스타일
+const toolbarButtonStyle = {
+    padding: '5px 10px',
+    border: '1px solid #ddd',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    borderRadius: '3px',
+    fontSize: '14px',
+    minWidth: '30px'
 };
 
 export default AdminSafetyForm;
