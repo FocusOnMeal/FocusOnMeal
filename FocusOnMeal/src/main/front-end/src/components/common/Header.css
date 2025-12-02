@@ -1,12 +1,23 @@
-/* 헤더 전체 영역 (전체 width 유지) */
+/* 1. 기본 헤더 (서브 페이지용) */
 .header {
     width: 100%;
-    background-color: transparent !important;  /* 배경 투명 */
-    border-bottom: none !important;           /* 라인 제거 */
-    position: fixed;                           /* (선택사항) 상단 고정 */
+    background-color: #fff;
+    border-bottom: 1px solid #0b7a2a;
+    z-index: 10000;
+    position: relative; 
+}
+
+/* 2. 메인 페이지용 투명 헤더 (오버라이딩) */
+.header.transparent {
+    background: transparent;
+    border-bottom: none;
+    position: absolute; 
     top: 0;
     left: 0;
-    z-index: 10000;
+}
+
+.header.transparent .nav-menu a:hover {
+    color:white !important;
 }
 
 /* 내부 정렬 (1920px 박스) */
@@ -63,7 +74,7 @@
 
 /* 호버 */
 .nav-menu a:hover {
-    color: #fff;
+    color: #0b7a2a;
 }
 
 /* 오른쪽 로그인 영역 */

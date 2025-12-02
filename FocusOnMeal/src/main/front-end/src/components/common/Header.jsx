@@ -272,8 +272,15 @@ const Header = () => {
         }
     };
 
+    const isMain = location.pathname === "/";
+
+    // ✅ 추가 권장: 페이지 이동(location 변경) 시 스크롤 최상단 이동
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
     return (
-        <header className="header">
+        <header className={`header ${isMain ? "transparent" : ""}`}>
             <div className="header-inner">
                 <div className="logo-area">
                     <Link to="/">
