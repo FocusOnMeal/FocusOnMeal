@@ -119,4 +119,10 @@ public class IngredientServiceImpl implements IngredientService {
 	public NutritionMaster getNutritionByIngredientId(int id) {
 		return iMapper.selectNutritionByIngredientId(id);
 	}
+
+	@Override
+	public String getSafetyStatus(int ingredientId) {
+		String status = iMapper.selectSafetyStatus(ingredientId);
+		return status != null ? status : "safe";
+	}
 }

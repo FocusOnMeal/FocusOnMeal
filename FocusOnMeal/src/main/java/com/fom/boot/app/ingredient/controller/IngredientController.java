@@ -47,18 +47,20 @@ public class IngredientController {
     @GetMapping("/api/detail/{id}")
     @ResponseBody // JSON 반환
     public ResponseEntity<Map<String, Object>> getIngredientDetail(@PathVariable int id) {
-        
+
         Ingredient ingredientInfo = iService.getIngredientById(id);
         if (ingredientInfo == null) {
             return ResponseEntity.notFound().build();
         }
         List<PriceHistory> priceHistory = iService.getPriceHistory(id);
         NutritionMaster nutrition = iService.getNutritionByIngredientId(id);
+        String safetyStatus = iService.getSafetyStatus(id);
 
         Map<String, Object> response = new HashMap<>();
         response.put("info", ingredientInfo);   // 식재료 기본 정보
         response.put("history", priceHistory); 	// 가격 이력 (그래프용)
         response.put("nutrition", nutrition);	// 영양 성분 정보
+        response.put("safetyStatus", safetyStatus);	// 안전 위험도
 
         return ResponseEntity.ok(response);
     }

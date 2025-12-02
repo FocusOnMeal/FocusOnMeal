@@ -97,12 +97,13 @@ function IngredientSearch() {
               pricePer100g: item.currentPrice ? Math.floor(item.currentPrice / 10) : 0,
               
               // [수정] 백엔드 데이터 매핑
-              priceChangePercent: item.priceChangePercent ?? 0, 
-              previousPrice: item.previousPrice || 0, 
+              priceChangePercent: item.priceChangePercent ?? 0,
+              previousPrice: item.previousPrice || 0,
               // ✅ 직전 데이터 수집일 추가 (문자열로 올 수 있으니 확인 필요)
               previousCollectedDate: item.previousCollectedDate || null,
 
-              safetyStatus: ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)], // TODO: 실제 안전도 로직
+              // ✅ 백엔드에서 계산된 안전위험도 사용 (danger/warning/safe)
+              safetyStatus: item.safetyStatus || 'safe',
               unit: item.unit || '1kg'
             }));
             setOriginalResults(processedData);
@@ -265,7 +266,7 @@ function IngredientSearch() {
                 <div className={styles.tooltipBox}>
                     <h4 className={styles.tooltipTitle}>안전 위험도 기준</h4>
                     <p className={styles.tooltipDanger}>
-                        <strong>🔴 위험:</strong> <span className={styles.tooltipTextContent}>최근 3개월 이내 식약처 회수 명령, 또는 농약/중금속 부적합 판정 등이 있었을 경우.</span>
+                        <strong>🔴 위험:</strong> <span className={styles.tooltipTextContent}>최근 7일 이내 식약처 회수 명령, 또는 농약/중금속 부적합 판정 등이 있었을 경우.</span>
                     </p>
                     <p className={styles.tooltipWarning}>
                         <strong>🟠 주의:</strong> <span className={styles.tooltipTextContent}>가격 변동률 ±20% 이상 등 급격한 불안정, 또는 계절적 품질 저하 우려가 있는 경우.</span>

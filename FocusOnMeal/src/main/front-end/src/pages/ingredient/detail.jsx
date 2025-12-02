@@ -201,9 +201,9 @@ function IngredientDetail() {
                     }
                 }
                 
-                // 안전 상태 랜덤 지정 (실제 로직에 맞게 수정 필요)
-                info.safetyStatus = ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)];
-                
+                // ✅ 백엔드에서 계산된 안전위험도 사용 (danger/warning/safe)
+                info.safetyStatus = response.data.safetyStatus || 'safe';
+
                 setItemInfo(info); 
                 setPriceHistory(history);
                 setNutritionInfo(nutrition); // [추가] State 업데이트
@@ -631,9 +631,9 @@ function IngredientDetail() {
                                     <div className={styles.tooltipBox}>
                                         <h4 className={styles.tooltipTitle}>안전 위험도 기준</h4>
                                         <p className={styles.tooltipDanger}>
-                                            <strong>🔴 위험:</strong> 
+                                            <strong>🔴 위험:</strong>
                                             <span className={styles.tooltipTextContent}>
-                                                최근 3개월 이내 식약처 회수 명령, 또는 농약/중금속 부적합 판정 등이 있었을 경우.
+                                                최근 7일 이내 식약처 회수 명령, 또는 농약/중금속 부적합 판정 등이 있었을 경우.
                                             </span>
                                         </p>
                                         <p className={styles.tooltipWarning}>

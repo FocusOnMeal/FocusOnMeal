@@ -19,4 +19,7 @@ public class IngredientDTO extends Ingredient {
     private LocalDateTime previousCollectedDate; // 직전 가격 수집일
     
     private Double priceChangePercent;      // 가격 변동률 (%)
+
+    // 안전 위험도 (safe, warning, danger)
+    private String safetyStatus;
 }

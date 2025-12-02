@@ -65,8 +65,11 @@ public interface IngredientMapper {
 			@Param("limit") int limit);
 			
 	int updateNutrition(NutritionMaster nutrition);
-	
+
 	int insertNutrition(NutritionMaster nutrition);
 	NutritionMaster selectNutritionByIngredientId(int id);
-	
+
+	// 단일 식재료 안전위험도 조회
+	String selectSafetyStatus(int ingredientId);
+
 }

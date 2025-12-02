@@ -30,4 +30,7 @@ public interface IngredientService {
 	int updateNutrition(NutritionMaster nutrition);
 	NutritionMaster getNutritionByIngredientId(int id);
 
+	// 단일 식재료 안전위험도 조회
+	String getSafetyStatus(int ingredientId);
+
 }
