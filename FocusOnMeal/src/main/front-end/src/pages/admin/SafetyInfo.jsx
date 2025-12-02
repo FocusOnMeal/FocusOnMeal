@@ -249,12 +249,12 @@ const AdminSafetyList = () => {
                                     checked={alertList.length > 0 && selectedItems.length === alertList.length}
                                 />
                             </th>
-                            <th onClick={() => handleSort("alertId")}>
+                            <th className={styles.sortable}
+                                onClick={() => handleSort("alertId")}>
                                 번호
                                 <span className={`${styles.sortIcon} ${
                                     sortColumn === "alertId" ? (sortOrder === "asc" ? styles.asc : styles.desc) : ""
                                 }`}>
-                                    ▲▼
                                 </span>
                             </th>
                             <th>
@@ -302,12 +302,12 @@ const AdminSafetyList = () => {
                                 </div>
                             </th>
                             <th>제목</th>
-                            <th onClick={() => handleSort("publicationDate")}>
+                            <th className={styles.sortable}
+                                onClick={() => handleSort("publicationDate")}>
                                 공표일
                                 <span className={`${styles.sortIcon} ${
                                     sortColumn === "publicationDate" ? (sortOrder === "asc" ? styles.asc : styles.desc) : ""
                                 }`}>
-                                    ▲▼
                                 </span>
                             </th>
                             <th>관리</th>

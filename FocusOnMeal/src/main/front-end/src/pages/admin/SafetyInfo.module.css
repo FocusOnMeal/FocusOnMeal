@@ -123,11 +123,14 @@
 .alertTable th {
     background-color: #f8f9fa;
     font-weight: 600;
-    cursor: pointer;
     user-select: none;
 }
 
-.alertTable th:hover {
+.sortable {
+    cursor: pointer;
+}
+
+.sortable:hover {
     background-color: #e9ecef;
 }
 
