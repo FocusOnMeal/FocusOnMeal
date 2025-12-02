@@ -11,11 +11,11 @@ const Footer = () => {
     const [hoveredSns, setHoveredSns] = useState(null);
 
     const snsItems = [
-        { id: 'blog', name: '블로그', logo: blog, url: '#' },
-        { id: 'facebook', name: '페이스북', logo: facebook, url: '#' },
-        { id: 'kakao', name: '카카오톡', logo: kakao, url: '#' },
-        { id: 'instagram', name: '인스타그램', logo: instagram, url: '#' },
-        { id: 'naver', name: '네이버밴드', logo: naver, url: '#' },
+        { id: 'blog', name: '블로그', logo: blog, url: 'https://section.blog.naver.com/BlogHome.naver?directoryNo=0&currentPage=1&groupId=0' },
+        { id: 'facebook', name: '페이스북', logo: facebook, url: 'https://www.facebook.com/' },
+        { id: 'kakao', name: '카카오톡', logo: kakao, url: 'https://accounts.kakao.com/' },
+        { id: 'instagram', name: '인스타그램', logo: instagram, url: 'https://www.instagram.com/' },
+        { id: 'naver', name: '네이버밴드', logo: naver, url: 'https://www.band.us/ko' },
     ];
 
     const menuLinks = [
