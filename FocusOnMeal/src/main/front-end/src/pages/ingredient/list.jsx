@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom'; // [수정] useSearchParams 추가
 import axios from 'axios';
 import styles from './list.module.css';
 import Pagination from '../../components/common/Pagination'; 
@@ -20,16 +20,45 @@ function IngredientSearch() {
   const [originalResults, setOriginalResults] = useState([]); 
   const [loading, setLoading] = useState(true);
   
-  const [currentPage, setCurrentPage] = useState(1);
+  // [추가] URL 쿼리 파라미터 관리 훅
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // [수정] URL 파라미터에서 초기값 읽어오기 (새로고침/뒤로가기 시 상태 유지용)
+  const [currentPage, setCurrentPage] = useState(() => {
+    const page = searchParams.get('page');
+    return page ? parseInt(page, 10) : 1;
+  });
+
   const [itemsPerPage] = useState(10); 
 
-  const [selectedCategoryKey, setSelectedCategoryKey] = useState(null); 
-  const [searchText, setSearchText] = useState('');
+  // [수정] URL에서 카테고리 초기값 읽기
+  const [selectedCategoryKey, setSelectedCategoryKey] = useState(() => {
+    return searchParams.get('category') || null;
+  });
+  
+  // [수정] URL에서 검색어 초기값 읽기
+  const [searchText, setSearchText] = useState(() => {
+    return searchParams.get('query') || '';
+  });
 
   const [wishlist, setWishlist] = useState(new Set()); 
   
+  // [수정] 현재 위치(경로+쿼리스트링)를 알기 위해 location 객체 사용
+  const location = useLocation();
+
+  // [추가] 상태가 변경될 때마다 URL 파라미터 업데이트 (동기화)
+  useEffect(() => {
+    const params = {};
+    if (currentPage > 1) params.page = currentPage;
+    if (searchText) params.query = searchText;
+    if (selectedCategoryKey) params.category = selectedCategoryKey;
+    
+    // replace: true를 사용하여 불필요한 히스토리 누적 방지하면서 URL만 조용히 변경
+    setSearchParams(params, { replace: true });
+  }, [currentPage, searchText, selectedCategoryKey, setSearchParams]);
+
   // ✅ [수정] 찜 토글 기능: 실제 백엔드 API 호출로 변경
-const toggleWishlist = async (ingredientId) => {
+  const toggleWishlist = async (ingredientId) => {
     try {
         // Post 요청 시 Body가 비어있으면 400 에러가 날 수 있으므로 빈 객체 {}를 넣어줍니다.
         const response = await axios.post(`/ingredient/detail/${ingredientId}/favorite`, {});
@@ -92,7 +121,7 @@ const toggleWishlist = async (ingredientId) => {
     fetchData();
   }, []);
 
-// 2. 내 찜 목록 불러오기 (초기화)
+  // 2. 내 찜 목록 불러오기 (초기화)
   useEffect(() => {
     // 1. 토큰이 있는지 먼저 확인
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -145,13 +174,14 @@ const toggleWishlist = async (ingredientId) => {
     window.scrollTo(0, 0); 
   };
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategoryKey, searchText]);
+  // [수정] 기존의 useEffect(() => setCurrentPage(1), ...)는 제거합니다.
+  // 이유: 초기 로딩 시 URL에 있는 page=3 정보를 1로 덮어쓰는 것을 방지하기 위함입니다.
+  // 대신 각 핸들러(검색, 필터, 초기화)에서 명시적으로 setCurrentPage(1)을 호출합니다.
 
   const handleReset = () => {
     setSelectedCategoryKey(null); 
     setSearchText('');
+    setCurrentPage(1); // 초기화 시 1페이지로 리셋
   };
 
   if (loading) return <div className={styles.container}>데이터를 불러오는 중...</div>;
@@ -180,7 +210,7 @@ const toggleWishlist = async (ingredientId) => {
                     <button 
                         type="submit" 
                         className={styles.submitButton}
-                        onClick={() => setCurrentPage(1)} 
+                        onClick={() => setCurrentPage(1)} // 검색 버튼 클릭 시 1페이지로
                     >
                         검색
                     </button>
@@ -199,7 +229,10 @@ const toggleWishlist = async (ingredientId) => {
         <div className={styles.categoryButtons}>
           <button
             className={`${styles.categoryButton} ${!selectedCategoryKey ? styles.active : ''}`}
-            onClick={() => setSelectedCategoryKey(null)}
+            onClick={() => {
+                setSelectedCategoryKey(null);
+                setCurrentPage(1); // 필터 변경 시 1페이지로
+            }}
           >
             전체
           </button>
@@ -208,7 +241,10 @@ const toggleWishlist = async (ingredientId) => {
             <button
               key={cat.key}
               className={`${styles.categoryButton} ${selectedCategoryKey === cat.key ? styles.active : ''}`}
-              onClick={() => setSelectedCategoryKey(selectedCategoryKey === cat.key ? null : cat.key)}
+              onClick={() => {
+                  setSelectedCategoryKey(selectedCategoryKey === cat.key ? null : cat.key);
+                  setCurrentPage(1); // 필터 변경 시 1페이지로
+              }}
             >
               {cat.name}
             </button>
@@ -266,14 +302,20 @@ const toggleWishlist = async (ingredientId) => {
             };
             
             const safetyText = item.safetyStatus === 'safe' ? '안전'
-                            : item.safetyStatus === 'warning' ? '주의'
-                            : '위험';
+                             : item.safetyStatus === 'warning' ? '주의'
+                             : '위험';
 
             return (
               <li key={item.ingredientId} className={styles.resultItem}>
                 
                 <div className={styles.itemHeader}>
-                    <Link to={`/ingredient/detail/${item.ingredientId}`} className={styles.itemTitleLink}>
+                    {/* [수정] Link에 state 속성을 추가하여 현재 경로 정보(from)를 넘겨줍니다 */}
+                    {/* location.search에는 이미 ?page=3&query=... 정보가 들어있습니다 */}
+                    <Link 
+                        to={`/ingredient/detail/${item.ingredientId}`} 
+                        className={styles.itemTitleLink}
+                        state={{ from: location.pathname + location.search }}
+                    >
                       <h3 className={styles.itemTitle}>
                         {item.name} 
                         <span style={{
@@ -288,29 +330,29 @@ const toggleWishlist = async (ingredientId) => {
                     </Link>
                     
                     <div className={styles.itemActions}>
-    <button 
-        onClick={() => toggleWishlist(item.ingredientId)}
-        // 찜 상태(isWished)일 때 styles.wished 클래스 추가
-        className={isWished ? styles.wished : ''}
-    >
-        {/* SVG 하트 아이콘 */}
-        <svg 
-            width="16" 
-            height="16" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path 
-                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
-                stroke="currentColor" 
-                strokeWidth="2"
-            />
-        </svg>
-        {/* 텍스트 */}
-        <span>{isWished ? '찜 완료' : '찜하기'}</span>
-    </button>
-</div>
+                        <button 
+                            onClick={() => toggleWishlist(item.ingredientId)}
+                            // 찜 상태(isWished)일 때 styles.wished 클래스 추가
+                            className={isWished ? styles.wished : ''}
+                        >
+                            {/* SVG 하트 아이콘 */}
+                            <svg 
+                                width="16" 
+                                height="16" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path 
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
+                                    stroke="currentColor" 
+                                    strokeWidth="2"
+                                />
+                            </svg>
+                            {/* 텍스트 */}
+                            <span>{isWished ? '찜 완료' : '찜하기'}</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div className={styles.itemDetails}>

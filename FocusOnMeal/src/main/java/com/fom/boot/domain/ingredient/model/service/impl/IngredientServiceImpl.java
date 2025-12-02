@@ -114,4 +114,9 @@ public class IngredientServiceImpl implements IngredientService {
 			return iMapper.insertNutrition(nutrition);
 		}
 	}
+
+	@Override
+	public NutritionMaster getNutritionByIngredientId(int id) {
+		return iMapper.selectNutritionByIngredientId(id);
+	}
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom'; // [수정] useLocation 추가
 import axios from 'axios';
 import styles from './detail.module.css';
 import PriceAlertModal from '../../components/alert/PriceAlertModal';
@@ -11,10 +11,16 @@ import {
     YAxis,
     Tooltip,
     Legend,
-    ResponsiveContainer
+    ResponsiveContainer,
+    PieChart, // [추가] 차트용 컴포넌트
+    Pie,      // [추가]
+    Cell      // [추가]
 } from 'recharts';
 
-// 토큰을 안전하게 가져오는 함수 (변동 없음)
+/**
+ * 토큰을 안전하게 가져오는 함수 (변동 없음)
+ * sessionStorage 또는 localStorage에서 토큰을 확인합니다.
+ */
 const getTokenSafe = () => {
     const raw = sessionStorage.getItem('token') ?? localStorage.getItem('token');
     if (!raw) return null;
@@ -23,7 +29,10 @@ const getTokenSafe = () => {
     return s;
 };
 
-// 토큰을 지우는 함수 (변동 없음)
+/**
+ * 토큰을 지우는 함수 (변동 없음)
+ * 로그아웃이나 세션 만료 시 호출됩니다.
+ */
 const clearToken = () => {
     try {
         sessionStorage.removeItem('token');
@@ -33,7 +42,10 @@ const clearToken = () => {
     } catch (e) { /* 무시 */ }
 };
 
-// Y축 도메인 계산 (컴포넌트 외부로 분리 - 변동 없음)
+/**
+ * Y축 도메인 계산 (컴포넌트 외부로 분리 - 변동 없음)
+ * 그래프의 Y축 범위를 데이터에 맞춰 동적으로 계산합니다.
+ */
 const calculateYAxisDomain = (dataPoints) => {
     if (!dataPoints || dataPoints.length === 0) return [0, 10000];
     
@@ -50,7 +62,10 @@ const calculateYAxisDomain = (dataPoints) => {
     return [Math.max(0, paddedMin), paddedMax];
 };
 
-// 변동률 표시 컴포넌트 (외부로 분리 - 변동 없음)
+/**
+ * 변동률 표시 컴포넌트 (외부로 분리 - 변동 없음)
+ * 전일/주간/월간 등락폭을 표시합니다.
+ */
 const PriceChangeDisplay = ({ changeRate }) => {
     if (!changeRate) return null;
 
@@ -108,29 +123,46 @@ const PriceChangeDisplay = ({ changeRate }) => {
     );
 };
 
+// [추가] 도넛 차트용 색상 배열 (탄:노랑, 단:초록, 지:주황)
+const COLORS = ['#FFBB28', '#00C49F', '#FF8042'];
+
 function IngredientDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation(); // [수정] 이전 페이지 정보를 받기 위해 추가
 
+    // 기본 데이터 상태
     const [itemInfo, setItemInfo] = useState(null);
     const [priceHistory, setPriceHistory] = useState([]);
     const [loading, setLoading] = useState(true);
-    // 로그인 사용자 전용 상태는 유지
+    
+    // [추가] 영양 성분 정보 상태
+    const [nutritionInfo, setNutritionInfo] = useState(null);
+
+    // 로그인 사용자 전용 상태
     const [isWished, setIsWished] = useState(false);
     const [isAlertEnabled, setIsAlertEnabled] = useState(false);
     const [isPriceAlertEnabled, setIsPriceAlertEnabled] = useState(false);
+    
+    // 차트 관련 상태
     // priceList는 priceHistory를 변환한 것이므로 유지
     const [priceList, setPriceList] = useState([]);
     // priceTrendData는 그래프 데이터로, 로그인 없이 로드되도록 로직 수정
     const [priceTrendData, setPriceTrendData] = useState(null);
     const [pricePrediction, setPricePrediction] = useState(null); // 가격 예측 데이터
+    
+    // 모달 및 로그인 상태
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
     const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
+    // [추가] 이미지 확대 모달 상태
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
+    // 이미지 에러 핸들러
     const handleImageError = (e) => {
         e.target.src = '/images/default_ingredient.png'; // public 폴더에 기본 이미지 필요
     };
 
+    // 초기 데이터 로딩
     useEffect(() => {
         const fetchDetail = async () => {
             let token = getTokenSafe();
@@ -141,8 +173,10 @@ function IngredientDetail() {
                 const response = await axios.get(`/ingredient/api/detail/${id}`);
                 const info = response.data.info || null;
                 const history = response.data.history || [];
+                // [추가] 백엔드에서 받은 nutrition 객체 저장
+                const nutrition = response.data.nutrition || null;
                 
-                // 가격 정보 추가 처리 (변동 없음)
+                // 가격 정보 추가 처리 로직
                 if (info && history.length > 0) {
                     const latestPrice = history[0];
                     info.currentPrice = latestPrice.priceValue;
@@ -167,11 +201,13 @@ function IngredientDetail() {
                     }
                 }
                 
+                // 안전 상태 랜덤 지정 (실제 로직에 맞게 수정 필요)
                 info.safetyStatus = ['safe', 'warning', 'danger'][Math.floor(Math.random() * 3)];
                 
                 setItemInfo(info); 
                 setPriceHistory(history);
-				
+                setNutritionInfo(nutrition); // [추가] State 업데이트
+                
                 // 차트용 데이터 변환 (로그인 무관)
                 if (history && history.length > 0) {
                     const mapped = history.map(h => ({
@@ -236,7 +272,7 @@ function IngredientDetail() {
                 try {
                     const predictionResponse = await axios.get(`/ingredient/api/${id}/price-prediction`);
                     setPricePrediction(predictionResponse.data);
-                    setIsLoggedIn(predictionResponse.data.hasAccess || false);
+                    // setIsLoggedIn(predictionResponse.data.hasAccess || false); // (선택사항)
                 } catch (error) {
                     console.error('가격 예측 데이터 로드 실패:', error);
                 }
@@ -258,6 +294,17 @@ function IngredientDetail() {
         // 로그인 상태가 변경될 때마다 전체 데이터 로드를 다시 시도
     }, [id]); 
 
+    // [추가] 스마트 뒤로가기 핸들러
+    const handleGoBack = () => {
+        // 리스트 페이지에서 navigate('/detail/1', { state: { from: location.pathname + location.search } }) 
+        // 형태로 보냈다면, 해당 정보를 이용해 정확한 이전 페이지로 돌아갑니다.
+        if (location.state?.from) {
+            navigate(location.state.from);
+        } else {
+            navigate(-1);
+        }
+    };
+
     // 찜하기 핸들러 (변동 없음)
     const handleWishClick = async () => {
         const token = getTokenSafe();
@@ -267,7 +314,7 @@ function IngredientDetail() {
         }
 
         try {
-            // NOTE: API 호출 시 토큰을 보내도록 수정이 필요할 수 있으나, 기존 코드의 `/ingredient/detail/${id}/favorite` 엔드포인트에 토큰 로직이 없었으므로, 일단 토큰 검증만 추가합니다.
+            // NOTE: API 호출 시 토큰을 보내도록 수정
             const response = await axios.post(`/ingredient/detail/${id}/favorite`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -314,56 +361,39 @@ function IngredientDetail() {
         }
     };
 
-    // 가격 알림 핸들러 (변동 없음)
-    const handlePriceAlertClick = async () => {
+    // [수정] 가격 알림 핸들러 (버튼 클릭 시 API 호출 제거, 모달만 오픈)
+    const handlePriceAlertClick = () => {
         const token = getTokenSafe();
-
         if (!token) {
             alert("로그인이 필요합니다.");
             return;
         }
-
-        // 모달 열기
+        
+        // 기존의 axios.post 로직을 삭제했습니다.
+        // 버튼 클릭 시에는 모달만 열고, 실제 설정/해제는 모달 내부에서 처리합니다.
         setIsPriceModalOpen(true);
-
-        try {
-            const response = await axios.post(`/ingredient/api/${id}/price-alert`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (response.data.success) {
-                setIsPriceAlertEnabled(response.data.isEnabled);
-            }
-        } catch (error) {
-            if (error.response?.status === 401) {
-                clearToken();
-                setIsLoggedIn(false);
-                alert("세션이 만료되었습니다. 다시 로그인해 주세요.");
-            } else {
-                alert("오류가 발생했습니다.");
-            }
-        }
     };
 
-    // 로딩 중 (변동 없음)
+    // 로딩 중 표시 (변동 없음)
     if (loading) {
         return <div className={styles.container}>로딩 중...</div>;
     }
     
-    // 데이터 없음 (변동 없음)
+    // 데이터 없음 표시 (변동 없음)
     if (!itemInfo) {
         return (
             <div className={styles.container}>
                 <h2>식품성분표 상세 페이지</h2>
                 <p>'{id}'에 해당하는 정보를 찾을 수 없습니다.</p>
-                <button onClick={() => navigate(-1)} className={styles.backButton}>
+                {/* [수정] 뒤로가기 로직 적용 */}
+                <button onClick={handleGoBack} className={styles.backButton}>
                     목록으로 돌아가기
                 </button>
             </div>
         );
     }
 
-    // 안전 상태 표시 (변동 없음)
+    // 안전 상태 텍스트 및 클래스 계산
     const safetyText = itemInfo.safetyStatus === 'safe' ? '안전'
                      : itemInfo.safetyStatus === 'warning' ? '주의'
                      : '위험';
@@ -372,18 +402,30 @@ function IngredientDetail() {
                       : styles.danger;
     
     const hasPriceChange = itemInfo.priceChangePercent != null;
+
+    // [추가] 차트 데이터 준비 로직
+    // 영양소 정보가 있다면 차트에 사용할 데이터 배열 생성
+    const nutritionChartData = nutritionInfo ? [
+        { name: '탄수화물', value: nutritionInfo.carbs || 0 },
+        { name: '단백질', value: nutritionInfo.protein || 0 },
+        { name: '지방', value: nutritionInfo.fat || 0 },
+    ] : [];
+
+    // [추가] 데이터가 모두 0이면 차트 안 그림 (빈 차트 방지)
+    const hasNutritionData = nutritionChartData.some(d => d.value > 0);
     
     return (
         <div className={styles.container}>
             <h2 className={styles.pageTitle}>식품성분표 상세 페이지</h2>
             
-            <button onClick={() => navigate(-1)} className={styles.backButton}>
+            {/* [수정] 뒤로가기 로직 적용 */}
+            <button onClick={handleGoBack} className={styles.backButton}>
                 뒤로가기
             </button>
             
             <div className={styles.mainContent}>
                 
-                {/* 왼쪽: 영양 성분 */}
+                {/* 왼쪽: 영양 성분 & 이미지 영역 */}
                 <div className={styles.leftColumn}>
                     
                     <div className={styles.nutritionSection}>
@@ -393,29 +435,118 @@ function IngredientDetail() {
                                 alt={itemInfo.name} 
                                 className={styles.ingredientImage}
                                 onError={handleImageError}
+                                // [추가] 이미지 클릭 시 모달 오픈
+                                onClick={() => setIsImageModalOpen(true)}
+                                style={{ cursor: 'pointer' }}
+                                title="클릭하여 이미지 확대"
                             />
                         </div>
-                        <h3 className={styles.sectionTitle}>영양 성분 표</h3>
+                        <br />
+                        <h3 className={styles.sectionTitle}>
+                            영양 성분
+                            {/* 기준 단위 표시 */}
+                            {nutritionInfo && nutritionInfo.measureUnit && (
+                                <span style={{fontSize: '0.7em', color: '#888', marginLeft: '8px', fontWeight: 'normal'}}>
+                                    ({nutritionInfo.measureUnit} 기준)
+                                </span>
+                            )}
+                        </h3>
+                        
+                        {/* [추가] 도넛 차트 영역 */}
+                        {hasNutritionData && (
+                            <div style={{ width: '100%', height: 220, display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={nutritionChartData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {nutritionChartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip formatter={(val) => `${val}g`} />
+                                        <Legend verticalAlign="bottom" height={36}/>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
                         <div className={styles.nutritionTablePlaceholder}>
                             <table className={styles.nutritionTable}>
                                 <thead>
                                     <tr>
-                                        <th>&nbsp; 구분</th>
-                                        <th>&nbsp; 함량</th>
-                                        <th>&nbsp; 수치</th>
+                                        <th width="40%">구분</th>
+                                        <th width="30%">함량</th>
+                                        <th width="30%">비고</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr className={styles.noDataRow}>
-                                        <td colSpan="3">NUTRITION_MASTER 테이블에 데이터가 없습니다.</td>
-                                    </tr>
+                                    {/* [수정] 영양 성분 데이터 바인딩 및 디자인 적용 */}
+                                    {nutritionInfo ? (
+                                        <>
+                                            {/* 열량 */}
+                                            <tr>
+                                                <td>
+                                                    <span style={{display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', backgroundColor: '#333', marginRight:'6px'}}></span>
+                                                    열량
+                                                </td>
+                                                <td style={{fontWeight: 'bold', color: '#333'}}>
+                                                    {nutritionInfo.calories} kcal
+                                                </td>
+                                                <td style={{fontSize: '0.8em', color: '#999'}}>-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <span style={{display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', backgroundColor: COLORS[0], marginRight:'6px'}}></span>
+                                                    탄수화물
+                                                </td>
+                                                <td>{nutritionInfo.carbs} g</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <span style={{display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', backgroundColor: COLORS[1], marginRight:'6px'}}></span>
+                                                    단백질
+                                                </td>
+                                                <td>{nutritionInfo.protein} g</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <span style={{display:'inline-block', width:'10px', height:'10px', borderRadius:'50%', backgroundColor: COLORS[2], marginRight:'6px'}}></span>
+                                                    지방
+                                                </td>
+                                                <td>{nutritionInfo.fat} g</td>
+                                                <td></td>
+                                            </tr>
+                                            {/* [수정] 당류: 들여쓰기 제거, 왼쪽에 검은 점 추가 */}
+                                            <tr>
+                                                <td style={{color: '#666'}}>
+                                                    <span style={{display:'inline-block', width:'6px', height:'6px', borderRadius:'50%', backgroundColor: '#666', marginRight:'6px', marginLeft:'2px', verticalAlign:'middle'}}></span>
+                                                    당류
+                                                </td>
+                                                <td style={{color: '#666'}}>{nutritionInfo.sugar} g</td>
+                                                <td style={{fontSize: '0.8em', color:'#999'}}>(탄수화물 포함)</td>
+                                            </tr>
+                                        </>
+                                    ) : (
+                                        <tr className={styles.noDataRow}>
+                                            <td colSpan="3">영양 성분 정보가 없습니다.</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                {/* 오른쪽: 정보 */}
+                {/* 오른쪽: 정보 영역 */}
                 <div className={styles.rightColumn}>
                     <h1 className={styles.itemTitle}>
                         {itemInfo.name}
@@ -424,9 +555,9 @@ function IngredientDetail() {
                         </span>
                     </h1>
                     
-                    {/* 상단 요약 (변동 없음) */}
                     <div className={styles.infoBoxTop}>
-                        <div className={styles.itemSummary}>
+                        {/* [수정] 상단 요약 정보 박스: flex column과 gap을 사용하여 줄 간격 일정하게 맞춤 */}
+                        <div className={styles.itemSummary} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <div className={styles.priceLine}>
                                 <strong>가격</strong>
                                 <span style={{marginLeft: '10px', color: '#666', fontSize: '0.9em', fontWeight: 'normal'}}>
@@ -439,7 +570,6 @@ function IngredientDetail() {
                                         ? `${itemInfo.currentPrice.toLocaleString()}원` 
                                         : '정보 없음'}
                                 </span>
-                                
                                 {itemInfo.pricePer100g > 0 && ( 
                                     <span className={styles.pricePer100g}>
                                         (100g당 {itemInfo.pricePer100g.toLocaleString()}원)
@@ -447,9 +577,9 @@ function IngredientDetail() {
                                 )}
                             </div>
                             
-                            {/* 가격 변동 표시 (변동 없음) */}
+                            {/* [수정] 기존 margin 제거 (gap으로 대체) */}
                             {hasPriceChange && (
-                                <div style={{fontSize: '0.9em', marginTop: '10px', marginBottom: '10px'}}>
+                                <div style={{fontSize: '0.9em'}}>
                                     {itemInfo.priceChangePercent === 0 ? (
                                         <span style={{color: '#666'}}>
                                             - 전일 대비 변동 없음
@@ -463,7 +593,6 @@ function IngredientDetail() {
                                             {Math.abs(itemInfo.priceChangePercent).toFixed(1)}%
                                         </span>
                                     )}
-
                                     {itemInfo.previousPrice > 0 && itemInfo.previousCollectedDate && (
                                         <span style={{marginLeft: '8px', color: '#999'}}>
                                             (전일 : {itemInfo.previousPrice.toLocaleString()}원, 
@@ -478,9 +607,9 @@ function IngredientDetail() {
                                 </div>
                             )}
 
-                            {/* 신규 데이터 표시 (변동 없음) */}
+                            {/* [수정] 기존 margin 제거 (gap으로 대체) */}
                             {!hasPriceChange && itemInfo.currentPrice && (
-                                <div style={{fontSize: '0.9em', color: '#999', marginTop: '10px', marginBottom: '10px'}}>
+                                <div style={{fontSize: '0.9em', color: '#999'}}>
                                     <span style={{
                                         background:'#ffc107', 
                                         color:'#fff', 
@@ -493,7 +622,6 @@ function IngredientDetail() {
                                 </div>
                             )}
 
-                            {/* 안전 위험도 (변동 없음) */}
                             <div className={styles.safetyLine}>
                                 <strong>안전 위험도:</strong> 
                                 <span className={safetyClass}>{safetyText}</span>
@@ -525,12 +653,11 @@ function IngredientDetail() {
                             </div>
                         </div>
                         
-                        {/* 액션 버튼들 - 로그인 필요시 알림/찜 핸들러에서 처리 */}
+                        {/* 액션 버튼들 */}
                         <div className={styles.topActions}>
                             <button 
                                 onClick={handleWishClick} 
                                 className={`${styles.wishButton} ${isWished ? styles.wished : ''}`}
-                                // 로그인 필요 상태 메시지 표시를 위해 title 속성 추가 가능
                                 title={!isLoggedIn ? '로그인 후 찜하기를 이용할 수 있습니다.' : ''}
                             >
                                 <svg 
@@ -566,7 +693,7 @@ function IngredientDetail() {
                         </div>
                     </div>
                     
-                    {/* 가격 변동 추이 그래프 - 로그인 조건부 렌더링 제거 **[수정]** */}
+                    {/* 가격 변동 추이 그래프 */}
                     <div className={styles.infoBox}>
                         <h3 className={styles.boxTitle}>가격 변동 추이 및 예측 그래프</h3>
 
@@ -775,6 +902,27 @@ function IngredientDetail() {
                     </div>
                 </div>
             </div>
+            
+            {/* [추가] 이미지 모달 */}
+            {isImageModalOpen && (
+                <div 
+                    style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000,
+                        display: 'flex', justifyContent: 'center', alignItems: 'center',
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => setIsImageModalOpen(false)}
+                >
+                    <img 
+                        src={`/images/ingredients/${id}.jpg`} 
+                        alt={itemInfo.name} 
+                        style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }}
+                        onError={handleImageError}
+                    />
+                </div>
+            )}
+
             <PriceAlertModal
                 isOpen={isPriceModalOpen}
                 onClose={() => setIsPriceModalOpen(false)}

@@ -18,8 +18,8 @@ public class NutritionMaster {
     private int ingredientId;
     private String measureUnit;
     private BigDecimal calories;
-    private BigDecimal carbsG;
-    private BigDecimal proteinG;
-    private BigDecimal fatG;
-    private BigDecimal sugarG;
+    private BigDecimal carbs;
+    private BigDecimal protein;
+    private BigDecimal fat;
+    private BigDecimal sugar;
 }

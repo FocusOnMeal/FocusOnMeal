@@ -67,5 +67,6 @@ public interface IngredientMapper {
 	int updateNutrition(NutritionMaster nutrition);
 	
 	int insertNutrition(NutritionMaster nutrition);
+	NutritionMaster selectNutritionByIngredientId(int id);
 	
 }

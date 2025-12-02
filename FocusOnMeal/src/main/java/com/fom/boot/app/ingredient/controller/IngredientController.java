@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fom.boot.app.ingredient.dto.IngredientDTO;
 import com.fom.boot.app.ingredient.dto.PricePredictionDTO;
-import com.fom.boot.app.mypage.dto.FavoriteIngredientSummaryDTO;
 import com.fom.boot.domain.alert.model.service.AlertService;
 import com.fom.boot.domain.ingredient.model.service.IngredientService;
 import com.fom.boot.domain.ingredient.model.service.PricePredictionService;
 import com.fom.boot.domain.ingredient.model.vo.FavoriteIngredient;
 import com.fom.boot.domain.ingredient.model.vo.Ingredient;
+import com.fom.boot.domain.ingredient.model.vo.NutritionMaster;
 import com.fom.boot.domain.ingredient.model.vo.PriceHistory;
 
 import lombok.RequiredArgsConstructor;
@@ -53,10 +53,12 @@ public class IngredientController {
             return ResponseEntity.notFound().build();
         }
         List<PriceHistory> priceHistory = iService.getPriceHistory(id);
+        NutritionMaster nutrition = iService.getNutritionByIngredientId(id);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("info", ingredientInfo);     // 식재료 기본 정보
-        response.put("history", priceHistory); // 가격 이력 (그래프용)
+        response.put("info", ingredientInfo);   // 식재료 기본 정보
+        response.put("history", priceHistory); 	// 가격 이력 (그래프용)
+        response.put("nutrition", nutrition);	// 영양 성분 정보
 
         return ResponseEntity.ok(response);
     }

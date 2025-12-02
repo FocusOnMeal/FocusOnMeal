@@ -194,6 +194,24 @@
 	    WHERE M.RN = 1 
 	    ORDER BY M.NAME ASC
 	</select>
+	
+	    <!-- [추가] 영양 성분 조회 -->
+    <!-- VO의 필드명(carbs, protein...)과 DB 컬럼명(CARBS_G...)을 맞춰줍니다 -->
+    <select id="selectNutritionByIngredientId" parameterType="_int" resultType="NutritionMaster">
+        SELECT 
+            NUTRITION_ID,
+            INGREDIENT_ID,
+            MEASURE_UNIT,
+            CALORIES,
+            CARBS_G     AS carbs,
+            PROTEIN_G   AS protein,
+            FAT_G       AS fat,
+            SUGAR_G     AS sugar
+        FROM 
+            NUTRITION_MASTER
+        WHERE 
+            INGREDIENT_ID = #{id}
+    </select>
 
     <!-- =========================== [관리자(Admin) 전용] =========================== -->
 
