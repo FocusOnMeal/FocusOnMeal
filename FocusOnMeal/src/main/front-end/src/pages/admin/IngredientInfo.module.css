@@ -630,8 +630,10 @@
     background-color: #fff;
     transition: all 0.2s;
     
-    /* 스피너 제거 */
-    -moz-appearance: textfield;
+    /* [수정] 스피너 제거 (표준 속성 추가) */
+    appearance: none;        /* 표준 속성: 이것을 추가하세요 */
+    -moz-appearance: textfield; /* Firefox 전용: 숫자 입력창 화살표 제거용 */
+    -webkit-appearance: none;   /* Chrome/Safari 전용 */
 }
 
 .formGroupRow input::-webkit-outer-spin-button,

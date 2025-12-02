@@ -447,7 +447,7 @@ function IngredientDetail() {
                             {/* 기준 단위 표시 */}
                             {nutritionInfo && nutritionInfo.measureUnit && (
                                 <span style={{fontSize: '0.7em', color: '#888', marginLeft: '8px', fontWeight: 'normal'}}>
-                                    ({nutritionInfo.measureUnit} 기준)
+                                    (100{nutritionInfo.measureUnit} 기준)
                                 </span>
                             )}
                         </h3>
