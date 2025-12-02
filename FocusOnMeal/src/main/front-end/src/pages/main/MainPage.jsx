@@ -8,12 +8,13 @@ import grassImg from "../../assets/parallax/grass.png";
 import bushImg from "../../assets/parallax/bush.png";
 
 const ParallaxPage = () => {
-    const [hoveredBox, setHoveredBox] = useState(null);
+        const [hoveredBox, setHoveredBox] = useState(null);
     const [scrollProgress, setScrollProgress] = useState(0);
     const [currentSection, setCurrentSection] = useState(0);
     const [staticLeaves, setStaticLeaves] = useState([]);
     const [cursorParticles, setCursorParticles] = useState([]);
     const [showOverlay, setShowOverlay] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     
     const containerRef = useRef(null);
     const scrollTimeoutRef = useRef(null);
@@ -21,14 +22,23 @@ const ParallaxPage = () => {
     const isSnapingRef = useRef(false);
     const lastScrollTimeRef = useRef(Date.now());
     const lastScrollTopRef = useRef(0);
-    const tickingRef = useRef(false);
-    // 🔥 첫 페이지 텍스트 움직임 및 페이드 상태
-    const textRef = useRef(null);
-    const [textParallax, setTextParallax] = useState(0);
-    const [textOpacity, setTextOpacity] = useState(1);
-    // 내부 갱신을 너무 자주 하지 않기 위한 최근값 저장용 ref
-    const lastTextParallaxRef = useRef(textParallax);
-    const lastTextOpacityRef = useRef(textOpacity);
+
+    // 🥬 식재료 가격 데이터
+    const priceData = [
+        { id: 1, name: "배추", price: "2,850원", change: 12.5, unit: "1포기" },
+        { id: 2, name: "무", price: "1,200원", change: -8.3, unit: "1개" },
+        { id: 3, name: "대파", price: "3,500원", change: 5.2, unit: "1kg" },
+        { id: 4, name: "양파", price: "1,800원", change: -3.1, unit: "1kg" },
+        { id: 5, name: "감자", price: "2,400원", change: 15.8, unit: "1kg" },
+        { id: 6, name: "당근", price: "2,100원", change: -5.6, unit: "1kg" },
+        { id: 7, name: "사과", price: "4,500원", change: 8.9, unit: "1개" },
+        { id: 8, name: "배", price: "3,800원", change: -2.4, unit: "1개" },
+    ];
+
+    // 검색 필터링
+    const filteredPriceData = priceData.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const sections = [
         {
@@ -109,30 +119,12 @@ const ParallaxPage = () => {
         }, 800);
     }, [sections, currentSection]);
 
-    const scrollToTop = () => {
-        const container = containerRef.current;
-        if (!container) return;
-
-        isSnapingRef.current = true;    // ✔ 자동 스냅 잠금
-
-        container.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-
-        // ✔ 스크롤이 끝난 뒤 자동 스냅 다시 허용
-        setTimeout(() => {
-            isSnapingRef.current = false;
-        }, 900);
-    };
-
-
     /* 📌 스크롤 핸들러 (최적화) */
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
 
-
+        let ticking = false;
 
         const updateScroll = () => {
         const scrollTop = container.scrollTop;
@@ -144,44 +136,6 @@ const ParallaxPage = () => {
         sections.forEach(section => {
             totalHeight += container.clientHeight * section.height;
         });
-
-        // 🔥 ADD HERE inside updateScroll (after calculating scrollTop and before heavy logic)
-        // --- 텍스트 패럴랙스 계산 & 페이드 아웃 ---
-        // firstSectionHeight: 첫 섹션(섹션[0])의 실제 픽셀 높이
-        const firstSectionHeight = container.clientHeight * sections[0].height;
-
-        // localScroll: 첫 섹션 내에서의 스크롤 양 (0 ~ firstSectionHeight)
-        const localScrollFirst = Math.max(0, Math.min(scrollTop, firstSectionHeight));
-
-        // textParallax: 스크롤의 일부만 텍스트에 적용 (값은 px)
-        const newTextParallax = - localScrollFirst * 0.3; // 음수면 위로 이동. 0.3은 이동 비율(원하면 0.2~0.4 조정)
-
-        // 텍스트 페이드아웃 범위: firstSectionHeight * 0.4 ~ firstSectionHeight * 0.9 (조정 가능)
-        const fadeStart = firstSectionHeight * 0.4;
-        const fadeEnd = firstSectionHeight * 0.9;
-        let newTextOpacity = 1;
-        if (scrollTop <= fadeStart) {
-            newTextOpacity = 1;
-        } else if (scrollTop >= fadeEnd) {
-            newTextOpacity = 0;
-        } else {
-            const ratio = (scrollTop - fadeStart) / (fadeEnd - fadeStart);
-            newTextOpacity = 1 - ratio;
-        }
-
-        // 상태 갱신을 아주 작은 변화에 대해서는 하지 않음 (성능 향상)
-        const PARALLAX_EPS = 0.5; // px 단위 임계값
-        const OPACITY_EPS = 0.02; // opacity 단위 임계값
-
-        if (Math.abs(lastTextParallaxRef.current - newTextParallax) > PARALLAX_EPS) {
-            lastTextParallaxRef.current = newTextParallax;
-            setTextParallax(newTextParallax);
-        }
-        if (Math.abs(lastTextOpacityRef.current - newTextOpacity) > OPACITY_EPS) {
-            lastTextOpacityRef.current = newTextOpacity;
-            setTextOpacity(newTextOpacity);
-        }
-
         const scrollHeight = totalHeight - container.clientHeight;
 
         setScrollProgress((scrollTop / scrollHeight) * 100);
@@ -200,7 +154,6 @@ const ParallaxPage = () => {
         setCurrentSection(currentSec);
 
         // 🌿 수풀 확대 체크 - 자동 이동
-        if (isSnapingRef.current) return;
         if (currentSec === 0) {
             const sectionHeight = container.clientHeight * sections[0].height;
             const localScroll = scrollTop;
@@ -212,7 +165,6 @@ const ParallaxPage = () => {
         }
 
         // 🔙 2페이지에서 위로 스크롤 시 1페이지 맨 위로
-        if (isSnapingRef.current) return;
         if (currentSec === 1 && scrollDelta < 0 && !isSnapingRef.current) {
             const section1Start = container.clientHeight * sections[0].height;
             const distanceFromSection1 = Math.abs(scrollTop - section1Start);
@@ -224,7 +176,6 @@ const ParallaxPage = () => {
 
         // 자동 스냅 로직 (민감도 개선)
         const now = Date.now();
-        if (isSnapingRef.current) return;
         if (now - lastScrollTimeRef.current > 100 && !isSnapingRef.current) {
             let accHeight = 0;
             for (let i = 0; i < sections.length; i++) {
@@ -257,9 +208,9 @@ const ParallaxPage = () => {
         const handleScroll = () => {
         lastScrollTimeRef.current = Date.now();
         
-        if (!tickingRef.current) {
-        rafIdRef.current = requestAnimationFrame(updateScroll);
-        tickingRef.current = true;
+        if (!ticking) {
+            rafIdRef.current = requestAnimationFrame(updateScroll);
+            ticking = true;
         }
         };
 
@@ -502,31 +453,22 @@ const ParallaxPage = () => {
                     />
                 ))}
 
-                {/* 🔥 REPLACE THIS BLOCK: 첫 화면 텍스트 (패럴랙스 + 페이드 적용) */}
+                {/* 첫 화면 텍스트 */}
                 {index === 0 && (
                     <div
-                        ref={textRef}
-                        style={{
-                            position: "absolute",
-                            top: "20%",
-                            left: "10%",
-                            textAlign: "left",
-                            color: "white",
-                            zIndex: 10,
-                            // will-change로 브라우저에 최적화 힌트 주기
-                            willChange: "transform, opacity",
-                            // transform/opacity은 상태로 제어
-                            transform: `translateY(${textParallax}px)`,
-                            opacity: textOpacity,
-                            transition: "opacity 120ms linear", // opacity는 부드럽게
-                        }}
+                    style={{
+                        position: "absolute",
+                        top: "20%",
+                        left: "10%",
+                        textAlign: "left",
+                        color: "white",
+                        zIndex: 10,
+                    }}
                     >
-                        <h1 style={{ fontSize: "40px", marginBottom: "20px", lineHeight: 1 }}>{section.title}</h1>
-                        <p style={{ fontSize: "16px", marginTop: 4 }}>{section.subtitle}</p>
+                    <h1 style={{ fontSize: "40px", marginBottom: "20px" }}>{section.title}</h1>
+                    <p style={{ fontSize: "16px" }}>{section.subtitle}</p>
                     </div>
                 )}
-
-
 
                 {/* ⭐ 1번째 페이지 패럴랙스 이미지 */}
                 {index === 0 && section.hasParallax && (
@@ -640,13 +582,216 @@ const ParallaxPage = () => {
                         top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%)",
-                        textAlign: "center",
-                        color: "white",
+                        width: "90%",
+                        maxWidth: "1400px",
                         zIndex: 10,
                     }}
                     >
-                    <h1 style={{ fontSize: "48px" }}>2페이지</h1>
-                    <p style={{ fontSize: "24px" }}>여기에 내용을 추가하세요</p>
+                    {/* 타이틀 */}
+                    <h1 style={{ 
+                        fontSize: "42px", 
+                        color: "white", 
+                        textAlign: "center",
+                        marginBottom: "15px",
+                        fontWeight: "bold",
+                    }}>
+                        🥬 오늘의 식재료 가격
+                    </h1>
+                    <p style={{ 
+                        fontSize: "16px", 
+                        color: "rgba(255,255,255,0.9)", 
+                        textAlign: "center",
+                        marginBottom: "30px" 
+                    }}>
+                        실시간 농산물 가격 정보를 확인하세요
+                    </p>
+
+                    {/* 검색바 */}
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginBottom: "30px",
+                    }}>
+                        <div style={{
+                        position: "relative",
+                        width: "100%",
+                        maxWidth: "500px",
+                        }}>
+                        <input
+                            type="text"
+                            placeholder="식재료 검색 (예: 배추, 무, 대파)"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                            width: "100%",
+                            padding: "15px 50px 15px 20px",
+                            fontSize: "16px",
+                            border: "none",
+                            borderRadius: "30px",
+                            outline: "none",
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                            }}
+                        />
+                        <span style={{
+                            position: "absolute",
+                            right: "20px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            fontSize: "20px",
+                            pointerEvents: "none",
+                        }}>
+                            🔍
+                        </span>
+                        </div>
+                    </div>
+
+                    {/* 가격 정보 카드들 - 가로로 길게 */}
+                    <div style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "15px",
+                        marginBottom: "25px",
+                    }}>
+                        {filteredPriceData.slice(0, 5).map((item, idx) => (
+                        <div
+                            key={item.id}
+                            style={{
+                            background: "white",
+                            borderRadius: "15px",
+                            padding: "20px 30px",
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+                            animation: `slideUp 0.5s ease-out ${idx * 0.1}s both`,
+                            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            }}
+                            onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "translateX(5px)";
+                            e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.25)";
+                            }}
+                            onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateX(0)";
+                            e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.15)";
+                            }}
+                        >
+                            {/* 왼쪽: 식재료 정보 */}
+                            <div style={{ display: "flex", alignItems: "center", gap: "20px", flex: 1 }}>
+                            <div style={{
+                                fontSize: "28px",
+                                fontWeight: "bold",
+                                color: "#67932A",
+                                minWidth: "80px",
+                            }}>
+                                {item.name}
+                            </div>
+                            <div style={{
+                                fontSize: "14px",
+                                color: "#999",
+                                padding: "4px 12px",
+                                background: "#f5f5f5",
+                                borderRadius: "20px",
+                            }}>
+                                {item.unit}
+                            </div>
+                            </div>
+
+                            {/* 중앙: 가격 */}
+                            <div style={{
+                            fontSize: "32px",
+                            fontWeight: "bold",
+                            color: "#333",
+                            minWidth: "150px",
+                            textAlign: "center",
+                            }}>
+                            {item.price}
+                            </div>
+
+                            {/* 오른쪽: 변동률 */}
+                            <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            minWidth: "150px",
+                            justifyContent: "flex-end",
+                            }}>
+                            <span style={{
+                                fontSize: "24px",
+                                fontWeight: "bold",
+                                color: item.change > 0 ? "#d32f2f" : "#1976d2",
+                            }}>
+                                {item.change > 0 ? "▲" : "▼"}
+                            </span>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                                <span style={{
+                                fontSize: "20px",
+                                fontWeight: "bold",
+                                color: item.change > 0 ? "#d32f2f" : "#1976d2",
+                                }}>
+                                {item.change > 0 ? "+" : ""}{item.change}%
+                                </span>
+                                <span style={{
+                                fontSize: "12px",
+                                color: "#999",
+                                }}>
+                                전주 대비
+                                </span>
+                            </div>
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+
+                    {/* 더보기 버튼 */}
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "center",
+                    }}>
+                        <button
+                        onClick={() => {
+                            // 식재료 페이지로 이동하는 로직
+                            // window.location.href = "/ingredients"; // 실제 경로로 변경
+                            alert("식재료 페이지로 이동합니다!");
+                        }}
+                        style={{
+                            padding: "15px 40px",
+                            fontSize: "16px",
+                            fontWeight: "bold",
+                            color: "white",
+                            background: "linear-gradient(135deg, #67932A 0%, #99A237 100%)",
+                            border: "none",
+                            borderRadius: "30px",
+                            cursor: "pointer",
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                            transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.05)";
+                            e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.3)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1)";
+                            e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.2)";
+                        }}
+                        >
+                        더 많은 식재료 보기 →
+                        </button>
+                    </div>
+
+                    {/* 검색 결과 없음 메시지 */}
+                    {searchQuery && filteredPriceData.length === 0 && (
+                        <div style={{
+                        textAlign: "center",
+                        color: "white",
+                        fontSize: "18px",
+                        padding: "40px",
+                        background: "rgba(255,255,255,0.1)",
+                        borderRadius: "15px",
+                        }}>
+                        🔍 "{searchQuery}"에 대한 검색 결과가 없습니다.
+                        </div>
+                    )}
                     </div>
                 )}
 
@@ -871,8 +1016,8 @@ const ParallaxPage = () => {
                     currentSection === index
                         ? "white"
                         : "rgba(255,255,255,0.3)",
-                cursor: "pointer",
-                transition: "0.3s",
+                    cursor: "pointer",
+                    transition: "0.3s",
                 }}
                 onClick={() => snapToSection(index)}
                 />
@@ -881,6 +1026,6 @@ const ParallaxPage = () => {
         </div>
         </>
     );
-};
+    };
 
 export default ParallaxPage;
