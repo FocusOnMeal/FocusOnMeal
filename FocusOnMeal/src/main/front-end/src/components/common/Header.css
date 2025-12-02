@@ -1,8 +1,12 @@
 /* 헤더 전체 영역 (전체 width 유지) */
 .header {
     width: 100%;
-    background-color: #fff;
-    border-bottom: 1px solid #0b7a2a;
+    background-color: transparent !important;  /* 배경 투명 */
+    border-bottom: none !important;           /* 라인 제거 */
+    position: fixed;                           /* (선택사항) 상단 고정 */
+    top: 0;
+    left: 0;
+    z-index: 10000;
 }
 
 /* 내부 정렬 (1920px 박스) */
@@ -59,56 +63,7 @@
 
 /* 호버 */
 .nav-menu a:hover {
-    color: #0b7a2a;
-}
-
-/* 드롭다운 기본 숨김 */
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 30px;
-    left: 55%;
-    transform: translateX(-50%);
-
-    background: white;
-    list-style: none;
-    padding: 10px 0;
-    margin: 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-
-/* 드롭다운 항목 */
-.dropdown-menu li {
-    white-space: nowrap;
-    padding: 10px;
-    text-align: center;
-}
-.dropdown-menu a {
-    white-space: nowrap;
-    padding: 5px;
-    font-size: 15px;  
-    text-align: center; 
-}
-
-.dropdown-menu li:hover {
-    background-color: #f0f8f0;
-}
-
-/* 호버 시 표시 */
-.dropdown:hover .dropdown-menu {
-    display: block;
-}
-
-/* hover 영역 확장 */
-/* navi 랑 top 여백을 여유롭게 주면 hover 가 끊겨서 영역 확장 */
-.dropdown::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 15px; /* hover 유지 여유 공간 */
+    color: #fff;
 }
 
 /* 오른쪽 로그인 영역 */
@@ -130,12 +85,6 @@
     font-size: 13px;
 }
 
-/* 하단 라인 */
-/* .header-line {
-    border-top: 1px solid #0b7a2a;
-    width: 100%;
-    margin-top: 5px;
-} */
 
 /* 알림 벨 래퍼 */
 .notification-bell-wrapper {
@@ -451,4 +400,22 @@
 .admin-clickable:hover {
     text-decoration: underline;
     color: #45a049;
+}
+
+/* 로그아웃 버튼 */
+.logout {
+    padding: 5px 12px;
+    font-size: 12px;
+    background: #e8f5e9;
+    color: #0b7a2a;
+    border: 1px solid #b2dfdb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout:hover {
+    background: #b2dfdb;
+    color: #fff;
+    border-color: #b2dfdb;
 }
