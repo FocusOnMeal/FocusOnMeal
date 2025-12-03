@@ -307,6 +307,7 @@
 .notification-title {
     font-size: 14px;
     margin-bottom: 5px;
+    color: #222;
 }
 
 .notification-title.bold {
