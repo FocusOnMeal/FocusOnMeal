@@ -8,16 +8,17 @@
 
 .container h2 {
     font-weight: 700;
-    font-size: 24px;
+    font-size: 28px;
     margin-bottom: 24px;
     padding-bottom: 0;
     border-bottom: none; 
+    
 }
 
 /* 1. 검색 필터 영역 (컨테이너) */
 .filterSection {
     background-color: white; 
-    border: 1px solid #eee;
+    /* border: 1px solid #eee; */
     border-radius: 12px;
     padding: 24px;
     margin-bottom: 32px;
@@ -72,19 +73,20 @@
 }
 
 .submitButton {
-    background-color: #007aff;
-    color: white;
+    border: 1px solid #67932A;
+    background-color: #67932A;
+    color: #fff;
     padding: 10px 20px;
     font-size: 15px;
     border-radius: 8px;
     cursor: pointer;
-    border: none;
     font-weight: 600;
     transition: all 0.2s;
     height: 40px;
 }
 .submitButton:hover {
-    background-color: #0056b3;
+    background-color: #7AA83A;
+    border-color: #7AA83A;
 }
 
 .resetButton {
@@ -110,7 +112,6 @@
     gap: 10px; 
     padding: 15px 0 0 0; 
     margin-top: 20px;
-    border-top: 1px solid #eee;
     justify-content: center;
 }
 
@@ -129,9 +130,9 @@
 }
 
 .categoryButton.active {
-    background-color: #007aff; 
-    color: white;
-    border-color: #007aff;
+    border: 1px solid #67932A;
+    background-color: #67932A;
+    color: #fff;
 }
 
 /* --- 3. 검색 결과 영역 --- */
@@ -213,7 +214,7 @@
     margin: 0;
 }
 .itemTitleLink:hover .itemTitle {
-    color: #007aff;
+    color: #67932A;
 }
 
 .itemActions {

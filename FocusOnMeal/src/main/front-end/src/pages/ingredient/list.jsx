@@ -6,14 +6,15 @@ import Pagination from '../../components/common/Pagination';
 
 // 카테고리 정의
 const CATEGORIES = [
-  { key: 'grain', name: '곡류', apiName: '식량작물' },
+  { key: 'grain', name: '식량작물', apiName: '식량작물' },
   { key: 'vegetable', name: '채소류', apiName: '채소류' },
-  { key: 'meat', name: '육류', apiName: '육류' },
+  // { key: 'meat', name: '육류', apiName: '육류' },
   { key: 'fruit', name: '과일류', apiName: '과일류' },
-  { key: 'tofu', name: '두류', apiName: '두류' }, 
-  { key: 'dairy', name: '유제품', apiName: '유제품' }, 
+  // { key: 'tofu', name: '두류', apiName: '두류' }, 
+  // { key: 'dairy', name: '유제품', apiName: '유제품' }, 
+  { key: 'special', name: '특용작물', apiName: '특용작물' },
   { key: 'seafood', name: '수산물', apiName: '수산물' },
-  { key: 'seasoning', name: '조미료', apiName: '조미료' }, 
+  // { key: 'seasoning', name: '조미료', apiName: '조미료' }, 
 ];
 
 function IngredientSearch() {
