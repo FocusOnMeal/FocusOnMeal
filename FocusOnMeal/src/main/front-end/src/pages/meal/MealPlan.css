@@ -1,11 +1,19 @@
 /* MealPlan 전용 컨테이너 */
-.container {
+/* .container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 40px;
     background: white;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-family: 'Malgun Gothic', sans-serif;
+} */
+
+.container {
+    max-width: 1200px;
+    margin: 6% auto;
+    padding: 40px;
+    background: white;
     font-family: 'Malgun Gothic', sans-serif;
 }
 
