@@ -48,7 +48,7 @@ const ParallaxPage = () => {
         {
         id: 1,
         title: "Focus on Meal",
-        subtitle: "메인에 들어가는 내용 왼쪽 상단에 들어갈 예정",
+        subtitle: "예산은 가볍게, 식단은 완벽하게 AI로 완성하는 <br> 스마트한 식생활 관리 솔루션, FOM",
         bgColor: "linear-gradient(180deg, #38A7DF 0%, #6AB9E2 100%)",
         height: 1.5, // 패럴랙스 효과를 위한 여유 공간
         hasParallax: true,
@@ -68,30 +68,30 @@ const ParallaxPage = () => {
     ];
 
     /* 💚 첫 장 정적 나뭇잎 - 성능 테스트를 위해 주석처리 */
-    // useEffect(() => {
-    //     const leafColors = ['#F1F7AD', '#B6BE5C', '#99A237'];
+    useEffect(() => {
+        const leafColors = ['#F1F7AD', '#B6BE5C', '#99A237'];
 
-    //     const createStaticLeaves = () => {
-    //     const leafCount = Math.floor(Math.random() * 4) + 4;
-    //     const newLeaves = Array.from({ length: leafCount }, (_, i) => ({
-    //         id: Date.now() + i,
-    //         left: Math.random() * 25,
-    //         top: 10 + Math.random() * 40,
-    //         duration: 5 + Math.random() * 3,
-    //         size: 6 + Math.random() * 4,
-    //         rotation: -15 + Math.random() * 30,
-    //         delay: i * 0.25,
-    //         color: leafColors[Math.floor(Math.random() * leafColors.length)],
-    //     }));
-    //     setStaticLeaves(newLeaves);
-    //     };
+        const createStaticLeaves = () => {
+        const leafCount = Math.floor(Math.random() * 4) + 4;
+        const newLeaves = Array.from({ length: leafCount }, (_, i) => ({
+            id: Date.now() + i,
+            left: Math.random() * 25,
+            top: 10 + Math.random() * 40,
+            duration: 5 + Math.random() * 3,
+            size: 6 + Math.random() * 4,
+            rotation: -15 + Math.random() * 30,
+            delay: i * 0.25,
+            color: leafColors[Math.floor(Math.random() * leafColors.length)],
+        }));
+        setStaticLeaves(newLeaves);
+        };
 
-    //     if (currentSection === 0) {
-    //     createStaticLeaves();
-    //     const interval = setInterval(createStaticLeaves, 8000);
-    //     return () => clearInterval(interval);
-    //     }
-    // }, [currentSection]);
+        if (currentSection === 0) {
+        createStaticLeaves();
+        const interval = setInterval(createStaticLeaves, 8000);
+        return () => clearInterval(interval);
+        }
+    }, [currentSection]);
 
     /* 🎯 자동 스냅 함수 */
     const snapToSection = useCallback((targetSection) => {
@@ -455,7 +455,7 @@ const ParallaxPage = () => {
                     <div
                     style={{
                         position: "absolute",
-                        top: "20%",
+                        top: "30%",
                         left: "10%",
                         textAlign: "left",
                         color: "white",
@@ -463,7 +463,11 @@ const ParallaxPage = () => {
                     }}
                     >
                     <h1 style={{ fontSize: "40px", marginBottom: "20px" }}>{section.title}</h1>
-                    <p style={{ fontSize: "16px" }}>{section.subtitle}</p>
+                    <p 
+                        style={{ fontSize: "20px" }} 
+                        dangerouslySetInnerHTML={{ __html: section.subtitle }} 
+                    />
+
                     </div>
                 )}
 
