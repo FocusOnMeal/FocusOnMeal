@@ -132,6 +132,8 @@
 .listButtonWrapper {
     margin-top: 40px; 
     text-align: right; 
+    justify-content: flex-end;
+    display: flex;
 }
 
 .listBtn {
@@ -143,6 +145,7 @@
     cursor: pointer;
     font-size: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    margin-left: auto;
 }
 
 .listBtn:hover {
