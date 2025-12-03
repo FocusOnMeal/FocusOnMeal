@@ -77,23 +77,72 @@
     color: #0b7a2a;
 }
 
-/* 오른쪽 로그인 영역 */
+/* 1. 사용자 영역 전체 배치 */
 .user-area {
     display: flex;
     align-items: center;
-    gap: 10px;
-    white-space: nowrap;
+    gap: 15px;
+    font-size: 14px; /* 메인 메뉴(17px)보다 작게 설정 */
+    color: #fff;
 }
 
-.user-area a {
-    font-size: 13px;
-    color: #0A3A2B;
-    text-decoration: none;
-}
-
-.slash {
+/* 2. 닉네임 강조 */
+.welcome {
     color: #333;
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+/* 3. 메뉴 아이템 (마이페이지, 로그아웃, 로그인 등) 공통 스타일 */
+.user-menu-item {
+    color: #666;
+    text-decoration: none;
+    font-weight: 400;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
     font-size: 13px;
+    transition: color 0.2s;
+    position: relative;
+}
+
+.user-menu-item:hover {
+    --color: #0b7a2a;
+    text-decoration: underline;
+}
+
+/* 4. 항목 사이에 얇은 구분선 넣기 (슬래시 대체) */
+.user-menu-item:not(:last-child)::after {
+    content: "";
+    
+    display: block;
+    width: 1%;
+    height: 8px;
+    background-color: #ddd;
+    position: absolute;
+    right: -8px; /* 간격 조절 */
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* 메인 페이지용 구분선 (흰색 또는 반투명 흰색) */
+.header.transparent .user-menu-item:not(:last-child)::after {
+    background-color: rgba(255, 255, 255, 0.5); /* 반투명 흰색 */
+}
+
+/* ========================================= */
+/* 2. 메인 페이지 전용 (투명 배경 - 하늘색 배경 위) */
+/* ========================================= */
+/* .header에 transparent 클래스가 있을 때만 적용됨 */
+
+.header.transparent .user-menu-item {
+    color: #f9fdfe; /* 흰색 텍스트 */
+}
+
+.header.transparent .user-menu-item:hover {
+    color: #fff; /* 호버 시 더 밝은 흰색 */
+    text-decoration: underline;
 }
 
 
@@ -110,6 +159,7 @@
     cursor: pointer;
     position: relative;
     padding: 5px;
+    margin-top: 6px;
 }
 
 /* 읽지 않은 알림 빨간 점 */

@@ -411,15 +411,13 @@ const Header = () => {
                                     </div>
                                 )}
                             </div>
-                            <Link to="/mypage" className="mypage">마이페이지</Link>
-                            <span className="slash">/</span>
-                            <button onClick={handleLogout} className="logout">로그아웃</button>
+                            <Link to="/mypage" className="user-menu-item">마이페이지</Link>
+                            <button onClick={handleLogout} className="user-menu-item logout-btn">로그아웃</button>
                         </>
                     ) : (
                         <>
-                            <Link to="/member/login" className="login">로그인</Link>
-                            <span className="slash">/</span>
-                            <Link to="/member/form" className="form">회원가입</Link>
+                            <Link to="/member/login" className="user-menu-item">로그인</Link>
+                            <Link to="/member/form" className="user-menu-item">회원가입</Link>
                         </>
                     )}
                 </div>
