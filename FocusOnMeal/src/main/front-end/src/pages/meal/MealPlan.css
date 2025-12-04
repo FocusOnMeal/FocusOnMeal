@@ -83,31 +83,114 @@
     font-weight: bold;
 }
 
+/* 전체 그리드 */
 .allergy-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 12px;
 }
 
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
+/* 체크박스 숨김 */
 .checkbox-item input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
+/* 라벨 (버튼) 디자인 */
 .checkbox-item label {
-    font-size: 14px;
+    display: inline-flex;          /* Flex로 변경 (아이콘 정렬 위해) */
+    align-items: center;
+    padding: 10px 20px;            /* 크기 살짝 키움 */
+    background-color: white;
+    border: 1px solid #e0e0e0;     /* 테두리 연하게 */
+    border-radius: 30px;           /* 완전 둥근 형태 */
     color: #555;
+    font-size: 15px;
+    font-weight: 600;              /* 글자 좀 더 진하게 */
     cursor: pointer;
-    margin: 0;
-    font-weight: normal;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 부드러운 탄성 효과 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 기본 옅은 그림자 */
+    user-select: none;
 }
+
+/* 호버 효과 */
+.checkbox-item label:hover {
+    background-color: #f9f9f9;
+    transform: translateY(-2px);   /* 살짝 떠오름 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* --- 선택되었을 때 (:checked) --- */
+.checkbox-item input[type="checkbox"]:checked + label {
+    background-color: #67932A;     /* 테마 컬러 */
+    color: white;
+    border-color: #67932A;
+    padding-left: 15px;            /* 아이콘 공간 확보를 위해 패딩 조정 */
+    padding-right: 20px;
+    box-shadow: 0 4px 12px rgba(103, 147, 42, 0.4); /* 초록색 그림자 */
+    transform: translateY(-1px);
+}
+
+/* 가상 요소로 체크 아이콘(✓) 만들기 */
+.checkbox-item input[type="checkbox"]:checked + label::before {
+    content: '✔';
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 12px;
+    animation: scaleIn 0.3s ease; /* 아이콘 등장 애니메이션 */
+}
+
+/* 아이콘 뿅! 하고 나타나는 애니메이션 */
+@keyframes scaleIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.allergy-section {
+    background: #ffffff;
+    /* 부드러운 회색 테두리 */
+    border: 1px solid #eaeaea;
+    border-radius: 16px;
+    padding: 30px;
+    
+    /* 카드 그림자 (띄워진 느낌) */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); 
+    
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 상단 장식바 (선택사항: 디자인 포인트) */
+.allergy-section::top {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #67932A, #99A237);
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.sub-text {
+    font-size: 13px;
+    color: #888;
+}
+
 
 .main-content {
     display: flex;
@@ -127,7 +210,7 @@
     margin-bottom: 15px;
     color: #333;
 }
-
+/*
 .chat-box {
     flex: 1;
     background: linear-gradient(180deg, #67932A 0%, #99A237 100%);
@@ -144,6 +227,114 @@
     position: relative;
     box-shadow: 0 4px 15px rgba(103, 147, 42, 0.4);
 }
+*/
+/* 채크무늬 */
+.chat-box {
+    flex: 1;
+    /* 베이스 컬러 */
+    /* background-color: #bcdf88;  */
+    background-color: #67932A; 
+    
+    /* 체크무늬 패턴 (투명도 조절로 은은하게) */
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+        linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        
+    background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+    
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 550px;
+    max-height: 550px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(103, 147, 42, 0.4);
+    overflow: hidden;
+}
+
+/* 로딩 로봇 화면 */
+/* 로딩 컨테이너 위치 잡기 */
+.loading.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+    height: 100%;
+}
+
+/* 1. 로봇 몸체 둥둥 떠다니기 */
+.robot-body {
+    animation: robotBounce 1.5s ease-in-out infinite;
+}
+
+@keyframes robotBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* 2. 바닥 그림자 (몸체가 올라갈 때 작아짐) */
+.robot-shadow {
+    animation: shadowScale 1.5s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes shadowScale {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(0.8); opacity: 0.3; }
+}
+
+/* 3. 눈 깜빡임 (가끔씩 깜빡임) */
+.robot-eyes {
+    animation: eyeBlink 3s infinite;
+    transform-origin: center;
+}
+
+@keyframes eyeBlink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+}
+
+/* 4. 안테나 불빛 깜빡임 */
+.robot-antenna-light {
+    animation: lightPulse 1s infinite alternate;
+}
+
+@keyframes lightPulse {
+    from { fill: #ff6b6b; }
+    to { fill: #ffcccb; }
+}
+
+/* 텍스트 스타일링 */
+.loading-text {
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #67932A;
+    font-family: 'Malgun Gothic', sans-serif;
+}
+
+/* 점 3개 애니메이션 (...) */
+.dots {
+    display: inline-block;
+    width: 20px;
+    animation: dotTyping 1.5s steps(4, end) infinite;
+    overflow: hidden;
+    vertical-align: bottom;
+    white-space: nowrap;
+}
+
+@keyframes dotTyping {
+    0% { content: ''; width: 0; }
+    25% { content: '.'; width: 5px; }
+    50% { content: '..'; width: 10px; }
+    75% { content: '...'; width: 15px; }
+    100% { content: ''; width: 0; }
+} /*로봇끝*/
 
 .chat-messages {
     width: 100%;

@@ -395,10 +395,42 @@ const MealPlan = () => {
                         <div className="result-box" ref={resultBoxRef}>
                             {loading && (
                                 <div className="loading active">
-                                    <div className="spinner"></div>
-                                    <p>AI가 맞춤 식단을 생성하고 있습니다...</p>
+                                    <div className="robot-loader">
+                                        <svg width="100" height="100" viewBox="0 0 100 100">
+                                            {/* JSX에서는 class 대신 className 사용 */}
+                                            <ellipse className="robot-shadow" cx="50" cy="90" rx="20" ry="4" fill="#ddd" />
+                                            
+                                            <g className="robot-body">
+                                                {/* JSX에서는 stroke-width 대신 strokeWidth 사용 */}
+                                                <path d="M30 35 C30 10, 70 10, 70 35 Z" fill="#fff" stroke="#67932A" strokeWidth="2"/>
+                                                <line x1="30" y1="35" x2="70" y2="35" stroke="#67932A" strokeWidth="2"/>
+                                                
+                                                <rect x="30" y="35" width="40" height="35" rx="5" fill="#fff" stroke="#67932A" strokeWidth="2"/>
+                                                
+                                                <g className="robot-eyes">
+                                                    <circle cx="43" cy="50" r="3" fill="#333"/>
+                                                    <circle cx="57" cy="50" r="3" fill="#333"/>
+                                                </g>
+                                                
+                                                {/* strokeLinecap 처럼 카멜케이스 적용됨 */}
+                                                <path d="M45 60 Q50 63 55 60" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round"/>
+                                                
+                                                <rect x="25" y="45" width="5" height="10" rx="2" fill="#99A237"/>
+                                                <rect x="70" y="45" width="5" height="10" rx="2" fill="#99A237"/>
+                                                
+                                                <line x1="50" y1="35" x2="50" y2="25" stroke="#67932A" strokeWidth="2"/>
+                                                <circle cx="50" cy="22" r="3" fill="#ff6b6b" className="robot-antenna-light"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    
+                                    <p className="loading-text">
+                                        AI 셰프가 식단을 요리 중입니다
+                                        <span className="dots">...</span>
+                                    </p>
                                 </div>
                             )}
+    
 
                             <div className={`meal-plan ${mealPlans.length > 0 ? 'active' : ''}`}>
                                 {mealPlans.map((mealPlan, index) => (
