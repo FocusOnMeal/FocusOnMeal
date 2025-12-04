@@ -408,6 +408,7 @@
     position: relative;
     box-shadow: 0 4px 15px rgba(103, 147, 42, 0.4);
     overflow: hidden;
+    justify-content: space-between; /* 내용이 없어도 입력창을 바닥으로 밀어냄 */
 }
 
 /* 로딩 로봇 화면 */
@@ -561,16 +562,28 @@
 }
 
 .chat-input-area {
-    width: 100%;
+    /* width: 100%;
     display: flex;
     gap: 10px;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.2); */
+    width: 100%;
+    margin-top: auto; /* 위쪽 여백을 다 차지해서 바닥으로 붙음 */
+    padding-top: 20px; /* 메시지와 간격 */
+    
+    /* 기존 글래스모피즘(배경, 테두리, 블러) 모두 제거 */
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    border-radius: 0;
+    
+    display: flex;
+    gap: 10px;
 }
 
 .chat-input {
-    flex: 1;
+    /* flex: 1;
     padding: 12px 18px;
     border: none;
     border-radius: 25px;
@@ -578,12 +591,29 @@
     background: rgba(255, 255, 255, 0.95);
     color: #333;
     outline: none;
+    transition: all 0.3s; */
+    flex: 1;
+    padding: 10px 25px; /* 내부 여백 넉넉하게 */
+    
+    /* 여기서 글래스 효과 적용 */
+    background: rgba(255, 255, 255, 0.85); /* 투명도를 낮춰서(더 진하게) 그리드 간섭 줄임 */
+    backdrop-filter: blur(12px);          /* 블러 효과 */
+    border: 1px solid rgba(255, 255, 255, 0.6); /* 테두리 */
+    
+    border-radius: 50px; /* 완전 둥근 캡슐 모양 */
+    font-size: 15px;
+    color: #333;
+    outline: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 */
     transition: all 0.3s;
 }
 
 .chat-input:focus {
-    background: white;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    /* background: white;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3); */
+    background: #ffffff; /* 입력 중엔 완전 흰색 */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px); /* 살짝 떠오름 */
 }
 
 .chat-input::placeholder {
@@ -591,11 +621,13 @@
 }
 
 .chat-send-btn {
-    padding: 12px 24px;
+    /* padding: 12px 24px;
+    border-radius: 25px; */
+    border-radius: 50px; /* 입력창과 맞춤 */
+    padding: 0 24px;     /* 가로 크기 확보 */
     background: #F1F7AD;
     color: #67932A;
     border: none;
-    border-radius: 25px;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
@@ -1191,19 +1223,39 @@
 }
 
 .ingredients-list {
-    list-style: none;
+    /* list-style: none;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px; */
+    list-style: none;
+    padding: 0;
+    display: flex;       /* Grid 대신 Flex로 변경하여 자연스럽게 */
+    flex-wrap: wrap;     /* 줄바꿈 */
     gap: 8px;
 }
 
 .ingredients-list li {
-    padding: 8px 12px;
+    /* padding: 8px 12px;
     background: #f5f5f5;
     border-radius: 6px;
     font-size: 14px;
+    color: #555; */
+    padding: 6px 14px;
+    background: #f0f7e6; /* 아주 연한 초록 배경 */
+    border: 1px solid #dcebc4;
+    border-radius: 20px; /* 캡슐 모양 */
+    font-size: 13px;
     color: #555;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+/* 마우스 올리면 반응 */
+.ingredients-list li:hover {
+    background: #67932A;
+    color: white;
+    border-color: #67932A;
+    transform: scale(1.05);
 }
 
 .meal-card-buttons {
@@ -1336,4 +1388,37 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+
+/* 전체 스크롤바 디자인 통일 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+    transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #99A237; /* 마우스 올리면 진한 색으로 */
+}
+
+/* 채팅창 내부는 조금 더 얇게 */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4); /* 채팅 배경에 어울리는 반투명 */
+}
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.7);
 }
