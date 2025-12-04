@@ -128,7 +128,6 @@ const ParallaxPage = () => {
 
         const updateScroll = () => {
         const scrollTop = container.scrollTop;
-        const scrollDelta = scrollTop - lastScrollTopRef.current;
         lastScrollTopRef.current = scrollTop;
         
         // 현재 섹션 계산
@@ -137,27 +136,15 @@ const ParallaxPage = () => {
         for (let i = 0; i < sections.length; i++) {
             const sectionHeight = container.clientHeight * sections[i].height;
             if (scrollTop < accumulatedHeight + sectionHeight) {
-            currentSec = i;
-            break;
+                currentSec = i;
+                break;
             }
             accumulatedHeight += sectionHeight;
         }
         setCurrentSection(currentSec);
 
-        // 🌿 수풀 확대 체크 - 자동 이동 (더 빠르게)
-        if (currentSec === 0 && !isSnapingRef.current) {
-            const sectionHeight = container.clientHeight * sections[0].height;
-            const localScroll = scrollTop;
-            const scale = 1 + (localScroll / sectionHeight) * 1.0;
-            
-            // 스케일 1.7부터 자동 이동 (더 빠르게)
-            if (scale >= 1.7) {
-            snapToSection(1);
-            }
-        }
-
         ticking = false;
-        };
+    };
 
         const handleScroll = () => {
         lastScrollTimeRef.current = Date.now();
@@ -168,45 +155,46 @@ const ParallaxPage = () => {
         }
         };
 
-        // 🎯 휠 이벤트로 페이지 전환
+        // 🎯 휠 이벤트 - 부드럽고 자연스럽게 개선
+        let wheelTimeout = null;
+        let accumulatedDelta = 0;
+        const WHEEL_THRESHOLD = 100;
+
         const handleWheel = (e) => {
-        if (isSnapingRef.current || isTransitioning) return;
-
-        const container = containerRef.current;
-        if (!container) return;
-
-        // 1페이지: 패럴랙스 효과를 위해 자연스럽게 스크롤 허용
-        // 단, 일정 이상 스크롤되면 2페이지로 스냅
-        if (currentSection === 0) {
-            // 아래로 스크롤할 때만 체크
-            if (e.deltaY > 0) {
-            const scrollTop = container.scrollTop;
-            const sectionHeight = container.clientHeight * sections[0].height;
-            const scrollProgress = scrollTop / sectionHeight;
-
-            // 30% 이상 스크롤되면 2페이지로 (풀숲 효과 후)
-            if (scrollProgress > 0.3) {
-                e.preventDefault();
-                snapToSection(1);
+            // ⭐ 첫 페이지에서는 자유 스크롤 허용 (패럴랙스 효과 활성화)
+            if (currentSection === 0 && !isSnapingRef.current) {
+                // 자연스러운 스크롤 허용 - preventDefault 하지 않음
+                return;
             }
-            }
-            return; // 1페이지에서는 자연스러운 스크롤 허용
-        }
 
-        // 2페이지, 3페이지: 휠 시 바로 페이지 전환
-        e.preventDefault();
-
-        if (e.deltaY > 0) {
-            // 아래로 스크롤 → 다음 페이지
-            if (currentSection < sections.length - 1) {
-            snapToSection(currentSection + 1);
-            }
-        } else {
-            // 위로 스크롤 → 이전 페이지
+            // 2, 3페이지에서만 페이지 스냅 적용
             if (currentSection > 0) {
-            snapToSection(currentSection - 1);
+                e.preventDefault();
+                
+                if (isSnapingRef.current || isTransitioning) return;
+
+                accumulatedDelta += e.deltaY;
+
+                clearTimeout(wheelTimeout);
+                wheelTimeout = setTimeout(() => {
+                    accumulatedDelta = 0;
+                }, 150);
+
+                if (Math.abs(accumulatedDelta) >= WHEEL_THRESHOLD) {
+                    if (accumulatedDelta > 0) {
+                        // 아래로 스크롤
+                        if (currentSection < sections.length - 1) {
+                            snapToSection(currentSection + 1);
+                        }
+                    } else {
+                        // 위로 스크롤 → 이전 페이지
+                        if (currentSection > 0) {
+                            snapToSection(currentSection - 1);
+                        }
+                    }
+                    accumulatedDelta = 0;
+                }
             }
-        }
         };
 
         container.addEventListener("scroll", handleScroll, { passive: true });
@@ -218,6 +206,7 @@ const ParallaxPage = () => {
         if (rafIdRef.current) {
             cancelAnimationFrame(rafIdRef.current);
         }
+            clearTimeout(wheelTimeout);
         };
     }, [sections, snapToSection, currentSection, isTransitioning]);
 
@@ -284,6 +273,18 @@ const ParallaxPage = () => {
 
     /* 🖼️ 1번째 섹션 패럴랙스 계산 - GPU 가속 */
     const getParallaxTransform = useCallback((speed, initialOffset = 0, shouldScale = false) => {
+
+        // ⭐ 첫 페이지가 아니면 패럴랙스 효과 비활성화
+        if (currentSection !== 0) {
+            return {
+                transform: shouldScale
+                    ? `translate3d(0, ${initialOffset}px, 0) scale(1)`
+                    : `translate3d(0, ${initialOffset}px, 0)`,
+                opacity: 0,
+                pointerEvents: 'none',
+            };
+        }
+        
         const container = containerRef.current;
         if (!container) return {};
 
@@ -291,11 +292,13 @@ const ParallaxPage = () => {
         const sectionHeight = container.clientHeight * sections[0].height;
         const localScroll = container.scrollTop - sectionTop;
 
+
         if (localScroll < 0) {
         return {
             transform: shouldScale
             ? `translate3d(0, ${initialOffset}px, 0) scale(1)`
             : `translate3d(0, ${initialOffset}px, 0)`,
+            opacity: 1,
             // willChange: "transform", // 성능 테스트를 위해 주석처리
         };
         }
@@ -315,12 +318,14 @@ const ParallaxPage = () => {
         const scale = 1 + (localScroll / sectionHeight) * 1.0;
         return {
             transform: `translate3d(0, ${translateY}px, 0) scale(${scale})`,
+            opacity: 1,
             // willChange: "transform", // 성능 테스트를 위해 주석처리
         };
         }
 
         return {
         transform: `translate3d(0, ${translateY}px, 0)`,
+        opacity: 1,
         // willChange: "transform", // 성능 테스트를 위해 주석처리
         };
     }, [sections]);
@@ -487,7 +492,7 @@ const ParallaxPage = () => {
                         }}
                     />
 
-                    {/* ☁ 구름 */}
+                    {/* ☁ 구름 - 가장 느리게 */}
                     <img
                         src={cloudImg}
                         alt="cloud"
@@ -501,10 +506,11 @@ const ParallaxPage = () => {
                         objectFit: "cover",
                         ...getParallaxTransform(0.2, 100, false),
                         zIndex: 1,
+                        transition: 'opacity 0.3s ease',
                         }}
                     />
 
-                    {/* 🏔 산 */}
+                    {/* 🏔 산 - 중간 속도 */}
                     <img
                         src={mountainImg}
                         alt="mountain"
@@ -518,10 +524,11 @@ const ParallaxPage = () => {
                         objectFit: "cover",
                         ...getParallaxTransform(0.45, 250, false),
                         zIndex: 2,
+                        transition: 'opacity 0.3s ease',
                         }}
                     />
 
-                    {/* 🌾 밀밭 */}
+                    {/* 🌾 밀밭 - 빠른 속도 */}
                     <img
                         src={cornImg}
                         alt="cornfield"
@@ -533,12 +540,13 @@ const ParallaxPage = () => {
                         height: "auto",
                         minHeight: "120vh",
                         objectFit: "cover",
-                        ...getParallaxTransform(0.65, 350, false),
+                        ...getParallaxTransform(0.7, 350, false),  // ⭐ 0.65 → 0.7 (잔디랑 차이)
                         zIndex: 3,
+                        transition: 'opacity 0.3s ease',
                         }}
                     />
 
-                    {/* 🌱 잔디 */}
+                    {/* 🌱 잔디 - 매우 빠른 속도 */}
                     <img
                         src={grassImg}
                         alt="grass"
@@ -550,12 +558,13 @@ const ParallaxPage = () => {
                         height: "auto",
                         minHeight: "120vh",
                         objectFit: "cover",
-                        ...getParallaxTransform(0.85, 450, false),
+                        ...getParallaxTransform(0.9, 450, false),  // ⭐ 0.85 → 0.9 (차이 증가)
                         zIndex: 4,
+                        transition: 'opacity 0.3s ease',
                         }}
                     />
 
-                    {/* 🌿 수풀 - 확대 효과 */}
+                    {/* 🌿 수풀 - 가장 빠르게 + 확대 효과 */}
                     <img
                         src={bushImg}
                         alt="bush"
@@ -570,6 +579,7 @@ const ParallaxPage = () => {
                         transformOrigin: "center bottom",
                         ...getParallaxTransform(1.0, 550, true),
                         zIndex: 5,
+                        transition: 'opacity 0.3s ease, transform 0.1s ease-out',  // ⭐ transform transition 추가
                         }}
                     />
                     </>
