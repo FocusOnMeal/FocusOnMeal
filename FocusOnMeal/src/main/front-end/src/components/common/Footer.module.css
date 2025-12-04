@@ -11,9 +11,10 @@
     margin: 0 auto;
 }
 
+/* ------------------------------------------- */
 .topSection {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: flex-start;
     margin-bottom: 50px;
     flex-wrap: wrap;
@@ -24,7 +25,10 @@
 
 .messageBox {
     margin-top: 5px;
+    flex-basis: auto; 
+    max-width: none; 
 }
+/* ------------------------------------------- */
 
 .messageTitle {
     font-size: 28px;
@@ -34,13 +38,22 @@
     line-height: 1.4;
 }
 
+/* ------------------------------------------- */
+/* 🚀 최종 수정된 부분: snsContainer - .rightSection의 최종 시작점에 맞추기 */
 .snsContainer {
     display: flex;
     gap: 50px;
     align-items: center;
     margin-top: 5px;
-    margin-right: 48px;
+    
+    /* (로고 150px) + (갭 60px) + (추가 마진 200px) = 410px */
+    /* .rightSection에 적용할 마진(200px)을 여기에 추가하여 정렬선을 일치시킵니다. */
+    margin-left: calc(150px + 60px + 200px); 
+    
+    margin-right: 0; 
+    flex-shrink: 0; 
 }
+/* ------------------------------------------- */
 
 .snsLink {
     display: flex;
@@ -108,13 +121,17 @@
     font-size: 40px;
 }
 
+/* ------------------------------------------- */
+/* 🚀 최종 수정된 부분: rightSection - 200px 추가 마진 적용 */
 .rightSection {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin-left: 200px;
+    /* 주소지 부분을 오른쪽으로 200px 더 밀어냅니다. */
+    margin-left: 200px; 
 }
+/* ------------------------------------------- */
 
 .menuLinks {
     display: flex;
