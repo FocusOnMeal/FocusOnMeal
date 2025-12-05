@@ -9,7 +9,7 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(11, 122, 42, 0.2); /* 경계선도 연하게 */
-    z-index: 10000;
+    z-index: 9998;
     position: sticky; /* 상단 고정 (스크롤 시 따라옴) */
     top: 0;
     transition: all 0.3s ease;
