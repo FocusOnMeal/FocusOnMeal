@@ -35,6 +35,11 @@
     display: flex;
     align-items: center;
     margin:0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* 텐션 있는 움직임 */
+}
+
+.logo-img:hover {
+    transform: scale(1.05) rotate(-2deg); /* 살짝 커지면서 기울기 */
 }
 
 .logo-img {
