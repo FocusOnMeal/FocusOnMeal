@@ -1,0 +1,209 @@
+/* 전체 컨테이너 */
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-family: 'Malgun Gothic', sans-serif;
+    padding: 20px;
+}
+
+/* 메인 카드 */
+.card {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    border-radius: 20px;
+    padding: 50px 40px;
+    animation: slideUp 0.5s ease;
+    border: 1px solid #e0e0e0;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 헤더 */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+    background: linear-gradient(135deg, #67932A 0%, #99A237 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* 약관동의 섹션 */
+.agreementSection {
+    margin-bottom: 30px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 8px 0;
+}
+
+.sectionDescription {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+/* 전체 동의 박스 */
+.allAgreeBox {
+    background: #f0f7e6;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #e0e0e0;
+}
+
+.allAgreeLabel {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 0;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-right: 12px;
+    accent-color: #67932A;
+}
+
+.allAgreeText {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 구분선 */
+.divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 20px 0;
+}
+
+/* 개별 약관 영역 */
+.individualAgreements {
+    margin-bottom: 30px;
+}
+
+.agreementItem {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.agreementItem:last-child {
+    border-bottom: none;
+}
+
+.agreementLabel {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1;
+    margin: 0;
+}
+
+.requiredBadge {
+    color: #67932A;
+    font-weight: 600;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.agreementButton {
+    background: none;
+    border: none;
+    color: #333;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.agreementButton:hover {
+    color: #67932A;
+}
+
+.agreementText {
+    color: #333;
+    margin-left: 4px;
+}
+
+/* 다음 버튼 */
+.nextButton {
+    width: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.nextButton.enabled {
+    background: #67932A;
+    box-shadow: 0 4px 15px rgba(153, 162, 55, 0.4);
+}
+
+.nextButton.enabled:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(153, 162, 55, 0.5);
+}
+
+.nextButton.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 640px) {
+    .card {
+        padding: 40px 30px;
+    }
+
+    .title {
+        font-size: 28px;
+    }
+
+    .sectionTitle {
+        font-size: 16px;
+    }
+
+    .allAgreeText {
+        font-size: 16px;
+    }
+
+    .nextButton {
+        font-size: 16px;
+        padding: 14px;
+    }
+}
