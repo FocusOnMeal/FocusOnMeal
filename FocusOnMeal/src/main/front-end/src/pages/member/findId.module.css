@@ -15,7 +15,7 @@
     width: 100%;
     background-color: white;
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid #e0e0e0;
     padding: 50px 40px;
     animation: slideUp 0.5s ease;
 }
@@ -40,10 +40,7 @@
 .title {
     font-size: 32px;
     font-weight: bold;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #67932A;
     margin: 0 0 10px 0;
 }
 
@@ -100,9 +97,9 @@
 
 .input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #67932A;
     background-color: white;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(103, 147, 42, 0.1);
 }
 
 .input.error {
@@ -119,7 +116,7 @@
 .submitButton {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #67932A;
     color: white;
     border: none;
     border-radius: 10px;
@@ -127,13 +124,14 @@
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgba(153, 162, 55, 0.4);
     margin-top: 10px;
 }
 
 .submitButton:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 20px rgba(153, 162, 55, 0.5);
+    background: #587b24;
 }
 
 .submitButton:disabled {
@@ -158,10 +156,26 @@
     cursor: pointer;
     text-decoration: none;
     transition: color 0.3s ease;
+    position: relative;
+}
+
+.footerLink::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #67932A;
+    transition: width 0.3s ease;
 }
 
 .footerLink:hover {
-    color: #667eea;
+    color: #67932A;
+}
+
+.footerLink:hover::after {
+    width: 100%;
 }
 
 .divider {
@@ -174,20 +188,120 @@
     padding: 20px;
 }
 
+/* 성공 아이콘 */
+.successIcon {
+    width: 80px;
+    height: 80px;
+    background: #67932A;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    animation: scaleIn 0.5s ease;
+}
+
+.successIcon::after {
+    content: '✉';
+    color: white;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 .successTitle {
     font-size: 32px;
     font-weight: bold;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #333;
     margin-bottom: 8px;
 }
 
 .successMessage {
-    color: #667eea;
+    color: #666;
     font-size: 16px;
     margin: 0 0 30px 0;
+}
+
+.successMessage strong {
+    color: #67932A;
+    font-weight: 700;
+}
+
+/* 아이디 결과 카드 */
+.resultCard {
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0 30px;
+}
+
+.resultLabel {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.resultId {
+    font-size: 24px;
+    font-weight: bold;
+    color: #67932A;
+    word-break: break-all;
+}
+
+/* 버튼 그룹 */
+.buttonGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.primaryButton {
+    width: 100%;
+    padding: 16px;
+    background: #67932A;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(153, 162, 55, 0.4);
+}
+
+.primaryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(153, 162, 55, 0.5);
+    background: #587b24;
+}
+
+.secondaryButton {
+    width: 100%;
+    padding: 16px;
+    background: white;
+    color: #67932A;
+    border: 2px solid #67932A;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.secondaryButton:hover {
+    background: #f0f7e6;
+    transform: translateY(-2px);
 }
 
 /* 반응형 디자인 */
@@ -209,7 +323,9 @@
         padding: 13px 18px;
     }
 
-    .submitButton {
+    .submitButton,
+    .primaryButton,
+    .secondaryButton {
         font-size: 16px;
         padding: 14px;
     }
@@ -217,5 +333,18 @@
     .footer {
         gap: 15px;
         font-size: 13px;
+    }
+
+    .successIcon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .successIcon::after {
+        font-size: 36px;
+    }
+
+    .resultId {
+        font-size: 20px;
     }
 }
