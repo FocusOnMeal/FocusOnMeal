@@ -303,11 +303,11 @@ const MealPlan = () => {
         <div>
             <div className="container">
                 <div className="page-header-center">
-                <div className="page-title-wrapper">
-                <div className="page-title">
-                    <h1>맞춤 식단 추천</h1>
-                </div>
-                </div>
+                    <div className="page-title-wrapper">
+                        <div className="page-title">
+                            <h1>맞춤 식단 추천</h1>
+                        </div>
+                    </div>
                 </div>
                 {/* <div className="divider">🌱</div> */}
                 {/* <div className="hr-wave"></div> */}
