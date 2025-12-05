@@ -6,13 +6,12 @@ import styles from './Join.module.css';
 
 // 이메일 도메인 목록
 const emailDomains = [
-    "선택",
+    "직접입력",
     "naver.com",
     "gmail.com",
     "daum.net",
     "hanmail.net",
-    "nate.com",
-    "직접입력"
+    "nate.com"
 ];
 
 function Join() {
@@ -26,13 +25,12 @@ function Join() {
         memberName: '',
         phone: '',
         emailId: '',
-        emailDomain: emailDomains[0],
-        customDomain: '',
+        emailDomain: '', // 수정: 도메인 입력값 (선택값 or 직접입력값 모두 여기 저장)
         gender: 'M'
     });
     
     // UI 상태
-    const [selectedDomain, setSelectedDomain] = useState(emailDomains[0]);
+    // selectedDomain 상태 제거 -> formData.emailDomain으로 통합 관리
     const [generatedNickname, setGeneratedNickname] = useState('');
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -48,7 +46,7 @@ function Join() {
     const [verificationSent, setVerificationSent] = useState(false);
     const [verificationTimer, setVerificationTimer] = useState(0);
     
-    const isCustomDomain = selectedDomain === "직접입력";
+    // isCustomDomain 변수 제거 (입력창이 항상 활성화되므로 불필요)
     
     // ============ 랜덤 닉네임 생성 로직 (기존 코드 그대로) ============
     
@@ -216,7 +214,7 @@ function Join() {
         if (/[a-z]/.test(password)) strength++;
         if (/[A-Z]/.test(password)) strength++;
         if (/\d/.test(password)) strength++;
-        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) strength++;
+        if (/[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(password)) strength++;
         
         setPasswordStrength(Math.min(strength, 5));
     }, [formData.memberPw]);
@@ -278,6 +276,19 @@ function Join() {
             }));
         }
     };
+
+    // ============ [추가] 도메인 선택 핸들러 ============
+    const handleDomainSelect = (e) => {
+        const value = e.target.value;
+        
+        if (value === "직접입력" || value === "선택") {
+            // 직접입력이거나 선택일 경우 도메인 입력칸을 비움
+            setFormData(prev => ({ ...prev, emailDomain: '' }));
+        } else {
+            // 도메인 목록에서 선택 시 자동으로 입력칸에 채움
+            setFormData(prev => ({ ...prev, emailDomain: value }));
+        }
+    };
     
     // ============ 아이디 중복 확인 ============
     const handleCheckId = async () => {
@@ -311,22 +322,16 @@ function Join() {
     
     // ============ 이메일 인증 코드 발송 ============
     const handleSendVerificationCode = async () => {
-        const email = selectedDomain === "직접입력" 
-            ? `${formData.emailId}@${formData.customDomain}`
-            : `${formData.emailId}@${selectedDomain}`;
+        // 수정: emailDomain 필드를 바로 사용
+        const email = `${formData.emailId}@${formData.emailDomain}`;
         
         if (!formData.emailId) {
             setErrors(prev => ({ ...prev, email: '이메일을 입력해주세요.' }));
             return;
         }
         
-        if (selectedDomain === "선택") {
-            setErrors(prev => ({ ...prev, email: '이메일 도메인을 선택해주세요.' }));
-            return;
-        }
-        
-        if (selectedDomain === "직접입력" && !formData.customDomain) {
-            setErrors(prev => ({ ...prev, email: '이메일 도메인을 입력해주세요.' }));
+        if (!formData.emailDomain) {
+            setErrors(prev => ({ ...prev, email: '이메일 도메인을 입력하거나 선택해주세요.' }));
             return;
         }
         
@@ -352,9 +357,8 @@ function Join() {
     
     // ============ 이메일 인증 코드 확인 ============
     const handleVerifyCode = async () => {
-        const email = selectedDomain === "직접입력" 
-            ? `${formData.emailId}@${formData.customDomain}`
-            : `${formData.emailId}@${selectedDomain}`;
+        // 수정: emailDomain 필드를 바로 사용
+        const email = `${formData.emailId}@${formData.emailDomain}`;
         
         if (!emailVerificationCode) {
             alert('인증 코드를 입력해주세요.');
@@ -401,7 +405,7 @@ function Join() {
             newErrors.memberPw = '비밀번호는 8자 이상이어야 합니다.';
         } else {
             const hasDigit = /\d/.test(formData.memberPw);
-            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.memberPw);
+            const hasSpecial = /[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(formData.memberPw);
             
             if (!hasDigit || !hasSpecial) {
                 newErrors.memberPw = '비밀번호는 숫자와 특수문자를 포함해야 합니다.';
@@ -428,8 +432,8 @@ function Join() {
         }
         
         // 이메일
-        if (!formData.emailId) {
-            newErrors.email = '이메일을 입력해주세요.';
+        if (!formData.emailId || !formData.emailDomain) {
+            newErrors.email = '이메일을 완성해주세요.';
         } else if (!emailVerified) {
             newErrors.email = '이메일 인증이 필요합니다.';
         }
@@ -447,9 +451,8 @@ function Join() {
             return;
         }
         
-        const email = selectedDomain === "직접입력" 
-            ? `${formData.emailId}@${formData.customDomain}`
-            : `${formData.emailId}@${selectedDomain}`;
+        // 수정: emailDomain 필드를 바로 사용
+        const email = `${formData.emailId}@${formData.emailDomain}`;
         
         const memberData = {
             memberId: formData.memberId,
@@ -641,7 +644,7 @@ function Join() {
                         )}
                     </div>
                     
-                    {/* 6. 이메일 + 인증 */}
+                    {/* 6. 이메일 + 인증 (수정됨: input, input, select 구조) */}
                     <div className={styles.formGroup}>
                         <label className={styles.label}>
                             이메일 <span className={styles.required}>*</span>
@@ -657,27 +660,29 @@ function Join() {
                                 className={`${styles.input} ${styles.flexGrow}`}
                             />
                             <span className={styles.separator}>@</span>
+                            
+                            {/* 두 번째 input: 도메인 직접 입력 (select 선택 시 자동 채워짐) */}
+                            <input
+                                type="text"
+                                name="emailDomain"
+                                value={formData.emailDomain}
+                                onChange={handleChange}
+                                placeholder="도메인 입력"
+                                disabled={emailVerified}
+                                className={`${styles.input} ${styles.flexGrow}`}
+                            />
+                            
+                            {/* 세 번째: 도메인 선택 select */}
                             <select
-                                value={selectedDomain}
-                                onChange={(e) => setSelectedDomain(e.target.value)}
+                                onChange={handleDomainSelect}
                                 disabled={emailVerified}
                                 className={styles.select}
+                                value={emailDomains.includes(formData.emailDomain) && formData.emailDomain !== "선택" ? formData.emailDomain : "직접입력"}
                             >
                                 {emailDomains.map((domain, index) => (
                                     <option key={index} value={domain}>{domain}</option>
                                 ))}
                             </select>
-                            {isCustomDomain && (
-                                <input
-                                    type="text"
-                                    name="customDomain"
-                                    value={formData.customDomain}
-                                    onChange={handleChange}
-                                    placeholder="직접입력"
-                                    disabled={emailVerified}
-                                    className={`${styles.input} ${styles.flexGrow}`}
-                                />
-                            )}
                         </div>
 
                         {!emailVerified && (
