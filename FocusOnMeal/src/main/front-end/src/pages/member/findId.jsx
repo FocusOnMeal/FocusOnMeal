@@ -149,7 +149,7 @@ function FindId() {
                                 <span className={styles.divider}>|</span>
 
                                 <span
-                                    onClick={() => navigate('/member/join')}
+                                    onClick={() => navigate('/member/form')}
                                     className={styles.footerLink}
                                 >
                                     회원가입

@@ -291,10 +291,38 @@ const Header = () => {
 
                 <nav className="nav">
                     <ul className="nav-menu">
-                        <li><Link to="/ingredient/list">식재료</Link></li>
-                        <li><Link to="/meal/mealAI">식단</Link></li>
-                        <li><Link to="/board/safety/list">안전정보</Link></li>
-                        <li><Link to="/board/notice/list">공지사항</Link></li>
+                        <li>
+                            <Link 
+                                to="/ingredient/list"
+                                className={location.pathname.startsWith('/ingredient') ? 'active' : ''}
+                            >
+                                식재료
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                to="/meal/mealAI"
+                                className={location.pathname.startsWith('/meal') ? 'active' : ''}
+                            >
+                                식단
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                to="/board/safety/list"
+                                className={location.pathname.startsWith('/board/safety') ? 'active' : ''}
+                            >
+                                안전정보
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                to="/board/notice/list"
+                                className={location.pathname.startsWith('/board/notice') ? 'active' : ''}
+                            >
+                                공지사항
+                            </Link>
+                        </li>
                     </ul>
                 </nav>
 
