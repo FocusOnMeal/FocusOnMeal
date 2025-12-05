@@ -302,8 +302,15 @@ const MealPlan = () => {
     return (
         <div>
             <div className="container">
-                <h1>맞춤 식단 추천</h1>
-                <div className="divider"></div>
+                <div className="page-header-center">
+                <div className="page-title-wrapper">
+                <div className="page-title">
+                    <h1>맞춤 식단 추천</h1>
+                </div>
+                </div>
+                </div>
+                {/* <div className="divider">🌱</div> */}
+                {/* <div className="hr-wave"></div> */}
 
                 {/* 신체 정보 입력 */}
                 <div className="input-section">
