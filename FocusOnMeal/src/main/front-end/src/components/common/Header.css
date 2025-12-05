@@ -96,10 +96,17 @@
 }
 
 /* 메뉴 호버 시: 연두색 배경 + 진한 녹색 글자 */
-.nav-menu a:hover {
+.nav-menu a:hover,
+.nav-menu a.active {
     background-color: #e3f2c1; 
     color: #0b7a2a;
     transform: translateY(-2px); /* 살짝 떠오름 */
+}
+
+/* 메인 페이지의 활성 메뉴 스타일 */
+.header.transparent .nav-menu a.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: white;
 }
 
 /* ========================================= */
