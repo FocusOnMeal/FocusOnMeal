@@ -105,17 +105,24 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    align-items: center;
+
+    width: 100%;
+    box-sizing: border-box; /* 추가 */
 }
 
 @media (min-width: 768px) {
     .input-row-styled {
         flex-direction: row;
+        justify-content: center;
     }
 }
 
 /* 개별 입력 카드 */
 .input-card {
     flex: 1;
+    max-width: 550px;
+    width: 100%;
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 16px;
@@ -158,6 +165,8 @@
     flex-direction: column;
     justify-content: center; 
     gap: 0px; 
+
+    min-width: 0;
 }
 
 /* 라벨과 숫자 입력창 (윗줄) */
@@ -185,7 +194,8 @@
 }
 
 .input-value-box input {
-    width: auto;           
+
+    width: 80px;        
     min-width: 60px;       
     border: none;
     background: transparent;
