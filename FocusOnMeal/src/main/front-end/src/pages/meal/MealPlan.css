@@ -577,18 +577,32 @@
     border: 1px solid #e0e0e0;
     border-radius: 20px;
     padding: 20px;
+    padding-right: 10px;
     min-height: 550px;
     max-height: 550px;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: overlay;
     box-sizing: border-box;
 
-    box-shadow: inset 0 0 20px rgba(103, 147, 42, 0.05); 
-    
+    box-shadow: inset 0 0 20px rgba(103, 147, 42, 0.05);
+
     display: flex;
     flex-direction: column;
     gap: 30px;
+}
 
-    --padding-bottom: 40px;
+.result-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.result-box::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0;
+}
+
+.result-box::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
 }
     
 /* 식단 카드 스타일 */
