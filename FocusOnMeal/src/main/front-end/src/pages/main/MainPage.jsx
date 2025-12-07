@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Footer from "../../components/common/Footer.jsx";
@@ -11,6 +11,21 @@ import useStaticLeaves from "../../components/hooks/useStaticLeaves.js";
 
 const ParallaxPage = () => {
     const navigate = useNavigate();
+
+    const staticStyles = {
+        wrapper: {
+            position: "relative",
+            width: "100%",
+            height: "100vh",
+            overflow: "hidden",
+        },
+        scrollContent: {
+            width: "100%",
+            height: "100%",
+            overflowY: "scroll",
+        },
+    };
+
     const [hoveredBox, setHoveredBox] = useState(null);
     const [cursorParticles, setCursorParticles] = useState([]);
     const [ingredientList, setIngredientList] = useState([]);
@@ -78,37 +93,43 @@ const ParallaxPage = () => {
 
     return (
         <>
-            {/* 기본 CSS */}
             <style>
                 {`
-                body, html {
-                    cursor: none !important;
-                    margin: 0;
-                    padding: 0;
-                    overflow: hidden;
-                }
+                    body, html {
+                        cursor: none !important;
+                        margin: 0;
+                        padding: 0;
+                        overflow: hidden;
+                    }
 
-                @keyframes flyLeafSlow {
-                    0% { opacity: 0; left: -10%; top: var(--start-top); }
-                    10% { opacity: 1; }
-                    100% { opacity: 0; left: 110%; top: calc(var(--start-top) + 40vh); }
-                }
+                    @keyframes flyLeafSlow {
+                        0% { opacity: 0; left: -10%; top: var(--start-top); }
+                        10% { opacity: 1; }
+                        100% { opacity: 0; left: 110%; top: calc(var(--start-top) + 40vh); }
+                    }
 
-                ::-webkit-scrollbar { display: none; }
+                    @keyframes floatIcon {
+                        0%, 100% { transform: translateY(0px) rotate(0deg); }
+                        50% { transform: translateY(-20px) rotate(5deg); }
+                    }
+
+                    @keyframes fadeInUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    ::-webkit-scrollbar { display: none; }
                 `}
             </style>
 
-            {/* 전체 Wrapper */}
-            <div style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden" }}>
-                <div
-                    ref={containerRef}
-                    style={{
-                        width: "100%",
-                        height: "100vh",
-                        overflowY: "scroll",
-                        scrollSnapType: "none",
-                    }}
-                >
+            <div style={staticStyles.wrapper}>
+                <div ref={containerRef} style={staticStyles.scrollContent}>
                     {sections.map((section, index) => (
                         <SectionBlock
                             key={section.id}
@@ -125,7 +146,6 @@ const ParallaxPage = () => {
                     ))}
                 </div>
 
-                {/* 스크롤 인디케이터 */}
                 <ScrollIndicator
                     sections={sections}
                     currentSection={currentSection}
@@ -140,7 +160,7 @@ const ParallaxPage = () => {
 // 개별 섹션 블록 분리 → 렌더 비용 절감
 // ------------------------------------------------------------
 
-const SectionBlock = ({
+const SectionBlock = React.memo(({
     index,
     section,
     staticLeaves,
@@ -151,8 +171,15 @@ const SectionBlock = ({
     currentSection,
     getParallaxTransform
 }) => {
+
+    const handleNavigate = useCallback(
+        (path) => navigate(path),
+        [navigate]
+    );
+
     return (
         <div
+            data-section-index={index}
             style={{
                 width: "100%",
                 height: section.height === "auto" ? "auto" : `${section.height * 100}vh`,
@@ -161,28 +188,27 @@ const SectionBlock = ({
                 overflow: "hidden",
             }}
         >
-            {/* 나뭇잎 (첫 화면) */}
-            {index === 0 &&
-                staticLeaves.map((leaf) => (
-                    <div
-                        key={leaf.id}
-                        style={{
-                            position: "absolute",
-                            left: `${leaf.left}%`,
-                            top: `${leaf.top}%`,
-                            width: `${leaf.size * 2}px`,
-                            height: `${leaf.size}px`,
-                            '--start-top': `${leaf.top}%`,
-                            background: leaf.color,
-                            borderRadius: "50%",
-                            transform: `rotate(${leaf.rotation}deg)`,
-                            animation: `flyLeafSlow ${leaf.duration}s ease-in-out forwards`,
-                            animationDelay: `${leaf.delay}s`,
-                            pointerEvents: "none",
-                            zIndex: 500,
-                        }}
-                    />
-                ))}
+            {/* 정적 나뭇잎 */}
+            {index === 0 && staticLeaves.map((leaf) => (
+                <div
+                    key={leaf.id}
+                    style={{
+                        position: "absolute",
+                        left: `${leaf.left}%`,
+                        top: `${leaf.top}%`,
+                        width: `${leaf.size * 2}px`,
+                        height: `${leaf.size}px`,
+                        '--start-top': `${leaf.top}%`,
+                        background: leaf.color,
+                        borderRadius: "50%",
+                        transform: `rotate(${leaf.rotation}deg)`,
+                        animation: `flyLeafSlow ${leaf.duration}s ease-in-out forwards`,
+                        animationDelay: `${leaf.delay}s`,
+                        pointerEvents: "none",
+                        zIndex: 500,
+                    }}
+                />
+            ))}
 
             {/* 텍스트 */}
             {index === 0 && (
@@ -194,19 +220,34 @@ const SectionBlock = ({
                         color: "white",
                         zIndex: 10,
                         textAlign: "left",
+                        animation: "fadeInUp 1s ease-out",
                     }}
                 >
-                    <h1 style={{ fontSize: "40px", marginBottom: "20px" }}>{section.title}</h1>
+                    <h1 style={{ 
+                        fontSize: "40px", 
+                        marginBottom: "20px",
+                        textShadow: "2px 2px 20px rgba(0,0,0,0.3)",
+                    }}>
+                        {section.title}
+                    </h1>
                     <p
-                        style={{ fontSize: "20px" }}
+                        style={{ 
+                            fontSize: "20px",
+                            textShadow: "1px 1px 10px rgba(0,0,0,0.3)",
+                        }}
                         dangerouslySetInnerHTML={{ __html: section.subtitle }}
                     />
                 </div>
             )}
 
+
+
             {/* 패럴랙스 */}
             {index === 0 && section.hasParallax && (
-                <ParallaxEffects currentSection={currentSection} getParallaxTransform={getParallaxTransform} />
+                <ParallaxEffects
+                    currentSection={currentSection}
+                    getParallaxTransform={getParallaxTransform}
+                />
             )}
 
             {/* 2, 3페이지 콘텐츠 */}
@@ -216,23 +257,26 @@ const SectionBlock = ({
                     hoveredBox={hoveredBox}
                     setHoveredBox={setHoveredBox}
                     ingredientList={ingredientList}
-                    navigate={navigate}
+                    navigate={handleNavigate}
                 />
             )}
 
             {/* Footer */}
-            {section.isFooter && (
-                <Footer />
-            )}
+            {section.isFooter && <Footer />}
         </div>
     );
-};
+});
+
 
 // ------------------------------------------------------------
 // 스크롤 인디케이터
 // ------------------------------------------------------------
 
-const ScrollIndicator = ({ sections, currentSection, snapToSection }) => {
+const ScrollIndicator = React.memo(({ sections, currentSection, snapToSection }) => {
+    const handleClick = useCallback((index) => {
+        snapToSection(index);
+    }, [snapToSection]);
+
     return (
         <div
             style={{
@@ -253,13 +297,16 @@ const ScrollIndicator = ({ sections, currentSection, snapToSection }) => {
                         borderRadius: "50%",
                         background: currentSection === index ? "white" : "rgba(255,255,255,0.3)",
                         cursor: "pointer",
-                        transition: "0.3s",
+                        transition: "all 0.3s ease",
+                        border: currentSection === index ? "2px solid white" : "2px solid transparent",
+                        transform: currentSection === index ? "scale(1.3)" : "scale(1)",
                     }}
-                    onClick={() => snapToSection(index)}
+                    onClick={() => handleClick(index)}
                 />
             ))}
         </div>
     );
-};
+});
+
 
 export default ParallaxPage;
