@@ -52,7 +52,7 @@
     text-decoration: none;
     transition: background 0.2s ease, color 0.2s ease;
     background: #d9e8c7;
-    color: #4b6a1e;
+    color: #4b6a1e !important;
     white-space: nowrap;
 }
 
@@ -77,7 +77,7 @@
 .active {
     font-size: 16px;
     padding: 8px 0px 8px 20px;
-    color: #67932A;
+    color: #67932A !important;
     margin-bottom: 4px;
     display: block;
     text-decoration: none;

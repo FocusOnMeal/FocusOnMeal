@@ -14,6 +14,7 @@
     top: 0;
     transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* 부드러운 그림자 */
+    font-family: 'Jua', "Noto Sans KR", sans-serif;
 }
 
 /* ========================================= */
@@ -165,6 +166,7 @@
 /* 로그인/회원가입 등 기본 텍스트 버튼 */
 .user-menu-item {
     color: #555;
+    font-family: 'Jua', "Noto Sans KR", sans-serif;
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
