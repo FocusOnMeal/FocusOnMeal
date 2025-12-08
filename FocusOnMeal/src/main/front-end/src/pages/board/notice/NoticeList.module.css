@@ -189,7 +189,7 @@
     background-color: #FFAB91; 
     color: white;
     font-size: 13px;
-    font-weight: bold;
+    font-weight: lighter;
     border-radius: 15px;
     box-shadow: 0 2px 5px rgba(255, 171, 145, 0.4);
 }
@@ -202,7 +202,7 @@
     background-color: #4DB6AC; 
     color: white;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: lighter;
     border-radius: 10px;
 }
 

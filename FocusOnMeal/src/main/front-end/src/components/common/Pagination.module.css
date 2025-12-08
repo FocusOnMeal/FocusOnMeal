@@ -7,44 +7,64 @@
 .pagination {
     list-style: none;
     display: flex;
-    gap: 8px;
+    gap: 6px;
     padding: 0;
     margin: 0;
 }
 
 /* 기본 버튼 스타일 */
 .pageItem button {
-    padding: 6px 10px;
-    border: 1px solid #ddd;
+    min-width: 36px; 
+    height: 36px;
+    padding: 0;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 1px solid #e3f2c1; /* 연두색 테두리 */
     background-color: #fff;
-    color: #333;
+    color: #5D7D45; 
     font-size: 14px;
-    border-radius: 4px;
+    font-family: inherit; /* 폰트 상속 */
+    
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 /* hover */
 .pageItem button:hover:not(.disabledBtn) {
-    background-color: #f1f1f1;
+    background-color: #f4f9eb;
+    border-color: #8CBF56;
+    color: #8CBF56;
+    transform: translateY(-2px);
 }
 
-/* active page */
+/* active page (현재 페이지) */
 .active button {
-    background-color: #67932A;
+    background-color: #8CBF56;
     color: #fff;
-    border-color: #67932A;
+    border-color: #8CBF56;
     font-weight: bold;
+    box-shadow: 0 2px 5px rgba(140, 191, 86, 0.4);
 }
 
 /* disabled 상태 */
 .disabled button,
 .disabledBtn {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.4;
+    background-color: #f9f9f9;
+    border-color: #eee;
+    color: #ccc;
+    transform: none !important;
 }
 
-/* 화살표 버튼 */
-.arrow {
-    font-size: 14px;
-}
+/* 화살표 폰트 */
+/* .arrow {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+    margin-top: -2px;
+} */
