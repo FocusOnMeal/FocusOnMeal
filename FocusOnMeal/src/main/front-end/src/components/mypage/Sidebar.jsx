@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom"; // useLocation 추가
 import styles from "./Sidebar.module.css";
 
 const menuItems = [
@@ -23,9 +23,30 @@ const menuItems = [
 ];
 
 const Sidebar = () => {
+    const location = useLocation(); // 현재 경로를 확인하기 위한 훅
+
     // 2. 어떤 메뉴가 열려있는지 관리하는 State (객체 형태 추천: { "식재료 관리": true })
     // 초기값으로 모든 메뉴를 닫아두거나, 필요하면 true로 설정 가능
     const [openMenus, setOpenMenus] = useState({});
+
+    // ✅ 새로고침/페이지 이동 시 현재 URL을 확인하여 해당 메뉴 열어두기
+    useEffect(() => {
+        const path = location.pathname;
+
+        menuItems.forEach((item) => {
+            if (item.subMenu) {
+                // 현재 주소가 서브메뉴의 주소를 포함하고 있다면 부모 메뉴를 켬
+                const shouldBeOpen = item.subMenu.some(sub => path.startsWith(sub.href));
+                
+                if (shouldBeOpen) {
+                    setOpenMenus(prev => ({
+                        ...prev,
+                        [item.label]: true
+                    }));
+                }
+            }
+        });
+    }, [location.pathname]);
 
     // 토글 함수
     const toggleMenu = (label) => {
@@ -85,6 +106,8 @@ const Sidebar = () => {
                             <li key={item.href}>
                                 <NavLink
                                     to={item.href}
+                                    // ✅ 홈 버튼 문제 해결: '/mypage'인 경우 정확히 일치할 때만 active 처리
+                                    end={item.href === "/mypage"} 
                                     className={({ isActive }) =>
                                         isActive ? `${styles.menuTitle} ${styles.active}` : styles.menuTitle
                                     }

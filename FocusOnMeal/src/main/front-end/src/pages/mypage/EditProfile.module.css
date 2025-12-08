@@ -1,7 +1,9 @@
 /* ========================================= */
 /* 기본 레이아웃 및 폰트 설정 */ EditProfile
 /* ========================================= */
-.container, .container * {
+
+/* 본문 내용에만 box-sizing 적용 */
+.content, .content * {
     box-sizing: border-box;
 }
 

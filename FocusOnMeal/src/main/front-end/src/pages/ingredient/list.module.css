@@ -201,6 +201,11 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 12px;
+    background-color: #f7fcf3;
+    padding: 12px;
+    border-radius: 12px 12px 0 0;
+    margin: -20px -20px 0px -20px;
+    padding: 12px 20px;
 }
 
 .itemTitleLink {
