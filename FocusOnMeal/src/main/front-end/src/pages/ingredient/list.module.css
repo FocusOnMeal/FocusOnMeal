@@ -1,18 +1,42 @@
 /* list.module.css */
 .container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 60px auto;
     padding: 24px;
     font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
 .container h1 {
-    font-size: 36px;
+    font-size: 32px;
     color: #5D7D45;
     text-align: center;
     margin-bottom: 50px;
-    letter-spacing: 1px;
-    font-weight: normal;
+    -font-weight: normal;
+
+    /* 아이콘 배치를 위해 필수 */
+    display: inline-block;
+    position: relative;
+    /* 화면 중앙 정렬 보정 */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* 당근 아이콘 추가 */
+.container h1::after {
+    content: '📋';
+    font-size: 24px;
+    position: absolute;
+    top: -15px;
+    right: -30px;
+
+    /* 살랑거리는 애니메이션 */
+    animation: sway 2s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+@keyframes sway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(10deg); }
 }
 
 /* 1. 검색 필터 영역 (컨테이너) */
