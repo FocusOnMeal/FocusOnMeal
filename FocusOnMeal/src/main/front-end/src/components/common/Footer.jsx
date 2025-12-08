@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import styles from './Footer.module.css';
+
+// 이미지 import
+import footerGrass from '../../assets/logo/footerGrass.png';
 import blog from "../../assets/logo/blog.avif";
 import facebook from "../../assets/logo/Facebook.png";
 import kakao from "../../assets/logo/KakaoTalk.png";
@@ -30,11 +33,37 @@ const Footer = () => {
 
     return (
         <footer className={styles.footer}>
-            {/* 푸터 콘텐츠 */}
+
+            {/* 🌿 잔디 이미지 (absolute로 푸터 위에 표시) */}
+            <div 
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '50px',
+                    overflow: 'hidden',
+                    zIndex: 2,
+                }}
+            >
+                <img 
+                    src={footerGrass} 
+                    alt="Footer Grass Decoration" 
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'top',
+                    }}
+                />
+            </div>
+
+            {/* ------------------------ */}
+
             <div className={styles.footerContent}>
-                {/* 상단: 문구 + SNS 버튼 */}
+                
+                {/* 상단 영역 */}
                 <div className={styles.topSection}>
-                    {/* 문구 */}
                     <div className={styles.messageBox}>
                         <h3 className={styles.messageTitle}>
                             당신의 건강에<br />
@@ -42,7 +71,7 @@ const Footer = () => {
                         </h3>
                     </div>
 
-                    {/* SNS 버튼들 */}
+                    {/* SNS 링크 */}
                     <div className={styles.snsContainer}>
                         {snsItems.map((sns) => (
                             <a
@@ -73,9 +102,8 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* 중단: 로고 + 링크 메뉴 */}
+                {/* 중단 영역 */}
                 <div className={styles.middleSection}>
-                    {/* 로고 */}
                     <div className={styles.logoContainer}>
                         <img 
                             src={FocusOnMeal} 
@@ -84,14 +112,12 @@ const Footer = () => {
                         />
                     </div>
 
-                    {/* 오른쪽 영역: 링크 메뉴 + 하단 정보 */}
                     <div className={styles.rightSection}>
-                        {/* 링크 메뉴 */}
                         <div className={styles.menuLinks}>
                             {menuLinks.map((link, index) => (
                                 <React.Fragment key={link}>
                                     <a 
-                                        href="#" 
+                                        href="#"
                                         className={`${styles.menuLink} ${index === 0 ? styles.primary : ''}`}
                                     >
                                         {link}
@@ -103,16 +129,11 @@ const Footer = () => {
                             ))}
                         </div>
 
-                        {/* 주소 정보 */}
-                        <div>
-                            <p className={styles.addressText}>
-                                우)20251   서울특별시 중구 을지로 12 창업빌딩 3층   TEL : 02 - 123 - 4567
-                            </p>
-                        </div>
+                        <p className={styles.addressText}>
+                            우)20251   서울특별시 중구 을지로 12 창업빌딩 3층   TEL : 02 - 123 - 4567
+                        </p>
 
-                        {/* 구분선 */}
                         <div className={styles.divider}>
-                            {/* 저작권 */}
                             <p className={styles.copyright}>
                                 Copyright © 2025 Focus ON Meal. All Rights Reserved.
                             </p>
