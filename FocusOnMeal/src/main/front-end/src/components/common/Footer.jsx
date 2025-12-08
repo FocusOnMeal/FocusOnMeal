@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './Footer.module.css';
 
-// 이미지 import
-import footerGrass from '../../assets/logo/footerGrass.png';
+import footerGrass from '../../assets/logo/footerGrass.png'; 
 import blog from "../../assets/logo/blog.avif";
 import facebook from "../../assets/logo/Facebook.png";
 import kakao from "../../assets/logo/KakaoTalk.png";
@@ -12,6 +11,22 @@ import FocusOnMeal from "../../assets/logo/FocusOnMeal.png";
 
 const Footer = () => {
     const [hoveredSns, setHoveredSns] = useState(null);
+    const grassRef = useRef(null);
+    const [grassHeight, setGrassHeight] = useState(0);
+
+    // 🌿 이미지 로드 후 실제 높이를 자동으로 padding-top에 반영
+    useEffect(() => {
+        if (grassRef.current) {
+            const img = grassRef.current;
+            const updateHeight = () => {
+                setGrassHeight(img.offsetHeight);
+            };
+
+            updateHeight();
+            window.addEventListener('resize', updateHeight);
+            return () => window.removeEventListener('resize', updateHeight);
+        }
+    }, []);
 
     const snsItems = [
         { id: 'blog', name: '블로그', logo: blog, url: 'https://section.blog.naver.com/BlogHome.naver?directoryNo=0&currentPage=1&groupId=0' },
@@ -32,33 +47,20 @@ const Footer = () => {
     ];
 
     return (
-        <footer className={styles.footer}>
+        <footer 
+            className={styles.footer}
+            style={{ paddingTop: grassHeight }} // 🌿 잔디 높이만큼 푸터 자동 내려가기
+        >
 
-            {/* 🌿 잔디 이미지 (absolute로 푸터 위에 표시) */}
-            <div 
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '50px',
-                    overflow: 'hidden',
-                    zIndex: 2,
-                }}
-            >
+            {/* 🌿 잔디 이미지 (푸터 최상단) */}
+            <div className={styles.grassWrapper}>
                 <img 
+                    ref={grassRef}
                     src={footerGrass} 
-                    alt="Footer Grass Decoration" 
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'top',
-                    }}
+                    alt="Footer Grass"
+                    className={styles.grassImage}
                 />
             </div>
-
-            {/* ------------------------ */}
 
             <div className={styles.footerContent}>
                 
