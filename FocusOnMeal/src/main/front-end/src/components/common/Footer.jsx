@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import styles from './Footer.module.css';
 
-// 이미지 import
-import footerGrass from '../../assets/logo/footerGrass.png';
+// 🚨 이미지 경로가 '../../assets/logo/footerGrass.png'임을 재차 가정하고 import 문 사용
+import footerGrass from '../../assets/logo/footerGrass.png'; 
 import blog from "../../assets/logo/blog.avif";
 import facebook from "../../assets/logo/Facebook.png";
 import kakao from "../../assets/logo/KakaoTalk.png";
 import instagram from "../../assets/logo/Instagram.png";
 import naver from "../../assets/logo/naverband.avif";
 import FocusOnMeal from "../../assets/logo/FocusOnMeal.png";
+
+const GRASS_HEIGHT = 70; // 잔디 높이 및 콘텐츠 간격 고정
 
 const Footer = () => {
     const [hoveredSns, setHoveredSns] = useState(null);
@@ -32,33 +34,19 @@ const Footer = () => {
     ];
 
     return (
-        <footer className={styles.footer}>
+        <footer 
+            className={styles.footer}
+            style={{ paddingTop: `${GRASS_HEIGHT}px` }} 
+        >
 
-            {/* 🌿 잔디 이미지 (absolute로 푸터 위에 표시) */}
-            <div 
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '50px',
-                    overflow: 'hidden',
-                    zIndex: 2,
-                }}
-            >
+            {/* 🌿 잔디 이미지 (푸터 최상단) */}
+            <div className={styles.grassWrapper}>
                 <img 
                     src={footerGrass} 
-                    alt="Footer Grass Decoration" 
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'top',
-                    }}
+                    alt="Footer Grass"
+                    className={styles.grassImage}
                 />
             </div>
-
-            {/* ------------------------ */}
 
             <div className={styles.footerContent}>
                 
@@ -130,7 +118,7 @@ const Footer = () => {
                         </div>
 
                         <p className={styles.addressText}>
-                            우)20251   서울특별시 중구 을지로 12 창업빌딩 3층   TEL : 02 - 123 - 4567
+                            우)20251   서울특별시 중구 을지로 12 창업빌딩 3층   TEL : 02 - 123 - 4567
                         </p>
 
                         <div className={styles.divider}>

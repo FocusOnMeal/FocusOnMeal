@@ -1,15 +1,31 @@
+/* Footer.module.css 최종 코드 */
+
 .footer {
     width: 100%;
     background: #e9e9e9;
     position: relative;
+    overflow: visible;
+    /* 🚨 잔디를 콘텐츠에 가깝게 붙이기 위해 마진 제거/줄임 */
+    margin-top: 0; 
+}
 
-    /* 잔디 높이 확보 */
-    padding-top: 50px;
+/* 🌿 잔디 wrapper (푸터 최상단) */
+.grassWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 3;
+}
 
-    margin-top: 80px;
-
-    /* ❌ 삭제해야 잔디 이미지가 보임 */
-    /* overflow: hidden; */
+.grassImage {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* object-fit: contain;과 object-position: top;을 사용하면 
+       잔디 이미지가 컨테이너에 맞춰지며 전체가 보입니다. */
+    object-fit: contain;
+    object-position: top;
 }
 
 .footerContent {
@@ -18,7 +34,9 @@
     padding: 60px 24px 40px;
 }
 
+/* ------------------------------------------- */
 /* 상단 영역 */
+/* ------------------------------------------- */
 .topSection {
     display: flex;
     justify-content: space-between;
@@ -38,7 +56,9 @@
     line-height: 1.4;
 }
 
+/* ------------------------------------------- */
 /* SNS */
+/* ------------------------------------------- */
 .snsContainer {
     display: flex;
     gap: 30px;
@@ -79,7 +99,9 @@
     line-height: 1.3;
 }
 
-/* 중단 */
+/* ------------------------------------------- */
+/* 중단 영역 */
+/* ------------------------------------------- */
 .middleSection {
     display: flex;
     justify-content: space-between;
@@ -97,7 +119,7 @@
     height: auto;
 }
 
-/* 오른쪽 정보 */
+/* 오른쪽 섹션 */
 .rightSection {
     display: flex;
     flex-direction: column;
@@ -143,7 +165,7 @@
     margin-top: 10px;
 }
 
-.username {
+.copyright {
     font-size: 13px;
     color: #999;
     margin: 0;
