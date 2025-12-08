@@ -15,6 +15,11 @@ const Header = () => {
     const [activeTab, setActiveTab] = useState("위험공표"); // 탭 상태 추가
     const [adminYn, setadminYn] = useState(false);
 
+    const [unreadCount, setUnreadCount] = useState({
+        위험공표: 0,
+        가격정보: 0
+    });
+
 
     // 페이지 이동 시 알림탭 닫기
     useEffect(() => {
@@ -182,8 +187,10 @@ const Header = () => {
                     
                     console.log("✅ 중복 제거 후:", uniqueNotifications.length);
                     setNotifications(uniqueNotifications);
+                    calculateUnreadCounts(uniqueNotifications);
                 } else {
                     setNotifications(data);
+                    calculateUnreadCounts(data);
                 }
                 
                 setHasUnread(data.some(n => n.isRead === 'N'));
@@ -193,6 +200,26 @@ const Header = () => {
         } catch (error) {
             console.error("❌ 알림 조회 실패:", error);
         }
+    };
+
+    const calculateUnreadCounts = (notificationList) => {
+        const counts = {
+            위험공표: 0,
+            가격정보: 0
+        };
+
+        notificationList.forEach(notif => {
+            if (notif.isRead === 'N') {
+                if (notif.type === '위험공표') {
+                    counts.위험공표++;
+                } else if (notif.type === '가격정보' || notif.type === '가격변동') {
+                    counts.가격정보++;
+                }
+            }
+        });
+
+        setUnreadCount(counts);
+        console.log("📊 탭별 읽지 않은 알림:", counts);
     };
 
     // ✅ 현재 탭의 알림 일괄 읽음 처리
@@ -362,12 +389,18 @@ const Header = () => {
                                                         onClick={() => setActiveTab('위험공표')}
                                                     >
                                                         위험공표
+                                                        {unreadCount.위험공표 > 0 && (
+                                                            <span className="tab-unread-dot"></span>
+                                                        )}
                                                     </button>
                                                     <button
                                                         className={`notification-tab ${activeTab === '가격정보' ? 'active' : ''}`}
                                                         onClick={() => setActiveTab('가격정보')}
                                                     >
                                                         가격정보
+                                                        {unreadCount.가격정보 > 0 && (
+                                                            <span className="tab-unread-dot"></span>
+                                                        )}
                                                     </button>
                                                 </div>
 
