@@ -1,49 +1,87 @@
-/* Dashboard.module.css */
-
+/* ========================================= */
+/* 전체 레이아웃 */
+/* ========================================= */
 .dashboardContainer {
     display: flex;
     min-height: 100vh;
-    background-color: #f8f9fa;
+    background: linear-gradient(135deg, #f5f7f0 0%, #e8f0dc 100%);
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
 .dashboardContent {
     flex: 1;
-    padding: 30px;
-    max-width: 1400px;
-    margin: 0 auto;
+    padding: 40px;
+    margin: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(93, 125, 69, 0.1);
+    backdrop-filter: blur(10px);
 }
 
 .dashboardContent h2 {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: normal;
     margin-bottom: 30px;
-    color: #333;
+    color: #5D7D45;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
+.dashboardContent h2::before {
+    content: '🏠';
+    font-size: 28px;
+}
+
+/* ========================================= */
 /* 로딩 & 에러 */
+/* ========================================= */
 .loading, .error {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     font-size: 18px;
-    color: #666;
+    color: #5D7D45;
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
+/* ========================================= */
 /* 차트 섹션 */
+/* ========================================= */
 .chartSection {
-    background: white;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #f8fdf5, #f0f7e8);
+    border: 2px solid #e3f2c1;
+    border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
 .chartSection h3 {
     font-size: 22px;
-    font-weight: 600;
+    font-weight: normal;
     margin-bottom: 20px;
-    color: #333;
+    color: #5D7D45;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.chartSection h3::before {
+    content: '📊';
+    font-size: 24px;
+}
+
+.chartContainer {
+    padding: 24px;
+    background: white;
+    border-radius: 16px;
+    border: 2px solid #e3f2c1;
+    box-shadow: 0 4px 16px rgba(93, 125, 69, 0.08);
 }
 
 .chartHeader {
@@ -57,30 +95,33 @@
 
 .chartContainer h4 {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: normal;
     margin: 0;
-    color: #333;
+    color: #5D7D45;
 }
 
 .chartContainer .unit {
     font-size: 14px;
-    font-weight: 400;
-    color: #999;
+    font-weight: normal;
+    color: #888;
     margin-left: 8px;
 }
 
+/* ========================================= */
 /* 등락률 표시 */
+/* ========================================= */
 .changeRateInfo {
     display: flex;
     gap: 20px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .changeRateInfo .currentPrice {
     display: flex;
     flex-direction: column;
     padding-right: 20px;
-    border-right: 2px solid #e0e0e0;
+    border-right: 2px solid #e3f2c1;
 }
 
 .changeRateInfo .changeItem {
@@ -90,67 +131,79 @@
 
 .changeRateInfo .label {
     font-size: 12px;
-    color: #999;
+    color: #888;
     margin-bottom: 4px;
 }
 
 .changeRateInfo .value {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: normal;
+    color: #5D7D45;
 }
 
 .changeRateInfo .value.up {
-    color: #f44336;
+    color: #e03131;
 }
 
 .changeRateInfo .value.down {
-    color: #2196F3;
+    color: #1971c2;
 }
 
 .changeRateInfo .value.stable {
-    color: #999;
+    color: #888;
 }
 
+.priceDiff {
+    font-size: 0.85em;
+    opacity: 0.8;
+    margin-left: 4px;
+}
+
+/* ========================================= */
 /* 차트 하단 정보 */
+/* ========================================= */
 .chartFooter {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
-    font-size: 13px;
-    color: #666;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 2px dashed #e3f2c1;
+    font-size: 14px;
+    color: #888;
 }
 
 .noChart {
     text-align: center;
     padding: 60px 20px;
-    color: #999;
+    color: #888;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e3f2c1;
 }
 
 .noChart p {
     margin: 10px 0;
 }
 
+/* ========================================= */
 /* 리스트 컨테이너 */
+/* ========================================= */
 .listsContainer {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: 24px;
 }
 
-@media (max-width: 1024px) {
-    .listsContainer {
-        grid-template-columns: 1fr;
-    }
-}
-
+/* ========================================= */
 /* 리스트 섹션 */
+/* ========================================= */
 .listSection {
-    background: white;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #f8fdf5, #f0f7e8);
+    border: 2px solid #e3f2c1;
+    border-radius: 20px;
     padding: 25px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
 .listHeader {
@@ -159,27 +212,33 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid #e3f2c1;
+    position: relative;
+    z-index: 1;
 }
 
 .listHeader h3 {
     font-size: 20px;
-    font-weight: 600;
-    color: #333;
+    font-weight: normal;
+    color: #5D7D45;
+    margin: 0;
 }
 
 .count {
-    font-size: 16px;
-    font-weight: 600;
-    color: #4CAF50;
-    background: #e8f5e9;
-    padding: 4px 12px;
+    font-size: 14px;
+    font-weight: normal;
+    color: white;
+    background: linear-gradient(135deg, #8CBF56, #5D7D45);
+    padding: 6px 16px;
     border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(93, 125, 69, 0.2);
 }
 
+/* ========================================= */
 /* 리스트 컨텐츠 */
+/* ========================================= */
 .listContent {
-    max-height: 500px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -187,17 +246,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    margin-bottom: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: white;
+    border: 2px solid #e3f2c1;
+    border-radius: 16px;
+    transition: all 0.3s;
 }
 
 .listItem:hover {
-    background-color: #f8f9fa;
-    border-color: #4CAF50;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    border-color: #8CBF56;
+    box-shadow: 0 6px 20px rgba(93, 125, 69, 0.12);
 }
 
 .itemInfo {
@@ -206,7 +266,7 @@
 
 .itemInfo h4 {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: normal;
     margin-bottom: 8px;
     color: #333;
     display: flex;
@@ -217,130 +277,129 @@
 .customBadge {
     display: inline-block;
     font-size: 11px;
-    font-weight: 600;
-    color: #fff;
-    background: #FF9800;
-    padding: 2px 8px;
+    font-weight: normal;
+    color: white;
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    padding: 3px 10px;
     border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
 }
 
 .price {
     font-size: 14px;
-    color: #666;
+    color: #5D7D45;
     margin: 0;
 }
 
 .servings {
     font-size: 13px;
-    color: #999;
+    color: #888;
 }
 
 .detailBtn {
-    padding: 8px 16px;
-    background: #4CAF50;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #5D7D45, #6c8c52);
     color: white;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 25px;
     font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s ease;
+    font-family: inherit;
+    transition: all 0.3s;
     white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(93, 125, 69, 0.2);
 }
 
 .detailBtn:hover {
-    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.3);
 }
 
 .emptyMessage {
     text-align: center;
     padding: 40px 20px;
-    color: #999;
+    color: #888;
     font-size: 15px;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e3f2c1;
 }
 
 .viewAll {
     display: block;
     text-align: center;
-    margin-top: 15px;
-    padding: 10px;
-    color: #4CAF50;
+    margin-top: 16px;
+    padding: 12px;
+    color: #5D7D45;
     text-decoration: none;
-    font-weight: 500;
     font-size: 15px;
-    transition: color 0.2s ease;
+    transition: all 0.3s;
+    background: white;
+    border: 2px solid #e3f2c1;
+    border-radius: 25px;
 }
 
 .viewAll:hover {
-    color: #45a049;
-    text-decoration: underline;
+    background: #f4f9eb;
+    border-color: #8CBF56;
+    transform: translateY(-2px);
 }
 
+/* ========================================= */
 /* 스크롤바 스타일링 */
+/* ========================================= */
 .listContent::-webkit-scrollbar {
     width: 8px;
 }
 
 .listContent::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #f4f9eb;
     border-radius: 10px;
 }
 
 .listContent::-webkit-scrollbar-thumb {
-    background: #888;
+    background: linear-gradient(135deg, #8CBF56, #5D7D45);
     border-radius: 10px;
 }
 
 .listContent::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #5D7D45;
 }
 
-/* 가격 차이 표시 스타일 */
-.priceDiff {
-    font-size: 0.85em;
-    opacity: 0.8;
-    margin-left: 4px;
+/* ========================================= */
+/* 반응형 */
+/* ========================================= */
+@media (max-width: 1024px) {
+    .listsContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .chartHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .changeRateInfo {
+        width: 100%;
+        justify-content: flex-start;
+    }
 }
 
-/* 차트 높이 조정 */
-.chartContainer {
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+@media (max-width: 768px) {
+    .dashboardContent {
+        margin: 10px;
+        padding: 20px;
+    }
 
-/* 변동률 정보 개선 */
-.changeRateInfo {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex-wrap: wrap;
-}
+    .chartSection {
+        padding: 20px;
+    }
 
-.changeItem {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+    .listSection {
+        padding: 20px;
+    }
 
-.changeItem .label {
-    font-size: 0.85em;
-    color: #666;
-}
-
-.changeItem .value {
-    font-size: 1.1em;
-    font-weight: 600;
-}
-
-.value.up {
-    color: #d32f2f;
-}
-
-.value.down {
-    color: #1976d2;
-}
-
-.value.stable {
-    color: #757575;
+    .chartFooter {
+        flex-direction: column;
+        gap: 8px;
+    }
 }

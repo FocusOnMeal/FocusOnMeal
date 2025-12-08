@@ -1,169 +1,296 @@
+/* ========================================= */
+/* 전체 레이아웃 */
+/* ========================================= */
 .container {
     display: flex;
     min-height: 100vh;
-    background-color: #f5f6f8;
-    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, #f5f7f0 0%, #e8f0dc 100%);
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
 .main {
     flex: 1;
-    padding: 30px 40px;
+    padding: 40px;
     margin: 20px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(93, 125, 69, 0.1);
+    backdrop-filter: blur(10px);
 }
 
+/* ========================================= */
+/* 헤더 영역 */
+/* ========================================= */
 .header {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #e3f2c1;
+    text-align: center;
 }
 
 .header h1 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 8px;
+    font-size: 28px;
+    font-weight: normal;
+    color: #5D7D45;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.header h1::before {
+    content: '❤️';
+    font-size: 28px;
 }
 
 .header p {
     color: #888;
-    font-size: 14px;
+    font-size: 15px;
+    margin: 0;
 }
 
+/* ========================================= */
 /* 카테고리 탭 */
+/* ========================================= */
 .categoryTab {
     display: flex;
     gap: 10px;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    overflow-x: auto; /* 모바일 대응 */
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    overflow-x: auto;
+    flex-wrap: wrap;
 }
 
 .tabBtn {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    background: #fff;
-    color: #555;
+    padding: 10px 20px;
+    border: 2px solid #e3f2c1;
+    border-radius: 25px;
+    background: white;
+    color: #5D7D45;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.2s;
+    font-family: inherit;
+    transition: all 0.3s;
 }
 
 .tabBtn:hover {
-    background: #f8f9fa;
-    border-color: #ccc;
+    background: #f4f9eb;
+    border-color: #8CBF56;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.12);
 }
 
 .tabBtn.active {
-    background: #67932A; /* 브랜드 컬러 */
-    color: #fff;
-    border-color: #67932A;
-    font-weight: 600;
+    background: linear-gradient(135deg, #5D7D45, #6c8c52);
+    color: white;
+    border-color: #5D7D45;
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.3);
 }
 
+/* ========================================= */
 /* 그리드 레이아웃 */
+/* ========================================= */
 .gridContainer {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
 }
 
+/* ========================================= */
 /* 카드 스타일 */
+/* ========================================= */
 .card {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    background: #fff;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 25px 20px;
+    background: white;
+    border: 2px solid #e3f2c1;
+    border-radius: 20px;
+    padding: 30px 24px;
     text-decoration: none;
     color: inherit;
     position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #8CBF56, #5D7D45);
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    border-color: #67932A;
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(93, 125, 69, 0.15);
+    border-color: #8CBF56;
 }
 
-/* 카드 아이콘 (이미지 대체) */
+.card:hover::before {
+    opacity: 1;
+}
+
+/* ========================================= */
+/* 카드 아이콘 */
+/* ========================================= */
 .cardIcon {
-    width: 60px;
-    height: 60px;
-    background-color: #f1f3f5;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #f4f9eb, #e8f5e9);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    font-weight: bold;
-    color: #67932A;
-    margin-bottom: 15px;
+    font-size: 36px;
+    color: #5D7D45;
+    margin-bottom: 18px;
+    border: 3px solid #e3f2c1;
+    transition: all 0.3s;
 }
 
+.card:hover .cardIcon {
+    transform: scale(1.1) rotate(5deg);
+    border-color: #8CBF56;
+    box-shadow: 0 6px 16px rgba(93, 125, 69, 0.15);
+}
+
+/* ========================================= */
+/* 카드 정보 */
+/* ========================================= */
 .cardInfo {
     width: 100%;
+    text-align: center;
 }
 
 .categoryBadge {
     display: inline-block;
-    font-size: 11px;
-    color: #868e96;
-    background: #f8f9fa;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-bottom: 6px;
+    font-size: 12px;
+    color: white;
+    background: linear-gradient(135deg, #8CBF56, #5D7D45);
+    padding: 4px 12px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(93, 125, 69, 0.2);
 }
 
 .cardTitle {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: normal;
     color: #333;
-    margin: 5px 0;
+    margin: 8px 0;
+}
+
+.cardPrice {
+    font-size: 16px;
+    color: #5D7D45;
+    margin: 8px 0;
 }
 
 .cardUnit {
     font-size: 13px;
-    color: #adb5bd;
+    color: #aaa;
+    margin: 0;
 }
 
+/* ========================================= */
 /* 찜 삭제 버튼 (하트) */
+/* ========================================= */
 .deleteBtn {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: #ff6b6b; /* 빨간 하트 */
-    font-size: 30px;
+    top: 16px;
+    right: 16px;
+    background: white;
+    border: 2px solid #ffcdd2;
+    color: #ff6b6b;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
 }
 
 .deleteBtn:hover {
-    transform: scale(1.2);
+    background: #ff6b6b;
+    color: white;
+    border-color: #ff6b6b;
+    transform: scale(1.15);
+    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
 }
 
+/* ========================================= */
 /* 데이터 없음 상태 */
+/* ========================================= */
 .emptyState {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 60px 0;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #fafafa, #f5f5f5);
+    border-radius: 20px;
+    border: 2px dashed #e3f2c1;
+}
+
+.emptyState p {
     color: #999;
+    font-size: 18px;
+    margin-bottom: 20px;
 }
 
 .goLink {
     display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #67932A;
-    color: #fff;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #5D7D45, #6c8c52);
+    color: white;
     text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 25px;
+    font-size: 15px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.3);
+}
+
+.goLink:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(93, 125, 69, 0.4);
+}
+
+/* ========================================= */
+/* 반응형 */
+/* ========================================= */
+@media (max-width: 768px) {
+    .main {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .gridContainer {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+
+    .card {
+        padding: 20px 16px;
+    }
+
+    .cardIcon {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+
+    .cardTitle {
+        font-size: 16px;
+    }
 }

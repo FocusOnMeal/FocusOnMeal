@@ -1,165 +1,219 @@
-/* === 레이아웃 공통 === */
+/* ========================================= */
+/* 전체 레이아웃 */
+/* ========================================= */
 .container {
     display: flex;
     min-height: 100vh;
-    background-color: #f5f6f8;
-    font-family: 'Noto Sans KR', sans-serif;
+    background: linear-gradient(135deg, #f5f7f0 0%, #e8f0dc 100%);
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
 .main {
     flex: 1;
-    padding: 30px 40px;
+    padding: 40px;
     margin: 20px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(93, 125, 69, 0.1);
+    backdrop-filter: blur(10px);
 }
 
-/* === 설정 카드 영역 === */
+/* ========================================= */
+/* 설정 카드 영역 */
+/* ========================================= */
 .settingsCard {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 30px; /* 툴바와의 간격 조정 */
+    background: linear-gradient(135deg, #f8fdf5, #f0f7e8);
+    border: 2px solid #e3f2c1;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.settingsCard::before {
+    content: '🛡️';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 100px;
+    opacity: 0.08;
 }
 
 .settingHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
 .settingTitle {
-    font-size: 20px;
-    font-weight: 700;
-    color: #343a40;
-    margin: 0 0 5px 0;
-}
-
-.settingDesc {
-    font-size: 14px;
-    color: #6c757d;
-    margin: 0;
-}
-
-/* 토글 스위치 */
-.toggleWrapper {
+    font-size: 22px;
+    font-weight: normal;
+    color: #5D7D45;
+    margin: 0 0 8px 0;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
+.settingTitle::before {
+    content: '⚙️';
+    font-size: 24px;
+}
+
+.settingDesc {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+}
+
+/* ========================================= */
+/* 토글 스위치 */
+/* ========================================= */
+.toggleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .toggleLabel {
-    font-weight: 600;
     font-size: 15px;
-    color: #333;
+    color: #5D7D45;
 }
 
 .toggleSwitch {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 26px;
+    width: 56px;
+    height: 30px;
 }
 
-.toggleSwitch input { opacity: 0; width: 0; height: 0; }
+.toggleSwitch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
 
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #ccc, #bbb);
+    transition: 0.4s;
+    border-radius: 30px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 20px; width: 20px;
-    left: 3px; bottom: 3px;
-    background-color: white;
-    transition: .4s;
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    transition: 0.4s;
     border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-input:checked + .slider { background-color: #67932A; }
-input:checked + .slider:before { transform: translateX(24px); }
+input:checked + .slider {
+    background: linear-gradient(135deg, #8CBF56, #5D7D45);
+}
 
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* ========================================= */
 /* 구독 식재료 박스 */
+/* ========================================= */
 .subscriptionBox {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #e0e0e0;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px dashed #d4e8a8;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
 }
 
 .subTitle {
-    font-size: 14px;
-    font-weight: 600;
-    color: #555;
-    margin-right: 5px;
+    font-size: 15px;
+    color: #5D7D45;
+    margin-right: 8px;
 }
 
 .tagContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
 }
 
 .ingredientTag {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    color: #495057;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 13px;
+    background: white;
+    border: 2px solid #e3f2c1;
+    color: #5D7D45;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 14px;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(93, 125, 69, 0.1);
 }
 
 .ingredientTag:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
-    color: #212529;
+    background: #f4f9eb;
+    border-color: #8CBF56;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.15);
 }
 
 .addTagBtn {
-    background-color: #f1f3f5;
-    color: #868e96;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
+    background: white;
+    color: #8CBF56;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 14px;
     text-decoration: none;
-    border: 1px dashed #adb5bd;
+    border: 2px dashed #d4e8a8;
+    transition: all 0.3s;
+}
+
+.addTagBtn:hover {
+    background: #f4f9eb;
+    border-color: #8CBF56;
+    border-style: solid;
 }
 
 .emptyText {
-    font-size: 13px;
-    color: #999;
+    font-size: 14px;
+    color: #aaa;
 }
 
+/* ========================================= */
+/* 툴바 */
+/* ========================================= */
 .toolbar {
-    height: 60px; /* 높이 고정 */
+    height: 65px;
     display: flex;
     align-items: center;
-    padding: 0 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    background-color: #fff;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    border-bottom: 1px solid #eee; /* 평소에는 하단 선 */
+    padding: 0 20px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    background: white;
+    border: 2px solid #e3f2c1;
+    transition: all 0.3s;
 }
 
-/* Mode 1: 활성화(선택) 모드 */
 .activeToolbar {
-    background-color: #e9f2e8; 
-    color: #52c41a; 
-    border-bottom: none; /* 활성 상태에선 선 제거 */
+    background: linear-gradient(135deg, #f4f9eb, #e8f5e9);
+    border-color: #8CBF56;
 }
 
 .actionHeader {
@@ -177,54 +231,63 @@ input:checked + .slider:before { transform: translateX(24px); }
 
 .selectionCount {
     font-size: 16px;
-    font-weight: 600;
-    color: #52c41a;
+    color: #5D7D45;
 }
 
 .clearSelectionBtn {
     background: none;
     border: none;
-    color: #52c41a;
+    color: #8CBF56;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
 }
 
-.clearSelectionBtn:hover { text-decoration: underline; }
+.clearSelectionBtn:hover {
+    color: #5D7D45;
+    text-decoration: underline;
+}
 
 .actionButtons {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .contextBtn {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 16px;
-    border: 1px solid rgba(0,0,0,0.1); /* 미세한 테두리 */
-    border-radius: 4px;
+    padding: 10px 18px;
+    border: 2px solid #e3f2c1;
+    border-radius: 25px;
     cursor: pointer;
-    font-weight: 600;
     font-size: 13px;
-    background-color: white; 
-    color: #444;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    transition: all 0.2s;
+    font-family: inherit;
+    background: white;
+    color: #5D7D45;
+    transition: all 0.3s;
 }
 
-.contextBtn:hover { background-color: #f8f9fa; }
+.contextBtn:hover {
+    background: #f4f9eb;
+    border-color: #8CBF56;
+    transform: translateY(-2px);
+}
 
-/* 툴바 내부 삭제 버튼 */
 .toolbar .deleteBtn {
-    color: #d93025;
-}
-.toolbar .deleteBtn:hover {
-    background-color: #fce8e6;
-    border-color: #fce8e6;
+    color: #ff6b6b;
+    border-color: #ffcdd2;
 }
 
-/* ⚪ Mode 2: 평상시(검색) 모드 */
+.toolbar .deleteBtn:hover {
+    background: #fff5f5;
+    border-color: #ff6b6b;
+}
+
+/* ========================================= */
+/* 평상시 헤더 (검색/필터) */
+/* ========================================= */
 .defaultHeader {
     width: 100%;
     display: flex;
@@ -232,188 +295,291 @@ input:checked + .slider:before { transform: translateX(24px); }
     align-items: center;
 }
 
-/* 탭 스타일 */
+/* 탭 그룹 */
 .tabGroup {
     display: flex;
-    gap: 24px;
-    height: 60px; /* 툴바 높이와 일치시켜 밑줄 위치 잡기 */
+    gap: 8px;
 }
 
 .tabGroup button {
-    background: none;
-    border: none;
-    font-size: 15px;
+    background: white;
+    border: 2px solid #e3f2c1;
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-family: inherit;
     cursor: pointer;
-    color: #5f6368;
-    padding: 0;
-    font-weight: 500;
-    position: relative;
-    display: flex;
-    align-items: center;
-    height: 100%; /* 부모 높이 상속 */
+    color: #888;
+    transition: all 0.3s;
+}
+
+.tabGroup button:hover {
+    border-color: #8CBF56;
+    color: #5D7D45;
 }
 
 .tabGroup .activeTab {
-    color: #52c41a;
-    font-weight: 700;
+    background: linear-gradient(135deg, #5D7D45, #6c8c52);
+    color: white;
+    border-color: #5D7D45;
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.3);
 }
 
-/* 활성 탭 밑줄 */
-.tabGroup .activeTab::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: #52c41a;
-    border-radius: 3px 3px 0 0;
+.tabGroup .inactiveTab {
+    background: white;
 }
 
-/* 검색창 영역 (캡슐 형태) */
+/* ========================================= */
+/* 검색 박스 */
+/* ========================================= */
 .searchBox {
     display: flex;
     align-items: center;
-    background-color: #f1f3f4;
-    border-radius: 24px; /* 둥근 캡슐 */
-    padding: 5px 15px;
-    width: 400px;
-    transition: background-color 0.2s;
+    gap: 10px;
 }
 
-.searchBox:focus-within {
-    background-color: #fff;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-
-/* JSX의 selectBox, searchInput 클래스를 툴바에 맞게 재정의 */
 .selectBox {
-    background: transparent;
-    border: none;
+    padding: 10px 16px;
+    border: 2px solid #e3f2c1;
+    border-radius: 25px;
     font-size: 14px;
-    color: #5f6368;
-    outline: none;
-    margin-right: 8px;
+    font-family: inherit;
+    color: #5D7D45;
+    background: white;
     cursor: pointer;
-    padding: 5px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.selectBox:focus {
+    border-color: #8CBF56;
 }
 
 .searchInput {
-    border: none;
-    background: transparent;
+    width: 180px;
+    padding: 10px 18px;
+    border: 2px solid #e3f2c1;
+    border-radius: 25px;
+    font-size: 14px;
+    font-family: inherit;
     outline: none;
-    padding: 8px;
-    font-size: 15px;
-    flex: 1; /* 남은 공간 모두 차지 */
-    color: #333;
+    transition: all 0.3s;
+}
+
+.searchInput:focus {
+    border-color: #8CBF56;
 }
 
 .searchBtn {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #5D7D45, #6c8c52);
+    color: white;
     border: none;
-    background: transparent;
-    cursor: pointer;
+    border-radius: 25px;
     font-size: 14px;
-    color: #5f6368;
-    font-weight: 600;
-    padding: 5px 10px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(93, 125, 69, 0.2);
 }
 
 .searchBtn:hover {
-    color: #333;
-    background: none; /* 기존 녹색 배경 제거 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.3);
 }
 
-/* === 📋 테이블 스타일 (기존 디자인 유지 및 보완) === */
+/* ========================================= */
+/* 테이블 스타일 */
+/* ========================================= */
 .alertTable {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 10px;
     font-size: 14px;
     table-layout: fixed;
 }
 
-.alertTable tr {
-    transition: background-color 0.2s, color 0.2s;
+.alertTable th {
+    background: #e3f2c1;
+    padding: 16px 12px;
+    color: #5D7D45;
+    font-weight: normal;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: center;
 }
 
-.alertTable th {
-    background-color: #fff; /* 헤더를 흰색으로 변경하여 깔끔함 강조 */
-    padding: 12px;
-    color: #5f6368;
-    border-bottom: 1px solid #dcdcdc;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 13px;
+.alertTable th:hover {
+    background: #d4e8a8;
+}
+
+.alertTable th:first-child {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.alertTable th:last-child {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
 }
 
 .alertTable td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #eee;
+    padding: 16px 12px;
+    background: white;
     text-align: center;
     vertical-align: middle;
+    border-top: 2px solid #e3f2c1;
+    border-bottom: 2px solid #e3f2c1;
+    transition: all 0.3s;
+}
+
+.alertTable td:first-child {
+    border-left: 2px solid #e3f2c1;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+}
+
+.alertTable td:last-child {
+    border-right: 2px solid #e3f2c1;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.alertTable tbody tr {
+    transition: all 0.3s;
+}
+
+.alertTable tbody tr:hover td {
+    border-color: #8CBF56;
 }
 
 /* 정렬 화살표 */
-.sortArrow { font-size: 10px; margin-left: 4px; color: #adb5bd; }
-
-/* 1. 안 읽은 알림 (Unread) - 진하게 */
-.unreadRow {
-    background-color: #ffffff;
-    color: #202124;
-    font-weight: 600;
+.sortArrow {
+    font-size: 10px;
+    margin-left: 6px;
+    color: #8CBF56;
 }
 
-.unreadRow td {
-    border-bottom: 1px solid #dadce0; /* 구분선 조금 더 진하게 */
-}
-
-/* 2. 읽은 알림 (Read) - 연하게 */
-.readRow {
-    background-color: #f8f9fa; /* 아주 연한 회색 */
-    color: #80868b;
-}
-
-/* 읽은 행의 링크 등 요소들도 연하게 처리 */
-.readRow a {
-    color: #80868b !important;
-    font-weight: 400;
-}
-
-.readRow .badgeHazard {
-    opacity: 0.6; /* 뱃지도 흐릿하게 */
-    border: 1px solid #eee;
-}
-
-/* 컬럼 너비 최적화 */
-.checkCol { width: 40px; } /* 체크박스 열 넓힘 */
+/* 컬럼 너비 */
+.checkCol { width: 50px; }
 .idCol { width: 70px; }
 .nationCol { width: 100px; }
 .hazardCol { width: 120px; }
-.titleCol { width: auto; text-align: left; padding-left: 20px !important;}
-.dateCol { width: 110px; }
+.titleCol { width: auto; text-align: center; }
+.dateCol { width: 100px; }
 
+/* ========================================= */
+/* 읽음/안읽음 행 스타일 */
+/* ========================================= */
+.unreadRow td {
+    background: white;
+    color: #333;
+}
+
+.readRow td {
+    background: #fafafa;
+    color: #aaa;
+}
+
+.readRow a {
+    color: #aaa !important;
+}
+
+.readRow .badgeHazard {
+    opacity: 0.5;
+}
+
+/* ========================================= */
 /* 요소 스타일 */
+/* ========================================= */
 .titleLink {
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: inline-block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 400px; /* 제목 길어지면 자르기 */
+    max-width: 400px;
+    transition: color 0.2s;
 }
-.titleLink:hover { text-decoration: underline; }
+
+.titleLink:hover {
+    color: #5D7D45;
+    text-decoration: underline;
+}
 
 .badgeHazard {
-    background-color: #fff5f5;
+    background: linear-gradient(135deg, #fff5f5, #ffe3e3);
     color: #e03131;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 6px 12px;
+    border-radius: 15px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
+    border: 1px solid #ffc9c9;
+    box-shadow: 0 2px 6px rgba(224, 49, 49, 0.1);
 }
 
 .emptyRow {
-    padding: 60px 0;
-    color: #999;
-    background-color: #fff;
+    padding: 60px 0 !important;
+    color: #aaa;
+    font-size: 16px;
+}
+
+/* ========================================= */
+/* 체크박스 스타일 */
+/* ========================================= */
+.alertTable input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #5D7D45;
+}
+
+/* ========================================= */
+/* 반응형 */
+/* ========================================= */
+@media (max-width: 1024px) {
+    .defaultHeader {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .toolbar {
+        height: auto;
+        padding: 16px 20px;
+    }
+
+    .tabGroup {
+        width: 100%;
+    }
+
+    .searchBox {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .searchInput {
+        flex: 1;
+        width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .settingHeader {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .actionHeader {
+        flex-direction: column;
+        gap: 12px;
+    }
 }

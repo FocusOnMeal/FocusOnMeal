@@ -6,7 +6,7 @@
 /* 메인 컨테이너 */
 .container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 60px auto;
     padding: 40px;
     background: white;
     font-family: 'Malgun Gothic', sans-serif;

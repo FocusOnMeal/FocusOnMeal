@@ -1,49 +1,70 @@
+/* ========================================= */
 /* 전체 레이아웃 */
+/* ========================================= */
 .container {
     display: flex;
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    background: #f7f7f7;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7f0 0%, #e8f0dc 100%);
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
-/* 메인 영역 */
 .main {
     flex: 1;
-    padding: 30px;
-    background: #fafafa;
+    padding: 40px;
+    margin: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(93, 125, 69, 0.1);
+    backdrop-filter: blur(10px);
 }
 
-/* 제목 행 */
+/* ========================================= */
+/* 헤더 영역 */
+/* ========================================= */
 .titleRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #e3f2c1;
 }
 
-/* 페이지 제목 */
 .title {
-    font-size: 26px;
-    font-weight: 700;
-    color: #222;
+    font-size: 28px;
+    font-weight: normal;
+    color: #5D7D45;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.title::before {
+    content: '🍽️';
+    font-size: 32px;
 }
 
 /* 휴지통 버튼 */
 .trashBtn {
     position: relative;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    padding: 8px 16px;
-    border-radius: 8px;
+    background: white;
+    border: 2px solid #e3f2c1;
+    padding: 12px 20px;
+    border-radius: 25px;
     font-size: 14px;
+    font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    color: #5D7D45;
+    font-weight: 500;
 }
 
 .trashBtn:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
+    background: #f4f9eb;
+    border-color: #8CBF56;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.15);
 }
 
 .trashBtn:disabled {
@@ -51,69 +72,96 @@
     cursor: not-allowed;
 }
 
-/* 휴지통 알림 뱃지 (빨간 동그라미) */
 .trashBadge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 10px;
-    height: 10px;
-    background: #e74c3c;
+    top: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
     border-radius: 50%;
     border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(255, 107, 107, 0.4);
 }
 
+/* ========================================= */
 /* 로딩 */
+/* ========================================= */
 .loading {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-size: 18px;
-    color: #666;
+    font-size: 20px;
+    color: #5D7D45;
+    background: linear-gradient(135deg, #f5f7f0 0%, #e8f0dc 100%);
 }
 
-/* 테이블 */
+/* ========================================= */
+/* 테이블 스타일 */
+/* ========================================= */
 .mealTable {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 12px;
     font-size: 15px;
-    table-layout: fixed;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* 테이블 헤더 */
 .mealTable thead th {
-    background: #f3f6ef;
-    padding: 14px 12px;
-    border-bottom: 2px solid #dcdcdc;
-    font-weight: 600;
+    background: #e3f2c1;
+    padding: 18px 15px;
+    font-weight: normal;
     text-align: center;
-    color: #333;
+    color: #5D7D45;
+    font-size: 16px;
+}
+
+.mealTable thead th:first-child {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.mealTable thead th:last-child {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
 }
 
 /* 테이블 행 */
 .mealTable tbody tr {
-    transition: 0.2s;
+    transition: all 0.3s;
 }
 
-.mealTable tbody tr:hover {
-    background: #f0f4e8;
+.mealTable tbody tr:hover td {
+    background: #fcfef9;
+    transform: scale(1.01);
 }
 
 /* 테이블 셀 */
 .mealTable td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #eaeaea;
+    padding: 20px 15px;
+    background: white;
     text-align: center;
+    border-top: 2px solid #e3f2c1;
+    border-bottom: 2px solid #e3f2c1;
+    color: #444;
+}
+
+.mealTable td:first-child {
+    border-left: 2px solid #e3f2c1;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.mealTable td:last-child {
+    border-right: 2px solid #e3f2c1;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
 }
 
 /* 식단명 컬럼 */
 .nameCol {
-    width: 25%;
+    width: 28%;
     text-align: left !important;
 }
 
@@ -125,103 +173,130 @@
     text-align: left;
 }
 
-/* 식단명 링크 스타일 */
+/* 식단명 링크 */
 .mealNameLink {
     cursor: pointer;
     color: #333;
     font-weight: 500;
-    transition: color 0.2s;
+    transition: all 0.2s;
+    position: relative;
 }
 
 .mealNameLink:hover {
-    color: #67932A;
-    text-decoration: underline;
+    color: #5D7D45;
 }
 
-/* 뱃지 공통 */
+.mealNameLink::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #8CBF56;
+    transition: width 0.3s;
+}
+
+.mealNameLink:hover::after {
+    width: 100%;
+}
+
+/* ========================================= */
+/* 뱃지 스타일 */
+/* ========================================= */
 .badge {
     display: inline-block;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .badgeMorning {
-    background-color: #fff3cd;
-    color: #856404;
+    background: linear-gradient(135deg, #fff8e1, #ffecb3);
+    color: #f57c00;
+    border: 1px solid #ffe082;
 }
 
 .badgeLunch {
-    background-color: #d4edda;
-    color: #155724;
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    color: #388e3c;
+    border: 1px solid #a5d6a7;
 }
 
 .badgeDinner {
-    background-color: #cce5ff;
-    color: #004085;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1976d2;
+    border: 1px solid #90caf9;
 }
 
 .badgeDefault {
-    background-color: #e9ecef;
-    color: #495057;
+    background: linear-gradient(135deg, #f5f5f5, #eeeeee);
+    color: #616161;
+    border: 1px solid #e0e0e0;
 }
 
+/* ========================================= */
 /* 버튼 그룹 */
+/* ========================================= */
 .btnGroup {
     display: flex;
-    gap: 5px;
+    gap: 8px;
     justify-content: center;
 }
 
-/* 레시피 보기 버튼 */
 .viewBtn {
     background: white;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-    color: black;
-    padding: 6px 10px;
+    color: #5D7D45;
+    padding: 8px 16px;
     border-radius: 20px;
-    border: 1px solid #67932A;
-    font-size: 12px;
+    border: 2px solid #e3f2c1;
+    font-size: 13px;
+    font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
 .viewBtn:hover {
-    background: #67932A;
+    background: #5D7D45;
     color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-color: #5D7D45;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.3);
 }
 
-/* 삭제 버튼 */
 .deleteBtn {
     background: white;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-    color: black;
-    padding: 6px 10px;
+    color: #ff6b6b;
+    padding: 8px 16px;
     border-radius: 20px;
-    border: 1px solid #dc3545;
-    font-size: 12px;
+    border: 2px solid #ffcdd2;
+    font-size: 13px;
+    font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
 .deleteBtn:hover {
-    background: #dc3545;
+    background: #ff6b6b;
     color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-color: #ff6b6b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
 }
 
-/* ====== 모달 ====== */
+/* ========================================= */
+/* 모달 스타일 */
+/* ========================================= */
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -230,105 +305,128 @@
 
 .modalContent {
     background: white;
-    border-radius: 12px;
-    width: 600px;
+    border-radius: 24px;
+    width: 650px;
     max-width: 90%;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 3px solid #e3f2c1;
 }
 
 .modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #eee;
+    padding: 24px 30px;
+    background: linear-gradient(135deg, #f4f9eb, #e8f5e9);
+    border-bottom: 2px solid #e3f2c1;
+    border-radius: 21px 21px 0 0;
 }
 
 .modalHeader h2 {
     margin: 0;
-    font-size: 20px;
-    color: #333;
+    font-size: 22px;
+    color: #5D7D45;
+    font-weight: normal;
 }
 
 .modalClose {
-    font-size: 28px;
+    font-size: 32px;
     cursor: pointer;
-    color: #999;
-    transition: color 0.2s;
+    color: #aaa;
+    transition: all 0.2s;
+    line-height: 1;
 }
 
 .modalClose:hover {
-    color: #333;
+    color: #ff6b6b;
+    transform: rotate(90deg);
 }
 
 .modalBody {
-    padding: 24px;
+    padding: 30px;
 }
 
 .modalFooter {
-    padding: 16px 24px;
-    border-top: 1px solid #eee;
+    padding: 20px 30px;
+    border-top: 2px solid #e3f2c1;
     display: flex;
     justify-content: flex-end;
+    gap: 12px;
+    background: #fafafa;
+    border-radius: 0 0 21px 21px;
 }
 
 .closeBtn {
-    background: #6c757d;
+    background: #5D7D45;
     color: white;
-    padding: 10px 24px;
-    border-radius: 6px;
+    padding: 12px 28px;
+    border-radius: 25px;
     border: none;
-    font-size: 14px;
+    font-size: 15px;
+    font-family: inherit;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s;
 }
 
 .closeBtn:hover {
-    background: #5a6268;
+    background: #4a6937;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(93, 125, 69, 0.3);
 }
 
-/* 식단 기본 정보 그리드 */
+/* 식단 기본 정보 */
 .mealInfoGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    margin-bottom: 24px;
-    padding: 16px;
-    background: #f8f9fa;
-    border-radius: 8px;
+    margin-bottom: 28px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8fdf5, #f0f7e8);
+    border-radius: 16px;
+    border: 2px solid #e3f2c1;
 }
 
 .infoItem {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 6px;
 }
 
 .infoLabel {
-    font-size: 12px;
-    color: #666;
+    font-size: 13px;
+    color: #888;
 }
 
 .infoValue {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
+    font-size: 18px;
+    color: #5D7D45;
 }
 
-/* 영양 정보 섹션 */
+/* 영양 정보 */
 .nutritionSection {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
-.nutritionSection h3 {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #67932A;
+.nutritionSection h3,
+.ingredientsSection h3,
+.recipeSection h3 {
+    font-size: 17px;
+    color: #5D7D45;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #e3f2c1;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+
+.nutritionSection h3::before { content: '📊'; }
+.ingredientsSection h3::before { content: '🥗'; }
+.recipeSection h3::before { content: '👨‍🍳'; }
 
 .nutritionGrid {
     display: grid;
@@ -337,52 +435,58 @@
 }
 
 .nutritionItem {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #fff, #f8fdf5);
+    padding: 16px 12px;
+    border-radius: 16px;
     text-align: center;
+    border: 2px solid #e3f2c1;
+    transition: all 0.2s;
+}
+
+.nutritionItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(93, 125, 69, 0.12);
 }
 
 .nutritionLabel {
     display: block;
     font-size: 12px;
-    color: #666;
-    margin-bottom: 4px;
+    color: #888;
+    margin-bottom: 6px;
 }
 
 .nutritionValue {
     display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: #67932A;
+    font-size: 16px;
+    color: #5D7D45;
 }
 
 /* 재료 섹션 */
 .ingredientsSection {
-    margin-bottom: 24px;
-}
-
-.ingredientsSection h3 {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #67932A;
+    margin-bottom: 28px;
 }
 
 .ingredientsList {
     list-style: none;
     padding: 0;
     margin: 0;
+    background: #fafafa;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .ingredientItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 12px;
+    padding: 14px 18px;
     border-bottom: 1px solid #eee;
     font-size: 14px;
+    transition: background 0.2s;
+}
+
+.ingredientItem:hover {
+    background: #f4f9eb;
 }
 
 .ingredientItem:last-child {
@@ -390,16 +494,16 @@
 }
 
 .ingredientName {
-    color: #333;
+    color: #444;
 }
 
 .ingredientPrice {
-    color: #67932A;
-    font-weight: 600;
+    color: #5D7D45;
+    font-weight: 500;
 }
 
 .ingredientPriceNa {
-    color: #999;
+    color: #bbb;
     font-size: 12px;
 }
 
@@ -408,62 +512,83 @@
     margin-bottom: 16px;
 }
 
-.recipeSection h3 {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #67932A;
-}
-
 .recipeSteps {
-    padding-left: 20px;
+    padding-left: 0;
     margin: 0;
+    counter-reset: step;
+    list-style: none;
 }
 
 .recipeSteps li {
-    padding: 8px 0;
-    line-height: 1.6;
+    padding: 16px 20px;
+    padding-left: 60px;
+    line-height: 1.7;
     color: #555;
-    border-bottom: 1px dashed #eee;
+    background: #fafafa;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.2s;
 }
 
-.recipeSteps li:last-child {
-    border-bottom: none;
+.recipeSteps li:hover {
+    background: #f4f9eb;
+    transform: translateX(5px);
 }
 
-/* ====== 휴지통 모달 ====== */
+.recipeSteps li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: #8CBF56;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+/* ========================================= */
+/* 휴지통 모달 */
+/* ========================================= */
 .trashModalContent {
     background: white;
-    border-radius: 12px;
-    width: 500px;
+    border-radius: 24px;
+    width: 550px;
     max-width: 90%;
-    max-height: 70vh;
+    max-height: 75vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 3px solid #ffcdd2;
 }
 
 .trashNotice {
-    background: #fff3cd;
-    color: #856404;
-    padding: 12px 24px;
-    font-size: 13px;
+    background: linear-gradient(135deg, #fff8e1, #ffecb3);
+    color: #f57c00;
+    padding: 14px 24px;
+    font-size: 14px;
     text-align: center;
-    border-bottom: 1px solid #ffc107;
+    border-bottom: 2px solid #ffe082;
 }
 
 .trashBody {
     flex: 1;
     overflow-y: auto;
-    padding: 16px 24px;
+    padding: 20px 24px;
 }
 
 .trashEmpty {
     text-align: center;
-    padding: 40px 0;
-    color: #999;
-    font-size: 14px;
+    padding: 50px 0;
+    color: #aaa;
+    font-size: 16px;
 }
 
 .trashList {
@@ -476,13 +601,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    gap: 12px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
 }
 
-.trashItem:last-child {
-    border-bottom: none;
+.trashItem:hover {
+    background: #fff5f5;
 }
 
 .trashItemInfo {
@@ -497,107 +624,111 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 4px;
 }
 
 .trashItemMeta {
     display: block;
-    font-size: 12px;
-    color: #666;
-    margin-top: 2px;
+    font-size: 13px;
+    color: #888;
 }
 
 .trashItemDays {
     display: block;
-    font-size: 11px;
-    color: #dc3545;
-    margin-top: 2px;
+    font-size: 12px;
+    color: #ff6b6b;
+    margin-top: 4px;
 }
 
 .trashItemBtns {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
 }
 
 .restoreBtn {
-    background: #67932A;
+    background: #5D7D45;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: inherit;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s;
 }
 
 .restoreBtn:hover {
-    background: #567a23;
+    background: #4a6937;
+    transform: translateY(-2px);
 }
 
 .permanentDeleteBtn {
     background: white;
-    color: #dc3545;
-    border: 1px solid #dc3545;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
+    color: #ff6b6b;
+    border: 2px solid #ffcdd2;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: inherit;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
 .permanentDeleteBtn:hover {
-    background: #dc3545;
+    background: #ff6b6b;
     color: white;
+    border-color: #ff6b6b;
 }
 
 .emptyTrashBtn {
-    background: #dc3545;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 12px 24px;
+    border-radius: 25px;
     font-size: 14px;
+    font-family: inherit;
     cursor: pointer;
-    transition: background 0.2s;
-    margin-right: 10px;
+    transition: all 0.3s;
+    margin-right: auto;
 }
 
 .emptyTrashBtn:hover {
-    background: #c82333;
+    background: linear-gradient(135deg, #ee5a5a, #dd4a4a);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
 }
 
-.modalFooter {
-    gap: 10px;
-}
-
-/* ====== SNS 공유 버튼 ====== */
+/* ========================================= */
+/* SNS 공유 버튼 */
+/* ========================================= */
 .shareButtons {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin-right: auto;
 }
 
 .shareBtn {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #ddd;
+    width: 44px;
+    height: 44px;
+    border: 2px solid #e3f2c1;
     border-radius: 50%;
-    background: #fff;
-    font-size: 18px;
+    background: white;
+    font-size: 20px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .shareBtn:hover {
-    background: #f0f0f0;
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: #f4f9eb;
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 카카오톡 버튼 */
 .kakaoBtn {
     padding: 0;
     overflow: hidden;
@@ -613,4 +744,23 @@
 
 .kakaoBtn:hover {
     background: #FEE500;
+    border-color: #e6cf00;
+}
+
+/* ========================================= */
+/* 반응형 */
+/* ========================================= */
+@media (max-width: 768px) {
+    .main {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .mealInfoGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .nutritionGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
