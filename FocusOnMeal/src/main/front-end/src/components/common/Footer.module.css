@@ -1,36 +1,34 @@
 .footer {
     width: 100%;
-    background: #f5f5f5;
+    background: #e9e9e9;
     position: relative;
-    overflow: hidden;
-    margin-top: 80px; 
+
+    /* 잔디 높이 확보 */
+    padding-top: 50px;
+
+    margin-top: 80px;
+
+    /* ❌ 삭제해야 잔디 이미지가 보임 */
+    /* overflow: hidden; */
 }
 
 .footerContent {
-    /* 중요: 서브페이지 컨테이너와 너비를 맞추려면 1200px로 수정,
-    메인과 동일하게 넓게 쓰고 싶다면 1400px 유지 */
-    max-width: 1400px; 
+    max-width: 1400px;
     margin: 0 auto;
     padding: 60px 24px 40px;
 }
 
-/* ------------------------------------------- */
-/* 상단 섹션: 문구(왼쪽) - SNS(오른쪽) 배치 */
-/* ------------------------------------------- */
+/* 상단 영역 */
 .topSection {
     display: flex;
-    justify-content: space-between; 
-    align-items: flex-end; /* 바닥 선에 맞춰 정렬 */
+    justify-content: space-between;
+    align-items: flex-end;
     margin-bottom: 40px;
     padding-bottom: 40px;
     border-bottom: 1px solid #ddd;
-    flex-wrap: wrap; /* 화면 작아지면 줄바꿈 */
+    flex-wrap: wrap;
     gap: 20px;
 }
-
-/* .messageBox {
-    /* 별도 마진 불필요
-} */
 
 .messageTitle {
     font-size: 28px;
@@ -40,14 +38,11 @@
     line-height: 1.4;
 }
 
-/* ------------------------------------------- */
-/* SNS 컨테이너 수정 */
-/* ------------------------------------------- */
+/* SNS */
 .snsContainer {
     display: flex;
-    gap: 30px; /* 아이콘 간격 */
+    gap: 30px;
     align-items: center;
-    /* ★ margin-left: calc(...) 제거! Flexbox가 알아서 정렬해줌 */
 }
 
 .snsLink {
@@ -84,9 +79,7 @@
     line-height: 1.3;
 }
 
-/* ------------------------------------------- */
-/* 중단 섹션: 로고(왼쪽) - 정보(오른쪽) */
-/* ------------------------------------------- */
+/* 중단 */
 .middleSection {
     display: flex;
     justify-content: space-between;
@@ -96,7 +89,7 @@
 }
 
 .logoContainer {
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
 
 .logoImage {
@@ -104,22 +97,20 @@
     height: auto;
 }
 
-/* ------------------------------------------- */
-/* 오른쪽 정보 섹션 수정 */
-/* ------------------------------------------- */
+/* 오른쪽 정보 */
 .rightSection {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    align-items: flex-end; /* 텍스트들을 오른쪽 정렬 */
-    text-align: right;     /* 텍스트 자체도 오른쪽 정렬 */
+    align-items: flex-end;
+    text-align: right;
 }
 
 .menuLinks {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
-    justify-content: flex-end; /* 메뉴들도 오른쪽 끝으로 */
+    justify-content: flex-end;
 }
 
 .menuLink {
@@ -146,13 +137,13 @@
 }
 
 .divider {
-    border-top: 1px solid #ddd; /* 필요 없다면 제거 */
+    border-top: 1px solid #ddd;
     width: 100%;
     padding-top: 10px;
     margin-top: 10px;
 }
 
-.copyright {
+.username {
     font-size: 13px;
     color: #999;
     margin: 0;

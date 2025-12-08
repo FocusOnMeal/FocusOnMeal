@@ -83,7 +83,7 @@ const useParallaxScroll = ({ containerRef, sections }) => {
             setTimeout(() => {
                 isSnapingRef.current = false;
                 setIsTransitioning(false);
-            }, 1000);
+            }, 800); // 더 빠른 전환
         },
         [containerRef]
     );
@@ -96,7 +96,6 @@ const useParallaxScroll = ({ containerRef, sections }) => {
         if (!container) return;
 
         let ticking = false;
-        let snapTimeout = null;
 
         const updateScroll = () => {
             const scrollTop = container.scrollTop;
@@ -107,16 +106,17 @@ const useParallaxScroll = ({ containerRef, sections }) => {
 
             let newSection = 0;
 
-            // 🔥 현재 섹션 정확하게 판단 (중간 지점 기준)
+            // 🔥 현재 섹션 정확하게 판단
             for (let i = 0; i < sections.length - 1; i++) {
-                const sectionEnd = offsets[i] + heights[i];
+                const sectionStart = offsets[i];
+                const sectionHeight = heights[i];
+                const sectionEnd = sectionStart + sectionHeight;
                 
-                // 현재 섹션의 80% 이상 지나면 다음 섹션으로 간주
-                if (scrollTop >= offsets[i] && scrollTop < offsets[i] + heights[i] * 0.8) {
+                // 섹션의 60% 지점을 기준으로 판단
+                if (scrollTop >= sectionStart && scrollTop < sectionStart + sectionHeight * 0.6) {
                     newSection = i;
                     break;
-                } else if (scrollTop >= offsets[i] + heights[i] * 0.8 && scrollTop < sectionEnd) {
-                    // 80~100% 구간이면 다음 섹션으로 간주
+                } else if (scrollTop >= sectionStart + sectionHeight * 0.6 && scrollTop < sectionEnd) {
                     newSection = Math.min(i + 1, sections.length - 1);
                     break;
                 }
@@ -132,18 +132,13 @@ const useParallaxScroll = ({ containerRef, sections }) => {
                 setCurrentSection(newSection);
             }
 
-            // 🔥 첫 페이지에서 90% 이상 스크롤하면 자동으로 2페이지로 스냅
+            // 🔥 첫 페이지에서 55% 이상 스크롤하면 즉시 2페이지로 스냅
             if (currentSection === 0 && !isSnapingRef.current) {
                 const firstSectionHeight = heights[0];
                 const scrollProgress = scrollTop / firstSectionHeight;
                 
-                if (scrollProgress > 0.92) { // 92% 이상 스크롤 시
-                    clearTimeout(snapTimeout);
-                    snapTimeout = setTimeout(() => {
-                        if (!isSnapingRef.current) {
-                            snapToSection(1);
-                        }
-                    }, 100);
+                if (scrollProgress > 0.55) {
+                    snapToSection(1);
                 }
             }
 
@@ -166,38 +161,36 @@ const useParallaxScroll = ({ containerRef, sections }) => {
             const heights = sectionHeightsRef.current;
             const offsets = sectionOffsetsRef.current;
 
-            // ⭐ 첫 페이지에서는 일정 지점 이후에만 스냅 적용
+            // ⭐ 첫 페이지에서는 50% 이후 즉시 스냅
             if (sec === 0) {
                 const firstSectionHeight = heights[0];
                 const scrollProgress = scrollTop / firstSectionHeight;
 
-                // 85% 이상 스크롤했고 아래로 스크롤 중이면 다음 섹션으로
-                if (scrollProgress > 0.85 && e.deltaY > 0 && !isSnapingRef.current) {
+                if (scrollProgress > 0.5 && e.deltaY > 0 && !isSnapingRef.current) {
                     e.preventDefault();
                     snapToSection(1);
                     return;
                 }
                 
-                // 일반 스크롤 허용
-                return;
+                return; // 일반 스크롤 허용
             }
 
-            // ⭐ 두 번째 페이지 - 정확한 위치 판단
+            // ⭐ 두 번째 페이지
             if (sec === 1) {
                 const secondSectionStart = offsets[1];
                 const secondSectionHeight = heights[1];
                 const relativeScroll = scrollTop - secondSectionStart;
                 const sectionProgress = relativeScroll / secondSectionHeight;
 
-                // 현재 섹션의 20% 이하면 이전 섹션으로
-                if (sectionProgress < 0.2 && e.deltaY < 0 && !isSnapingRef.current) {
+                // 섹션의 15% 이하면 이전 섹션으로
+                if (sectionProgress < 0.15 && e.deltaY < 0 && !isSnapingRef.current) {
                     e.preventDefault();
                     snapToSection(0);
                     return;
                 }
 
-                // 현재 섹션의 80% 이상이면 다음 섹션으로
-                if (sectionProgress > 0.8 && e.deltaY > 0 && !isSnapingRef.current) {
+                // 섹션의 85% 이상이면 다음 섹션으로
+                if (sectionProgress > 0.85 && e.deltaY > 0 && !isSnapingRef.current) {
                     e.preventDefault();
                     snapToSection(2);
                     return;
@@ -213,9 +206,9 @@ const useParallaxScroll = ({ containerRef, sections }) => {
                 clearTimeout(wheelTimeoutRef.current);
                 wheelTimeoutRef.current = setTimeout(() => {
                     wheelAccumRef.current = 0;
-                }, 120);
+                }, 150);
 
-                const THRESHOLD = 100;
+                const THRESHOLD = 120;
 
                 if (Math.abs(wheelAccumRef.current) >= THRESHOLD) {
                     if (wheelAccumRef.current > 0) {
@@ -235,15 +228,15 @@ const useParallaxScroll = ({ containerRef, sections }) => {
                 const relativeScroll = scrollTop - thirdSectionStart;
                 const sectionProgress = relativeScroll / thirdSectionHeight;
 
-                // 현재 섹션의 20% 이하면 이전 섹션으로
-                if (sectionProgress < 0.2 && e.deltaY < 0 && !isSnapingRef.current) {
+                // 섹션의 15% 이하면 이전 섹션으로
+                if (sectionProgress < 0.15 && e.deltaY < 0 && !isSnapingRef.current) {
                     e.preventDefault();
                     snapToSection(1);
                     return;
                 }
 
-                // 현재 섹션의 80% 이상이면 다음 섹션으로
-                if (sectionProgress > 0.8 && e.deltaY > 0 && !isSnapingRef.current) {
+                // 섹션의 85% 이상이면 다음 섹션으로
+                if (sectionProgress > 0.85 && e.deltaY > 0 && !isSnapingRef.current) {
                     e.preventDefault();
                     snapToSection(3);
                     return;
@@ -259,9 +252,9 @@ const useParallaxScroll = ({ containerRef, sections }) => {
                 clearTimeout(wheelTimeoutRef.current);
                 wheelTimeoutRef.current = setTimeout(() => {
                     wheelAccumRef.current = 0;
-                }, 120);
+                }, 150);
 
-                const THRESHOLD = 100;
+                const THRESHOLD = 120;
 
                 if (Math.abs(wheelAccumRef.current) >= THRESHOLD) {
                     if (wheelAccumRef.current > 0) {
@@ -286,7 +279,6 @@ const useParallaxScroll = ({ containerRef, sections }) => {
             container.removeEventListener("wheel", handleWheel);
             if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
             clearTimeout(wheelTimeoutRef.current);
-            clearTimeout(snapTimeout);
         };
     }, [sections, currentSection, isTransitioning, snapToSection, containerRef]);
 
@@ -317,12 +309,10 @@ const useParallaxScroll = ({ containerRef, sections }) => {
             const progress = Math.min(scroll / height, 1);
             const translateY = -scroll * speed + initialOffset;
 
-            // 90% 이상 스크롤 시 빠르게 페이드아웃
+            // 50% 이상 스크롤 시 빠르게 페이드아웃
             let opacity = 1;
-            if (progress > 0.9) {
-                opacity = Math.max(0, 1 - ((progress - 0.9) / 0.1) * 3);
-            } else {
-                opacity = Math.max(0.3, 1 - progress * 0.5);
+            if (progress > 0.5) {
+                opacity = Math.max(0, 1 - ((progress - 0.5) / 0.5) * 2);
             }
 
             if (shouldScale) {

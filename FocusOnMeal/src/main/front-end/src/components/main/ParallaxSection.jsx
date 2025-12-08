@@ -1,25 +1,23 @@
 import React, { useEffect, useRef, useMemo } from "react";
 import cloudImg from "../../assets/parallax/cloudzip.png";
 import mountainImg from "../../assets/parallax/mountainzip.png";
-import cornImg from "../../assets/parallax/cornfieldzip.png";
-import grassImg from "../../assets/parallax/grasszip.png";
 import bushImg from "../../assets/parallax/bushzip.png";
 
 const ParallaxEffects = ({ currentSection }) => {
     const layerRefs = useRef([]);
     const containerRef = useRef(null);
 
-    // 🔥 패럴랙스 레이어 설정 - 각 레이어마다 명확히 다른 속도
+    // 🔥 패럴랙스 레이어 설정 (높이와 수풀 bottom 값 수정)
     const layers = useMemo(() => [
-        { src: cloudImg, speed: 0.2, top: "-15%", minH: "130vh", z: 1, scale: false },
-        { src: mountainImg, speed: 0.4, top: "-3%", minH: "120vh", z: 2, scale: false },
-        { src: cornImg, speed: 0.6, top: "-3%", minH: "120vh", z: 3, scale: false },
-        { src: grassImg, speed: 0.85, top: "-3%", minH: "120vh", z: 4, scale: false },
-        { src: bushImg, speed: 1.2, bottom: "-15", minH: "100vh", z: 5, scale: true },
+        // 1. 구름: 높이 넉넉하게 확보
+        { src: cloudImg, speed: 0.2, top: "-15%", height: "200vh", z: 1, scale: false },
+        // 2. 산: 높이 넉넉하게 확보
+        { src: mountainImg, speed: 0.4, top: "0", height: "180vh", z: 2, scale: false },
+        // 3. 수풀: bottom을 음수로 설정하고 높이를 충분히 확보하여 잘림 방지
+        { src: bushImg, speed: 1.2, bottom: "-30vh", height: "180vh", z: 5, scale: true },
     ], []);
 
     useEffect(() => {
-        // 스크롤 컨테이너 찾기
         const findScrollContainer = () => {
             let el = layerRefs.current[0];
             while (el && el.parentElement) {
@@ -43,12 +41,10 @@ const ParallaxEffects = ({ currentSection }) => {
         const handleParallax = () => {
             if (!running) return;
 
-            // 🔥 올바른 스크롤 값 가져오기
             const scrollY = scrollContainer === window 
                 ? window.scrollY 
                 : scrollContainer.scrollTop;
             
-            // 스크롤이 변하지 않으면 스킵
             if (scrollY === lastScrollY) {
                 animationFrameId = requestAnimationFrame(handleParallax);
                 return;
@@ -56,49 +52,18 @@ const ParallaxEffects = ({ currentSection }) => {
             lastScrollY = scrollY;
 
             const viewportHeight = window.innerHeight;
-            const firstSectionHeight = viewportHeight * 1.5;
+            // 섹션 높이 (스크롤이 완료되는 지점)
+            const firstSectionHeight = viewportHeight * 1.5; 
 
-            // 🔥 첫 섹션 벗어났을 때 페이드아웃
-            if (currentSection !== 0) {
-                const fadeStart = firstSectionHeight;
-                const fadeDistance = viewportHeight * 0.5;
-                const fadeProgress = Math.min((scrollY - fadeStart) / fadeDistance, 1);
-                
-                layerRefs.current.forEach((el, i) => {
-                    if (!el) return;
-                    
-                    const { speed, scale } = layers[i];
-                    const translateY = -(scrollY * speed);
-                    
-                    const progress = scrollY / firstSectionHeight;
-                    let scaleValue = 1;
-                    if (scale) {
-                        scaleValue = 1 + (progress * 0.4);
-                    }
-                    
-                    const combined = scale 
-                        ? `translate3d(0, ${translateY}px, 0) scale(${scaleValue})`
-                        : `translate3d(0, ${translateY}px, 0)`;
-                    
-                    const opacity = Math.max(0, 1 - fadeProgress);
-                    
-                    el.style.transform = combined;
-                    el.style.opacity = opacity.toString();
-                });
-                
-                animationFrameId = requestAnimationFrame(handleParallax);
-                return;
-            }
-
-            // 🔥 섹션 0일 때 - 풀 패럴랙스 효과
-            const progress = Math.min(scrollY / firstSectionHeight, 1);
+            // 🔥 스크롤 진행률 (0.0 ~ 1.0)
+            const progress = Math.min(scrollY / firstSectionHeight, 1); 
 
             layerRefs.current.forEach((el, i) => {
                 if (!el) return;
-
+                
                 const { speed, scale } = layers[i];
                 
-                // 🎯 각 레이어마다 독립적인 패럴랙스 이동 (음수로 위로 올라감)
+                // 1. 변환 계산
                 const translateY = -(scrollY * speed);
                 
                 let scaleValue = 1;
@@ -110,14 +75,25 @@ const ParallaxEffects = ({ currentSection }) => {
                     ? `translate3d(0, ${translateY}px, 0) scale(${scaleValue})`
                     : `translate3d(0, ${translateY}px, 0)`;
 
-                // 🔥 90% 이상 스크롤 시 빠르게 페이드아웃
+                // 2. 투명도 (Opacity) 계산
                 let opacity = 1;
-                if (progress > 0.9) {
-                    opacity = Math.max(0, 1 - ((progress - 0.9) / 0.1) * 5);
-                } else {
-                    opacity = Math.max(0.5, 1 - (progress * 0.3));
+
+                if (currentSection === 0) {
+                    // 섹션 0일 때: 스크롤 끝(70% 지점부터) 빠르게 페이드아웃
+                    if (progress > 0.7) {
+                        // 70%부터 100%까지 (0.3 구간) 투명도를 1에서 0으로 선형적으로 낮춤
+                        opacity = Math.max(0, 1 - ((progress - 0.7) / 0.3)); 
+                    } else {
+                        // 일반 스크롤 시에도 약간 투명도를 낮춰 뒷 배경과 융화
+                        opacity = Math.max(0.6, 1 - (progress * 0.4));
+                    }
+                } 
+                else {
+                    // 💥 섹션 0이 아닐 때: 즉시 투명도 0으로 설정하여 잔상 제거
+                    opacity = 0;
                 }
 
+                // 3. 스타일 적용
                 el.style.transform = combined;
                 el.style.opacity = opacity.toString();
             });
@@ -146,7 +122,6 @@ const ParallaxEffects = ({ currentSection }) => {
             scrollContainer.addEventListener('scroll', handleScrollEvent, { passive: true });
         }
 
-        // 초기 실행
         handleParallax();
 
         return () => {
@@ -162,7 +137,17 @@ const ParallaxEffects = ({ currentSection }) => {
     }, [currentSection, layers]);
 
     return (
-        <>
+        <div 
+            style={{
+                position: 'absolute', 
+                top: 0, 
+                left: 0, 
+                width: '100%', 
+                height: '100%', 
+                zIndex: 1, 
+                overflow: 'hidden' 
+            }}
+        >
             {/* 아래 그라디언트 오버레이 */}
             <div
                 style={{
@@ -189,20 +174,24 @@ const ParallaxEffects = ({ currentSection }) => {
                         position: "absolute",
                         left: 0,
                         width: "100%",
-                        height: "auto",
+                        height: layer.height, 
                         objectFit: "cover",
                         willChange: "transform",
+                        // 렌더링 안정성 추가
+                        backfaceVisibility: "hidden", 
+                        perspective: "1000px", 
+                        
                         transformOrigin: layer.scale ? "center bottom" : "center",
-                        top: layer.top,
+                        top: layer.bottom ? 'unset' : layer.top, 
                         bottom: layer.bottom,
-                        minHeight: layer.minH,
                         zIndex: layer.z,
                         pointerEvents: "none",
-                        opacity: 1,
+                        // opacity는 useEffect에서 제어
+                        opacity: 1, 
                     }}
                 />
             ))}
-        </>
+        </div>
     );
 };
 
