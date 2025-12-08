@@ -17,12 +17,35 @@
 
 .main h1 {
     font-size: 32px;
-    color: #5D7D45; /* 진한 올리브색 타이틀 */
+    color: #5D7D45;
     text-align: center;
     margin-bottom: 50px;
-    letter-spacing: 1px;
+    
+    /* 아이콘 배치를 위해 필수 */
+    display: inline-block;
+    position: relative;
+    /* 화면 중앙 정렬 보정 */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
+/* 새싹 아이콘 추가 */
+.main h1::after {
+    content: '🌱';
+    font-size: 24px;
+    position: absolute;
+    top: -15px;    /* 글자 오른쪽 위 */
+    right: -25px;
+    
+    /* 살랑거리는 애니메이션 */
+    animation: sway 2s ease-in-out infinite;
+    transform-origin: bottom center; /* 아래쪽을 중심으로 흔들림 */
+}
+
+@keyframes sway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(10deg); }
+}
 /* ============================= */
 /* 검색 박스 (알약 모양) */
 /* ============================= */
