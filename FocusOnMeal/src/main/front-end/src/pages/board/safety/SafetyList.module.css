@@ -28,9 +28,9 @@
 }
 
 /* 확성기 아이콘 추가 */
-.main h1::after {
-    content: '🚨'; 
-    font-size: 28px;
+.main h1::before{
+    content: '📣'; 
+    font-size: 24px;
     animation: shout 1s ease-in-out infinite alternate;
 }
 
