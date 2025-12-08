@@ -10,8 +10,8 @@
 .container {
     display: flex;
     min-height: 100vh;
-    --background-color: #fcfdfa; /* 아주 연한 미색 배경 */
-    --font-family: 'Jua', "Noto Sans KR", sans-serif;
+    background-color: #fcfdfa; /* 아주 연한 미색 배경 */
+    font-family: 'Jua', "Noto Sans KR", sans-serif;
 }
 
 .content {
@@ -123,12 +123,13 @@
 .randomButton {
     padding: 0 24px;
     /* 신비로운 라벤더 색상 */
-    background-color: #CE93D8; 
+    background-color: #CE93D8;
     color: white;
     border: none;
     border-radius: 25px;
     font-size: 15px;
     font-family: inherit;
+    font-weight: normal;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
@@ -162,7 +163,7 @@
     font-size: 13px;
     margin-top: 8px;
     padding-left: 10px;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .validationSuccess {
@@ -206,7 +207,7 @@
 
 .strengthText {
     font-size: 13px;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .strengthBarContainer {
@@ -241,7 +242,7 @@
     border-radius: 25px;
     font-size: 16px;
     font-family: inherit;
-    font-weight: bold;
+    font-weight: normal;
     cursor: pointer;
     transition: all 0.2s;
 }

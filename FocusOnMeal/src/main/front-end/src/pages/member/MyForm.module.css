@@ -5,7 +5,7 @@
     align-items: center;
     justify-content: center;
     background: white;
-    font-family: 'Malgun Gothic', sans-serif;
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
     padding: 20px;
 }
 
@@ -142,6 +142,8 @@
     text-decoration: underline;
     cursor: pointer;
     font-size: 14px;
+    font-family: inherit;
+    font-weight: normal;
     padding: 0;
     transition: color 0.3s ease;
 }
@@ -161,7 +163,8 @@
     padding: 16px;
     border-radius: 10px;
     font-size: 18px;
-    font-weight: bold;
+    font-family: inherit;
+    font-weight: normal;
     color: white;
     border: none;
     cursor: pointer;

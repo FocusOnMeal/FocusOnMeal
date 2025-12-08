@@ -1,7 +1,8 @@
 .container {
     display: flex;
     min-height: 100vh;
-    background-color: #f9fafb;
+    background-color: #fcfdfa;
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
 .content {
@@ -24,9 +25,10 @@
 
 .title {
     font-size: 34px;
-    color: #5D7D45; /* 진한 올리브 텍스트 */
+    font-weight: normal;
+    color: #5D7D45;
     text-align: center;
-    margin-bottom: 60px; 
+    margin-bottom: 60px;
     letter-spacing: 1px;
 }
 
@@ -46,7 +48,7 @@
 
 .infoBox p {
     margin: 0;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .grid {
@@ -63,14 +65,16 @@
     justify-content: center;
     cursor: pointer;
     user-select: none;
-    
+
     /* 버튼 스타일 */
     padding: 10px 20px;
-    border: 2px solid #e3f2c1; /* 기본 테두리 */
-    border-radius: 25px; /* 알약 모양 */
+    border: 2px solid #e3f2c1;
+    border-radius: 25px;
     background-color: #fff;
     color: #888;
     font-size: 16px;
+    font-family: inherit;
+    font-weight: normal;
     transition: all 0.2s ease;
 }
 
@@ -81,12 +85,12 @@
     transform: translateY(-2px);
 }
 
-/* ✅ 선택되었을 때 스타일 (핵심) */
+/* 선택되었을 때 스타일 */
 .checkboxLabel.checked {
-    background-color: #8CBF56; /* 진한 연두색 배경 */
+    background-color: #8CBF56;
     border-color: #8CBF56;
-    color: white; /* 글씨 하얗게 */
-    font-weight: bold;
+    color: white;
+    font-weight: normal;
     box-shadow: 0 4px 10px rgba(140, 191, 86, 0.3);
     transform: translateY(-2px);
 }
@@ -113,7 +117,7 @@
     font-size: 15px;
     color: #5D7D45;
     margin-bottom: 10px;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .selectedList {
@@ -136,15 +140,15 @@
 
 .saveButton {
     padding: 15px 60px;
-    background-color: #5D7D45; /* 진한 쑥색 */
+    background-color: #5D7D45;
     color: white;
     border: none;
     border-radius: 30px;
     font-size: 18px;
     font-family: inherit;
-    font-weight: bold;
+    font-weight: normal;
     cursor: pointer;
-    box-shadow: 0 4px 0 #3b5228; /* 입체감 그림자 */
+    box-shadow: 0 4px 0 #3b5228;
     transition: all 0.2s;
 }
 

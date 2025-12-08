@@ -225,7 +225,21 @@ function IngredientDetail() {
                     const trendResponse = await axios.get(
                         `/api/mypage/price-chart/${id}?days=30`
                     );
-                    setPriceTrendData(trendResponse.data);
+                    // 최근 8개 데이터만 그래프에 표시, 전체 기간 정보는 별도 저장
+                    const trendData = trendResponse.data;
+                    if (trendData?.dataPoints?.length > 8) {
+                        // 전체 기간 정보 저장
+                        trendData.fullStartDate = trendData.startDate;
+                        trendData.fullEndDate = trendData.endDate;
+                        trendData.fullDataCount = trendData.dataPoints.length;
+
+                        // 그래프용 최근 8개만 추출
+                        const slicedData = trendData.dataPoints.slice(-8);
+                        trendData.dataPoints = slicedData;
+                        trendData.startDate = slicedData[0]?.date;
+                        trendData.endDate = slicedData[slicedData.length - 1]?.date;
+                    }
+                    setPriceTrendData(trendData);
                 } catch (error) {
                     console.error('가격 추이 데이터 로드 실패:', error);
                 }
@@ -436,11 +450,17 @@ function IngredientDetail() {
 		    </div>
 		</div>
             
+            <h1 className={styles.itemTitle}>
+                {itemInfo.name}
+                <span className={styles.categoryInTitle}>
+                    ({itemInfo.category})
+                </span>
+            </h1>
+
             <div className={styles.mainContent}>
-                
+
                 {/* 왼쪽: 영양 성분 & 이미지 영역 */}
                 <div className={styles.leftColumn}>
-                    
                     <div className={styles.nutritionSection}>
                         <div className={styles.imageWrapper}>
                             <img 
@@ -561,13 +581,6 @@ function IngredientDetail() {
 
                 {/* 오른쪽: 정보 영역 */}
                 <div className={styles.rightColumn}>
-                    <h1 className={styles.itemTitle}>
-                        {itemInfo.name}
-                        <span className={styles.categoryInTitle}>
-                            ({itemInfo.category})
-                        </span>
-                    </h1>
-                    
                     <div className={styles.infoBoxTop}>
                         {/* [수정] 상단 요약 정보 박스: flex column과 gap을 사용하여 줄 간격 일정하게 맞춤 */}
                         <div className={styles.itemSummary} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -868,9 +881,14 @@ function IngredientDetail() {
                                 color: '#666',
                                 textAlign: 'center'
                             }}>
-                                📅 조회 기간: {priceTrendData.startDate} ~ {priceTrendData.endDate}
+                                📊 그래프 기간: {priceTrendData.startDate} ~ {priceTrendData.endDate}
+                                {priceTrendData.fullStartDate && (
+                                    <span style={{marginLeft: '15px', color: '#888'}}>
+                                        | 📈 분석 기간: {priceTrendData.fullStartDate} ~ {priceTrendData.fullEndDate}
+                                    </span>
+                                )}
                                 {pricePrediction?.prediction && (
-                                    <span style={{marginLeft: '10px', color: '#FF6B6B', fontWeight: 600}}>
+                                    <span style={{marginLeft: '15px', color: '#FF6B6B', fontWeight: 600}}>
                                         | 🔮 예측: {pricePrediction.prediction.trend} ({pricePrediction.prediction.confidence}% 신뢰도)
                                     </span>
                                 )}

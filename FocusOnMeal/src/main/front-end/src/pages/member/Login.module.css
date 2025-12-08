@@ -5,7 +5,7 @@
     align-items: center;
     justify-content: center;
     background: white;
-    font-family: 'Malgun Gothic', sans-serif;
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
     padding: 20px;
 }
 
@@ -73,6 +73,8 @@
     width: 100%;
     padding: 15px 20px;
     font-size: 16px;
+    font-family: inherit;
+    font-weight: normal;
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     background: #fafafa;
@@ -115,7 +117,8 @@
     width: 100%;
     padding: 16px;
     font-size: 18px;
-    font-weight: bold;
+    font-family: inherit;
+    font-weight: normal;
     color: white;
     background: #67932A;
     border: none;

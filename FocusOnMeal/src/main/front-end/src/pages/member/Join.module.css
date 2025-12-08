@@ -6,7 +6,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    font-family: 'Malgun Gothic', sans-serif;
+    font-family: 'Jua', 'Noto Sans KR', sans-serif;
 }
 
 /* 메인 카드 */
@@ -72,6 +72,8 @@
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-size: 16px;
+    font-family: inherit;
+    font-weight: normal;
     background-color: #fafafa;
     color: #333;
     transition: all 0.3s ease;
@@ -124,7 +126,8 @@
     color: white;
     border: none;
     border-radius: 10px;
-    font-weight: bold;
+    font-family: inherit;
+    font-weight: normal;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -172,7 +175,9 @@
     border-radius: 10px;
     cursor: pointer;
     white-space: nowrap;
-    font-weight: bold;
+    font-family: inherit;
+    font-weight: normal;
+    font-size: 16px;
     transition: all 0.3s ease;
 }
 
@@ -246,6 +251,8 @@
     border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-size: 16px;
+    font-family: inherit;
+    font-weight: normal;
     background-color: #fafafa;
     color: #333;
     transition: all 0.3s ease;
