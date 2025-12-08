@@ -22,6 +22,7 @@ const MealPlan = () => {
     // Refs
     const resultBoxRef = useRef(null);
     const lastMealCardRef = useRef(null);
+    const chatMessagesRef = useRef(null);
 
     // 새로운 식단 카드가 추가되면 자동 스크롤
     useEffect(() => {
@@ -35,6 +36,13 @@ const MealPlan = () => {
             }, 100); // 카드 렌더링 후 스크롤
         }
     }, [mealPlans]);
+
+    // 채팅 메시지가 추가되면 자동 스크롤
+    useEffect(() => {
+        if (chatMessagesRef.current) {
+            chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+        }
+    }, [chatMessages]);
 
     // DB에서 알레르기 목록 가져오기
     useEffect(() => {
@@ -422,7 +430,7 @@ const MealPlan = () => {
                             {chatMessages.length === 0 && (
                                 <div id="chatPlaceholder">AI에게 식단 추천받기</div>
                             )}
-                            <div className={`chat-messages ${chatMessages.length > 0 ? 'active' : ''}`}>
+                            <div className={`chat-messages ${chatMessages.length > 0 ? 'active' : ''}`} ref={chatMessagesRef}>
                                 {chatMessages.map((msg, index) => (
                                     <div key={index} className={`message ${msg.type}`}>
                                         {msg.text}
