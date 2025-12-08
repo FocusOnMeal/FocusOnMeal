@@ -25,19 +25,19 @@ const NoticeList = () => {
             if(!Params.has('page')){
                 Params.set('page','1');
             }
-            
-            fetch(`/api/board/notice/list?${Params.toString()}`)
-            .then(res => res.json())
-            .then(data => {
-                console.log(data);
-                setImportantList(data.importantList || []); 
-                setNoticeList(data.list || []);
-                setPageInfo(data.pi);
 
-                setKeyword(searchParams.get('keyword') || '');
-                setSearchType(searchParams.get('type') || 'all');
-            })
-            .catch(err => console.log(err))
+            fetch(`/api/board/notice/list?${Params.toString()}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    setImportantList(data.importantList || []);
+                    setNoticeList(data.list || []);
+                    setPageInfo(data.pi);
+
+                    setKeyword(searchParams.get('keyword') || '');
+                    setSearchType(searchParams.get('type') || 'all');
+                })
+                .catch(err => console.log(err))
         }
 
         fetchNoticeList();
@@ -95,7 +95,7 @@ const NoticeList = () => {
                 newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
             } else {
                 // 새로운 컬럼 클릭 시 기본 정렬 설정 (보통 최신순/높은순인 desc를 선호하면 desc로 설정)
-                newOrder = 'desc'; 
+                newOrder = 'desc';
             }
 
             Params.set('sortColumn', column);
@@ -119,37 +119,38 @@ const NoticeList = () => {
         <>
             <div className={styles.container}>
                 <div className={styles.main}>
-                <h1>공지사항</h1>
+                    <h1>공지사항</h1>
 
-                <form onSubmit={handleSearch} className ={styles.searchBox}>
-                    <select 
-                        name="type"
-                        value={searchType}
-                        onChange={handleTypeChange}
-                    >
-                        <option value="all">제목+내용</option>
-                        <option value="title">제목</option>
-                        <option value="content">내용</option>
-                    </select>
-                    <input 
-                        type="text" 
-                        name="keyword" 
-                        placeholder="검색어를 입력하세요."
-                        value={keyword}
-                        onChange={handleKeywordChange}
-                        className={styles.input}
-                    />
-                    <button type="submit" className={styles.searchBtn}>검색</button>
-                </form>
+                    <form onSubmit={handleSearch} className ={styles.searchBox}>
+                        <select
+                            name="type"
+                            value={searchType}
+                            onChange={handleTypeChange}
+                            className={styles.select}
+                        >
+                            <option value="all">제목+내용</option>
+                            <option value="title">제목</option>
+                            <option value="content">내용</option>
+                        </select>
+                        <input
+                            type="text"
+                            name="keyword"
+                            placeholder="검색어를 입력하세요."
+                            value={keyword}
+                            onChange={handleKeywordChange}
+                            className={styles.input}
+                        />
+                        <button type="submit" className={styles.searchBtn}>검색</button>
+                    </form>
 
-                <table className ={styles.noticeTable}>
-                    <thead>
+                    <table className ={styles.noticeTable}>
+                        <thead>
                         <tr>
                             <th>번호</th>
                             <th onClick={() => handleSort('noticeSubject')} className={styles.sortable}>
                                 제목 {renderSortIcon('noticeSubject')}
                             </th>
-                            <th>작성자</th> 
+                            <th>작성자</th>
                             <th onClick={() => handleSort('noticeCreateAt')} className={styles.sortable}>
                                 작성일 {renderSortIcon('noticeCreateAt')}
                             </th>
@@ -157,10 +158,10 @@ const NoticeList = () => {
                                 조회수 {renderSortIcon('viewCount')}
                             </th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         {importantList.map((notice) => (
-                            <tr key={`imp-${notice.noticeNo}`} className={styles.importantRow} style={{backgroundColor: '#f9f9f9'}}>
+                            <tr key={`imp-${notice.noticeNo}`} className={styles.importantRow}>
                                 <td>
                                     <span className={styles.badgeImportant}>필독</span>
                                 </td>
@@ -191,24 +192,24 @@ const NoticeList = () => {
                                     <td>{new Date(notice.noticeCreateAt).toLocaleDateString("ko-KR")}</td>
                                     <td>{notice.viewCount}</td>
                                 </tr>
-                                ))
-                            ) : (
-                                (importantList.length === 0 && noticeList.length === 0) && (
+                            ))
+                        ) : (
+                            (importantList.length === 0 && noticeList.length === 0) && (
                                 <tr>
                                     <td colSpan="5">등록된 공지사항이 없습니다.</td>
                                 </tr>
                             )
                         )}
-                    </tbody>
-                </table>
-                <Pagination
-                    pageInfo={pageInfo}
-                    currentPage={currentPage}
-                    changePage={changePage}
-                />
+                        </tbody>
+                    </table>
+                    <Pagination
+                        pageInfo={pageInfo}
+                        currentPage={currentPage}
+                        changePage={changePage}
+                    />
+                </div>
             </div>
-        </div>
-        <Footer />
+            <Footer />
         </>
     );
 };

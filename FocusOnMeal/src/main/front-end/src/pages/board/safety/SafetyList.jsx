@@ -170,13 +170,14 @@ const SafetyAlertList = () => {
         <>
             <div className={styles.container}>
                 <div className={styles.main}>
-                <h1>안전 정보 뉴스</h1>
+                <h1 className={styles.title}>안전 정보 뉴스</h1>
 
                 <form onSubmit={handleSearch} className={styles.searchBox}>
-                    <select 
+                    <select
                         name="type"
                         value={searchType}
                         onChange={handleTypeChange}
+                        className={styles.select}
                     >
                         <option value="all">전체</option>
                         <option value="title">제목</option>

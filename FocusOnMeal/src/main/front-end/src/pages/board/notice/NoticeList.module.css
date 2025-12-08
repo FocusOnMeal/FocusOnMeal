@@ -1,148 +1,213 @@
 /* ============================= */
-/* 기본 레이아웃 */
+/* 기본 레이아웃 & 폰트 */
 /* ============================= */
 .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 60px auto;
-    font-family: "Noto Sans KR", sans-serif;
+    font-family: 'Jua', "Noto Sans KR", sans-serif;
+    color: #333;
 }
 
 .main {
     width: 100%;
+    padding: 20px;
+    background-color: transparent;
 }
 
-.title {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 24px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
+.main h1 {
+    font-size: 36px;
+    color: #5D7D45; /* 진한 올리브색 타이틀 */
+    text-align: center;
+    margin-bottom: 50px;
+    letter-spacing: 1px;
 }
 
 /* ============================= */
-/* 검색 박스 */
+/* 검색 박스 (알약 모양) */
 /* ============================= */
 .searchBox {
+    width: 100%;
+    box-sizing: border-box;
+
     display: flex;
     justify-content: flex-end;
+
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 30px;
+    align-items: center;
 }
 
-.select, .input {
-    border: 1px solid #ccc;
-    padding: 6px 10px;
-    border-radius: 4px;
-}
+/* Select 박스 */
+.select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 
-.searchBtn {
-    border: 1px solid #67932A;
-    background-color: #67932A;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
+    width: 130px;
+    height: 45px;
+    padding: 0 20px 0 20px;
 
-.searchBtn:hover {
-    background-color: #7AA83A;
-    border-color: #7AA83A;
-}
+    border: 2px solid #e3f2c1; /* 연두색 테두리 */
+    border-radius: 25px;       /* 둥글게 */
+    background-color: #fff;
 
-/* ============================= */
-/* 테이블 기본 */
-/* ============================= */
-.noticeTable {
-    width: 100%;
-    border-collapse: collapse;
-    border-top: 2px solid #444;
-}
-
-.noticeTable th {
-    background-color: #f8f9fa;
+    font-family: inherit;
+    font-size: 15px;
+    color: #5D7D45;
     font-weight: 600;
-    height: 35px; 
-    vertical-align: middle;
+
+    /* 초록색 화살표 아이콘 */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235D7D45' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 14px;
+
+    outline: none;
+    cursor: pointer;
 }
 
-.noticeTable th, 
-.noticeTable td {
-    padding: 12px 8px;
-    border-bottom: 1px solid #eee;
-    text-align: center;
-    vertical-align: middle;
+/* Input 박스 */
+.input {
+    height: 45px;
+    width: 200px;
+    border: 2px solid #e3f2c1;
+    padding: 0 15px;
+    border-radius: 25px;
+    background-color: #fff;
+    outline: none;
+    font-family: inherit;
+    color: #666;
     font-size: 15px;
 }
 
-/* 행 hover */
-.noticeTable tbody tr:hover {
-    background-color: #fafafa;
-    transition: 0.15s ease-in-out;
+.select:focus, .input:focus {
+    border-color: #8CBF56;
 }
 
-/* ============================= */
-/* 정렬 가능한 th (hover + 아이콘 정렬) */
-/* ============================= */
-.noticeTable th.sortable {
+/* 검색 버튼 */
+.searchBtn {
+    height: 45px;
+    border: none;
+    background-color: #e3f2c1; /* 연두색 배경 */
+    color: #5D7D45; /* 진한 글씨 */
+    padding: 0 20px;
+    border-radius: 25px;
     cursor: pointer;
-    user-select: none;
-    position: relative;
-    transition: 0.2s;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.2s;
 }
 
-.noticeTable th.sortable:hover {
-    background-color: #f7f7f7;
+.searchBtn:hover {
+    background-color: #d4e8a8;
+    transform: translateY(-2px);
 }
 
 /* ============================= */
+/* 테이블 스타일 (핵심 디자인) */
+/* ============================= */
+.noticeTable {
+    width: 100%;
+    border-collapse: separate; /* 행 간격을 위해 필수 */
+    border-spacing: 0 12px;    /* 행 사이를 12px씩 띄움 */
+}
+
+/* 헤더 스타일 */
+.noticeTable th {
+    background-color: #e3f2c1; /* 헤더 전체 배경색 */
+    color: #5D7D45;
+    font-weight: normal;
+    font-size: 17px;
+    padding: 18px 10px;
+    border: none;
+}
+
+/* 헤더 양쪽 끝 둥글게 */
+.noticeTable th:first-child { border-top-left-radius: 20px; border-bottom-left-radius: 20px; }
+.noticeTable th:last-child { border-top-right-radius: 20px; border-bottom-right-radius: 20px; }
+
+/* 데이터 셀 공통 스타일 */
+.noticeTable td {
+    padding: 20px 10px;
+    background-color: white;
+    text-align: center;
+    font-size: 16px;
+    color: #444;
+
+    /* 상하 테두리 (좌우는 아래에서 처리) */
+    border-top: 2px solid #e3f2c1;
+    border-bottom: 2px solid #e3f2c1;
+}
+
+/* 행의 첫 번째 칸 (왼쪽 둥글게 + 왼쪽 테두리) */
+.noticeTable td:first-child {
+    border-left: 2px solid #e3f2c1;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+/* 행의 마지막 칸 (오른쪽 둥글게 + 오른쪽 테두리) */
+.noticeTable td:last-child {
+    border-right: 2px solid #e3f2c1;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+/* 행 Hover 효과 */
+.noticeTable tbody tr:hover td {
+    background-color: #fcfef9;
+    border-color: #8CBF56; /* 호버 시 테두리 진하게 */
+    color: #5D7D45;
+    cursor: pointer;
+    transform: scale(1.002);
+    transition: all 0.2s ease;
+}
+
 /* 제목 링크 */
-/* ============================= */
 .noticeTable td a {
     text-decoration: none;
-    color: #333;
+    color: inherit;
+    font-weight: 500;
 }
 
-.noticeTable td a:hover {
-    color: #0796E5;
-    text-decoration: underline;
+/* 정렬 헤더 */
+.sortable:hover {
+    cursor: pointer;
+    color: #3b5228;
 }
 
 /* ============================= */
-/* 필독 / NEW 뱃지 */
+/* 뱃지 및 행 스타일 */
 /* ============================= */
+
+/* [필독] 뱃지 - 코랄 핑크 */
 .badgeImportant {
     display: inline-block;
-    padding: 4px 10px;
-    margin-right: 6px;
-    background-color: #ff4d4f;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 4px;
-    vertical-align: middle;
+    padding: 5px 12px;
+    background-color: #FFAB91;
+    color: white;
+    font-size: 13px;
+    font-weight: lighter;
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(255, 171, 145, 0.4);
 }
 
+/* [NEW] 뱃지 - 민트 */
 .badgeNew {
     display: inline-block;
-    padding: 4px 10px;
-    margin-right: 6px;
-    background-color: #0796E5;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 4px;
-    vertical-align: middle;
+    padding: 4px 8px;
+    margin-right: 8px;
+    background-color: #4DB6AC;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 10px;
 }
 
-/* ============================= */
-/* 중요 공지 강조 행 */
-/* ============================= */
-.importantRow {
-    background-color: #fdf6f6 !important;
-}
-
+/* 중요 공지(필독) 행 스타일 */
 .importantRow td {
-    font-weight: 600;
+    font-weight: bold;
+    color: #5e2b09;
 }
