@@ -193,7 +193,7 @@
 /* 제목 셀 */
 /* ============================= */
 .titleCell {
-    text-align: left !important;
+    text-align: center !important;
     max-width: 400px;
     white-space: nowrap;
     overflow: hidden;
@@ -277,7 +277,7 @@
     font-size: 17px;
     font-weight: normal;
     font-family: inherit;
-    padding: 8px 12px;
+    padding: 0;
     display: flex;
     align-items: center;
     gap: 6px;
